@@ -4,10 +4,18 @@ import type {
   ParagraphNode as ParagraphNodeType,
   TextNode as TextNodeType,
 } from "./types";
+import { cn } from "@/lib/utils";
 
 export const HeadingNode = memo(({ node }: { node: HeadingNodeType }) => {
   return (
-    <h1 data-node-id={node.id} className="text-3xl whitespace-pre-wrap">
+    <h1
+      data-node-id={node.id}
+      className={cn(
+        "text-3xl whitespace-pre-wrap",
+        node.children.length === 0 &&
+          "after:pointer-events-none after:block after:content-['\\00a0']",
+      )}
+    >
       {node.children.map((child) => (
         <TextNode key={child.text} node={child} />
       ))}
@@ -18,12 +26,17 @@ HeadingNode.displayName = "HeadingNode";
 
 export const ParagraphNode = memo(({ node }: { node: ParagraphNodeType }) => {
   return (
-    <p data-node-id={node.id} className="whitespace-pre-wrap">
-      {node.children.length > 0
-        ? node.children.map((child) => (
-            <TextNode key={child.text} node={child} />
-          ))
-        : "\u200B"}
+    <p
+      data-node-id={node.id}
+      className={cn(
+        "whitespace-pre-wrap",
+        node.children.length === 0 &&
+          "after:pointer-events-none after:block after:content-['\\00a0']",
+      )}
+    >
+      {node.children.map((child) => (
+        <TextNode key={child.text} node={child} />
+      ))}
     </p>
   );
 });

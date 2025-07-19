@@ -46,10 +46,16 @@ export type MergeNodesOperation = {
   secondNodeId: string;
 } & OperationBase;
 
+export type InsertParagraphOperation = {
+  type: "insertParagraph";
+  newNodeId: string;
+} & OperationBase;
+
 export type Operation =
   | InsertTextOperation
   | DeleteTextOperation
-  | MergeNodesOperation;
+  | MergeNodesOperation
+  | InsertParagraphOperation;
 
 /////////////////////
 // Utils

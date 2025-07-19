@@ -104,6 +104,19 @@ export function setCaretPosition(nodes: EditorNode[], position: CaretPosition) {
     null,
   );
 
+  if (node.children.length === 0) {
+    const range = document.createRange();
+    range.setStart(
+      nodeElement,
+      Math.min(position.offset, nodeElement.textContent?.length ?? 0),
+    );
+    range.collapse(true);
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
   let textNode = walker.nextNode() as Text;
   let childIndex = 0;
 
@@ -154,6 +167,7 @@ export function addCharacter(
 }
 
 export function deleteCharacter(node: EditorNode, position: CaretPosition) {
+  //TODO if the node is empty, delete it
   const { childIndex, offset } = position;
 
   const newChildren = [...node.children];
@@ -161,7 +175,10 @@ export function deleteCharacter(node: EditorNode, position: CaretPosition) {
   const newText =
     currentChild.text.slice(0, offset - 1) + currentChild.text.slice(offset);
   newChildren[childIndex] = { ...currentChild, text: newText };
-  return { ...node, children: newChildren };
+  return {
+    ...node,
+    children: newChildren.length === 1 && newText === "" ? [] : newChildren,
+  };
 }
 
 export function mergeNodes(firstNode: EditorNode, secondNode: EditorNode) {
@@ -169,4 +186,36 @@ export function mergeNodes(firstNode: EditorNode, secondNode: EditorNode) {
     ...firstNode,
     children: [...firstNode.children, ...secondNode.children],
   };
+}
+
+export function splitNode(
+  node: EditorNode,
+  position: CaretPosition,
+  newNodeId: string,
+) {
+  const { childIndex, offset } = position;
+  const left: EditorNode = {
+    ...node,
+    children: [],
+  };
+  const right: EditorNode = {
+    ...node,
+    id: newNodeId,
+    children: [],
+  };
+
+  node.children.forEach((child, index) => {
+    if (index < childIndex) {
+      left.children.push(child);
+    } else if (index === childIndex) {
+      const leftText = child.text.slice(0, offset);
+      const rightText = child.text.slice(offset);
+      if (leftText) left.children.push({ ...child, text: leftText });
+      if (rightText) right.children.push({ ...child, text: rightText });
+    } else {
+      right.children.push(child);
+    }
+  });
+
+  return [left, right] as const;
 }

@@ -9,6 +9,7 @@ import {
   setCaretPosition,
   deleteCharacter,
   mergeNodes,
+  splitNode,
 } from "./utils";
 import { HeadingNode, ParagraphNode } from "./editor-nodes";
 
@@ -56,6 +57,23 @@ function apply(nodes: EditorNode[], operation: Operation) {
         ...nodes.slice(0, firstNodeIndex),
         newNode,
         ...nodes.slice(secondNodeIndex + 1),
+      ];
+    }
+    case "insertParagraph": {
+      const { caretPosition, newNodeId } = operation;
+      const nodeIndex = nodes.findIndex((n) => n.id === caretPosition.nodeId);
+      if (nodeIndex === -1) return nodes;
+
+      const node = nodes[nodeIndex]!;
+      const [left, right] = splitNode(node, caretPosition, newNodeId);
+
+      if (right.children.length === 0) right.type = "paragraph";
+
+      return [
+        ...nodes.slice(0, nodeIndex),
+        left,
+        right,
+        ...nodes.slice(nodeIndex + 1),
       ];
     }
   }
@@ -115,17 +133,16 @@ export function NoteEditor() {
           break;
         }
         case "deleteContentBackward": {
+          //TODO doesn't work if the node is empty
           e.preventDefault();
           if (caretPosition.offset === 0) {
             const nodeIdx = nodes.findIndex(
               (n) => n.id === caretPosition.nodeId,
             );
-            if (nodeIdx === -1) return;
+            if (nodeIdx === -1 || nodeIdx === 0) return;
 
             const node = nodes[nodeIdx]!;
             const prevNode = nodes[nodeIdx - 1]!;
-
-            console.log("MERGE NODES", node, prevNode);
 
             setNodes((prev) =>
               apply(prev, {
@@ -153,6 +170,23 @@ export function NoteEditor() {
           };
           break;
         }
+        case "insertParagraph": {
+          e.preventDefault();
+          const newNodeId = crypto.randomUUID();
+          setNodes((prev) =>
+            apply(prev, {
+              type: "insertParagraph",
+              caretPosition,
+              newNodeId,
+            }),
+          );
+          pendingCaretPositionRef.current = {
+            nodeId: newNodeId,
+            childIndex: 0,
+            offset: 0,
+          };
+          break;
+        }
       }
     },
     [nodes],
@@ -169,7 +203,7 @@ export function NoteEditor() {
   }, [handleBeforeInput]);
 
   useEffect(() => {
-    console.log(nodes);
+    console.log("NODES", nodes);
 
     const position = pendingCaretPositionRef.current;
     if (!position) return;
