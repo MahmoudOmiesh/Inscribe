@@ -2,16 +2,17 @@
 // Data Model Types
 /////////////////////
 
-export type TextNode = {
-  type: "text";
-  text: string;
-  bold?: boolean;
-};
+export interface Mark {
+  type: "bold" | "italic" | "underline" | "strikethrough";
+  start: number;
+  end: number;
+}
 
-export type BaseNode = {
+export interface BaseNode {
   id: string;
-  children: TextNode[];
-};
+  text: string;
+  marks: Mark[];
+}
 
 export type HeadingNode = BaseNode & {
   type: "heading";
@@ -27,9 +28,9 @@ export type EditorNode = HeadingNode | ParagraphNode;
 // Operation Types
 /////////////////////
 
-export type OperationBase = {
-  caretPosition: CaretPosition;
-};
+export interface OperationBase {
+  range: SelectionRange;
+}
 
 export type InsertTextOperation = {
   type: "insertText";
@@ -61,8 +62,13 @@ export type Operation =
 // Utils
 /////////////////////
 
-export type CaretPosition = {
+export interface CaretPosition {
   nodeId: string;
-  childIndex: number;
   offset: number;
-};
+}
+
+export interface SelectionRange {
+  start: CaretPosition;
+  end: CaretPosition;
+  isCollapsed: boolean;
+}
