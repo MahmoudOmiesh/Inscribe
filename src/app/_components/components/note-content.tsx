@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { EditorNode } from "../types";
+import type { EditorNode } from "../utils/types";
 import { Paragraph } from "./paragraph";
 import { Heading } from "./heading";
 

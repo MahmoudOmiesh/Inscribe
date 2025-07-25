@@ -37,6 +37,11 @@ export type InsertTextOperation = {
   text: string;
 } & OperationBase;
 
+export type InsertReplacementTextOperation = {
+  type: "insertReplacementText";
+  text: string;
+} & OperationBase;
+
 export type DeleteTextOperation = {
   type: "deleteText";
 } & OperationBase;
@@ -56,7 +61,13 @@ export type Operation =
   | InsertTextOperation
   | DeleteTextOperation
   | MergeNodesOperation
-  | InsertParagraphOperation;
+  | InsertParagraphOperation
+  | InsertReplacementTextOperation;
+
+export type OperationResult = {
+  nodes: EditorNode[];
+  newCaretPosition: CaretPosition | null;
+};
 
 /////////////////////
 // Utils
@@ -71,4 +82,10 @@ export interface SelectionRange {
   start: CaretPosition;
   end: CaretPosition;
   isCollapsed: boolean;
+}
+
+export interface TextChange {
+  offset: number;
+  deletedLength: number;
+  insertedLength: number;
 }

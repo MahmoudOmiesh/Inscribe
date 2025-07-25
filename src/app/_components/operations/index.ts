@@ -1,22 +1,35 @@
-import type { EditorNode, Operation } from "../types";
+import type {
+  EditorNode,
+  Mark,
+  Operation,
+  OperationResult,
+} from "../utils/types";
 import { insertText } from "./insert-text";
 import { deleteText } from "./delete-text";
 import { mergeNodes } from "./merge-nodes";
 import { insertParagraph } from "./insert-paragraph";
+import { insertReplacementText } from "./insert-replacement-text";
 
-export function applyOperation(nodes: EditorNode[], operation: Operation) {
+export function applyOperation(
+  nodes: EditorNode[],
+  activeMarks: Mark["type"][],
+  operation: Operation,
+): OperationResult {
   switch (operation.type) {
     case "insertText": {
-      return insertText(nodes, operation);
+      return insertText(nodes, activeMarks, operation);
     }
     case "deleteText": {
-      return deleteText(nodes, operation);
+      return deleteText(nodes, activeMarks, operation);
     }
     case "mergeNodes": {
       return mergeNodes(nodes, operation);
     }
     case "insertParagraph": {
-      return insertParagraph(nodes, operation);
+      return insertParagraph(nodes, activeMarks, operation);
+    }
+    case "insertReplacementText": {
+      return insertReplacementText(nodes, operation);
     }
   }
 }

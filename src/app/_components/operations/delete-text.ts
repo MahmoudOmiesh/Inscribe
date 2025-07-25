@@ -1,33 +1,58 @@
-import type { CaretPosition, EditorNode, DeleteTextOperation } from "../types";
+import { adjustMarks, createDeleteChange } from "../utils/marks";
+import type {
+  EditorNode,
+  DeleteTextOperation,
+  SelectionRange,
+  Mark,
+} from "../utils/types";
 import { deleteBetween } from "./helpers/delete-between";
 
 export function deleteText(
   nodes: EditorNode[],
+  activeMarks: Mark["type"][],
   operation: DeleteTextOperation,
 ) {
   const { range } = operation;
+  const newCaretPosition = getCaretPositionAfterDeleteText(range);
 
   if (range.isCollapsed) {
     const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
-    if (nodeIndex === -1) return nodes;
+    if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
     const node = nodes[nodeIndex]!;
-    const newNode = deleteCharacter(node, range.start);
-    return [
-      ...nodes.slice(0, nodeIndex),
-      newNode,
-      ...nodes.slice(nodeIndex + 1),
-    ];
+    const deletePosition = range.start.offset - 1;
+
+    const newText =
+      node.text.slice(0, deletePosition) + node.text.slice(deletePosition + 1);
+    const change = createDeleteChange(deletePosition, 1);
+    const newMarks = adjustMarks(node.marks, change);
+
+    return {
+      nodes: [
+        ...nodes.slice(0, nodeIndex),
+        {
+          ...node,
+          text: newText,
+          marks: newMarks,
+        },
+        ...nodes.slice(nodeIndex + 1),
+      ],
+      newCaretPosition,
+    };
   }
 
-  return deleteBetween(nodes, range);
+  return {
+    nodes: deleteBetween(nodes, activeMarks, range),
+    newCaretPosition,
+  };
 }
 
-function deleteCharacter(node: EditorNode, position: CaretPosition) {
+function getCaretPositionAfterDeleteText(range: SelectionRange) {
   return {
-    ...node,
-    text:
-      node.text.slice(0, position.offset - 1) +
-      node.text.slice(position.offset),
+    ...range.start,
+    offset: Math.max(
+      range.isCollapsed ? range.start.offset - 1 : range.start.offset,
+      0,
+    ),
   };
 }

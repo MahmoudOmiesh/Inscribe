@@ -1,7 +1,18 @@
 import { memo, type ReactNode } from "react";
-import type { Mark } from "../types";
+import type { Mark } from "../utils/types";
 
-//TODO fix this piece of shit
+const MARK_PRIORITY: Record<Mark["type"], number> = {
+  bold: 1,
+  italic: 2,
+  underline: 3,
+  strikethrough: 4,
+};
+
+//TODO still not wrapping the marks correctly
+// <strong>bo</strong><strong>ld <em>italic</em></strong>
+// instead of
+// <strong>bold <em>italic</em></strong>
+
 export const MarkRenderer = memo(
   ({ text, marks }: { text: string; marks: Mark[] }) => {
     if (marks.length === 0) {
@@ -23,30 +34,30 @@ export const MarkRenderer = memo(
 MarkRenderer.displayName = "MarkRenderer";
 
 const TextSegment = memo(({ text, marks }: { text: string; marks: Mark[] }) => {
-  let content: ReactNode = text;
-
-  for (const mark of marks) {
-    content = wrapWithMark(content, mark);
-  }
-
-  return <>{content}</>;
+  return <>{wrapWithMarks(text, marks)}</>;
 });
 
 TextSegment.displayName = "TextSegment";
 
-function wrapWithMark(content: ReactNode, mark: Mark) {
-  switch (mark.type) {
-    case "bold":
-      return <strong>{content}</strong>;
-    case "italic":
-      return <em>{content}</em>;
-    case "underline":
-      return <u>{content}</u>;
-    case "strikethrough":
-      return <s>{content}</s>;
-    default:
-      return content;
-  }
+function wrapWithMarks(text: string, marks: Mark[]) {
+  const sortedMarks = [...marks].sort(
+    (a, b) => MARK_PRIORITY[a.type] - MARK_PRIORITY[b.type],
+  );
+
+  return sortedMarks.reduceRight<ReactNode>((acc, mark) => {
+    switch (mark.type) {
+      case "bold":
+        return <strong>{acc}</strong>;
+      case "italic":
+        return <em>{acc}</em>;
+      case "underline":
+        return <u>{acc}</u>;
+      case "strikethrough":
+        return <s>{acc}</s>;
+      default:
+        return acc;
+    }
+  }, text);
 }
 
 function createTextSegments(text: string, marks: Mark[]) {
@@ -70,7 +81,7 @@ function createTextSegments(text: string, marks: Mark[]) {
 
     const textSegment = text.slice(start, end);
     const activeMarks = marks.filter(
-      (mark) => mark.start <= start && mark.end >= end,
+      (mark) => mark.start <= start && mark.end >= end - 1,
     );
 
     segments.push({ text: textSegment, marks: activeMarks });

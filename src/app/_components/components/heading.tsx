@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { cn } from "@/lib/utils";
-import type { HeadingNode as HeadingNodeType } from "../types";
+import type { HeadingNode as HeadingNodeType } from "../utils/types";
 import { MarkRenderer } from "./mark-renderer";
 
 export const Heading = memo(({ node }: { node: HeadingNodeType }) => {

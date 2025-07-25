@@ -1,4 +1,4 @@
-import type { CaretPosition, SelectionRange } from "../types";
+import type { CaretPosition, SelectionRange } from "./types";
 
 export function getSelectionRange(): SelectionRange | null {
   const selection = window.getSelection();
