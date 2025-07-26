@@ -2,8 +2,15 @@
 // Data Model Types
 /////////////////////
 
+export const MARK_TYPES = [
+  "bold",
+  "italic",
+  "underline",
+  "strikethrough",
+] as const;
+
 export interface Mark {
-  type: "bold" | "italic" | "underline" | "strikethrough";
+  type: (typeof MARK_TYPES)[number];
   start: number;
   end: number;
 }
@@ -57,16 +64,28 @@ export type InsertParagraphOperation = {
   newNodeId: string;
 } & OperationBase;
 
+export type ToggleMarkOperation = {
+  type: "toggleMark";
+  markType: Mark["type"];
+} & OperationBase;
+
 export type Operation =
   | InsertTextOperation
   | DeleteTextOperation
   | MergeNodesOperation
   | InsertParagraphOperation
-  | InsertReplacementTextOperation;
+  | InsertReplacementTextOperation
+  | ToggleMarkOperation;
 
 export type OperationResult = {
   nodes: EditorNode[];
-  newCaretPosition: CaretPosition | null;
+  newCaretPosition:
+    | CaretPosition
+    | {
+        start: CaretPosition;
+        end: CaretPosition;
+      }
+    | null;
 };
 
 /////////////////////

@@ -1,4 +1,4 @@
-import { adjustMarks, createInsertChange } from "../utils/marks";
+import { adjustMarks, createInsertChange } from "../utils/adjust-marks";
 import type {
   EditorNode,
   InsertTextOperation,
@@ -6,6 +6,7 @@ import type {
   SelectionRange,
 } from "../utils/types";
 import { deleteBetween } from "./helpers/delete-between";
+import { mergeOverlappingMarks } from "./helpers/merge-marks";
 
 export function insertText(
   nodes: EditorNode[],
@@ -14,9 +15,7 @@ export function insertText(
 ) {
   const { range, text } = operation;
 
-  const newNodes = range.isCollapsed
-    ? nodes
-    : deleteBetween(nodes, activeMarks, range);
+  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
 
   const nodeIndex = newNodes.findIndex((n) => n.id === range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
@@ -29,6 +28,11 @@ export function insertText(
 
   const change = createInsertChange(range.start.offset, text.length);
   const newMarks = adjustMarks(node.marks, change);
+  const newMarksFromActive = activeMarks.map((mark) => ({
+    type: mark,
+    start: range.start.offset,
+    end: range.start.offset + text.length,
+  }));
 
   return {
     nodes: [
@@ -36,7 +40,7 @@ export function insertText(
       {
         ...node,
         text: newText,
-        marks: newMarks,
+        marks: mergeOverlappingMarks([...newMarks, ...newMarksFromActive]),
       },
       ...newNodes.slice(nodeIndex + 1),
     ],

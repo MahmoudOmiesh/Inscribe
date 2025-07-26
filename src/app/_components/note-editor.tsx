@@ -1,9 +1,18 @@
 "use client";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import type { CaretPosition, EditorNode, Mark } from "./utils/types";
+import type {
+  CaretPosition,
+  EditorNode,
+  Mark,
+  SelectionRange,
+} from "./utils/types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getSelectionRange, setSelectionRange } from "./utils/range";
+import {
+  compareSelectionRanges,
+  getSelectionRange,
+  setSelectionRange,
+} from "./utils/range";
 import { applyOperation } from "./operations";
 import { NoteContent } from "./components/note-content";
 import { Button } from "@/components/ui/button";
@@ -42,7 +51,10 @@ export function NoteEditor() {
   ]);
 
   const editorRef = useRef<HTMLDivElement>(null);
-  const pendingCaretPositionRef = useRef<CaretPosition | null>(null);
+  const previousSelectionRangeRef = useRef<SelectionRange | null>(null);
+  const pendingCaretPositionRef = useRef<
+    CaretPosition | { start: CaretPosition; end: CaretPosition } | null
+  >(null);
 
   function getActiveMarks() {
     const range = getSelectionRange();
@@ -91,6 +103,36 @@ export function NoteEditor() {
 
     return commonMarks.map((m) => m.type);
   }
+
+  const toggleMark = useCallback(
+    (mark: Mark["type"]) => {
+      const selectionRange = getSelectionRange();
+      if (!selectionRange) return;
+
+      const { nodes: newNodes, newCaretPosition } = applyOperation(
+        nodes,
+        activeMarks,
+        {
+          type: "toggleMark",
+          markType: mark,
+          range: selectionRange,
+        },
+      );
+
+      setNodes(newNodes);
+      pendingCaretPositionRef.current = newCaretPosition;
+
+      if (selectionRange.isCollapsed) {
+        if (activeMarks.includes(mark)) {
+          setActiveMarks(activeMarks.filter((m) => m !== mark));
+        } else {
+          setActiveMarks([...activeMarks, mark]);
+        }
+        if (newCaretPosition) setSelectionRange(newCaretPosition);
+      }
+    },
+    [activeMarks, nodes],
+  );
 
   const handleBeforeInput = useCallback(
     (e: InputEvent) => {
@@ -170,13 +212,30 @@ export function NoteEditor() {
           pendingCaretPositionRef.current = newCaretPosition;
           break;
         }
+        case "formatBold": {
+          e.preventDefault();
+          toggleMark("bold");
+          break;
+        }
+        case "formatItalic": {
+          e.preventDefault();
+          toggleMark("italic");
+          break;
+        }
       }
     },
-    [nodes, activeMarks],
+    [nodes, activeMarks, toggleMark],
   );
 
   function handleSelect() {
+    const currentSelectionRange = getSelectionRange();
+    const previousSelectionRange = previousSelectionRangeRef.current;
+
+    if (compareSelectionRanges(currentSelectionRange, previousSelectionRange))
+      return;
+
     const activeMarks = getActiveMarks();
+    previousSelectionRangeRef.current = currentSelectionRange;
     setActiveMarks(activeMarks ?? []);
   }
 
@@ -200,9 +259,7 @@ export function NoteEditor() {
 
     const position = pendingCaretPositionRef.current;
     if (!position) return;
-    setSelectionRange({
-      start: position,
-    });
+    setSelectionRange(position);
     pendingCaretPositionRef.current = null;
   }, [nodes]);
 
@@ -214,7 +271,7 @@ export function NoteEditor() {
           onSelect={handleSelect}
           contentEditable
           suppressContentEditableWarning
-          className="p-0.5 whitespace-pre outline-none"
+          className="space-y-2 p-0.5 whitespace-pre outline-none"
         >
           <NoteContent nodes={nodes} />
         </div>
@@ -222,11 +279,13 @@ export function NoteEditor() {
       <CardFooter>
         <Button
           variant={`${activeMarks.includes("bold") ? "default" : "outline"}`}
+          onClick={() => toggleMark("bold")}
         >
           Bold
         </Button>
         <Button
           variant={`${activeMarks.includes("italic") ? "default" : "outline"}`}
+          onClick={() => toggleMark("italic")}
         >
           Italic
         </Button>

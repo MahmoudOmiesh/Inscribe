@@ -10,7 +10,7 @@ export const Paragraph = memo(({ node }: { node: ParagraphNodeType }) => {
       className={cn(
         "whitespace-pre-wrap",
         node.text.length === 0 &&
-          "after:pointer-events-none after:block after:content-['\\200b']",
+          "after:pointer-events-none after:block after:content-['\\00a0']",
       )}
     >
       <MarkRenderer text={node.text} marks={node.marks} />

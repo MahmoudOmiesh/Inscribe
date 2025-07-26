@@ -24,3 +24,15 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     }, wait);
   };
 }
+
+export function groupBy<T>(array: T[], key: keyof T) {
+  return array.reduce(
+    (acc, item) => {
+      const value = String(item[key]);
+      acc[value] = acc[value] ?? [];
+      acc[value].push(item);
+      return acc;
+    },
+    {} as Record<string, T[]>,
+  );
+}

@@ -9,6 +9,7 @@ import { deleteText } from "./delete-text";
 import { mergeNodes } from "./merge-nodes";
 import { insertParagraph } from "./insert-paragraph";
 import { insertReplacementText } from "./insert-replacement-text";
+import { toggleMark } from "./toggle-mark";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -23,10 +24,13 @@ export function applyOperation(
       return deleteText(nodes, activeMarks, operation);
     }
     case "mergeNodes": {
-      return mergeNodes(nodes, operation);
+      return mergeNodes(nodes, activeMarks, operation);
     }
     case "insertParagraph": {
       return insertParagraph(nodes, activeMarks, operation);
+    }
+    case "toggleMark": {
+      return toggleMark(nodes, activeMarks, operation);
     }
     case "insertReplacementText": {
       return insertReplacementText(nodes, operation);

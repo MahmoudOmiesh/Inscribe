@@ -1,9 +1,10 @@
-import { adjustMarks, createInsertChange } from "../utils/marks";
-import type { EditorNode, SelectionRange } from "../utils/types";
+import { adjustMarks, createInsertChange } from "../utils/adjust-marks";
+import type { EditorNode, Mark, SelectionRange } from "../utils/types";
 import type { MergeNodesOperation } from "../utils/types";
 
 export function mergeNodes(
   nodes: EditorNode[],
+  activeMarks: Mark["type"][],
   operation: MergeNodesOperation,
 ) {
   const { firstNodeId, secondNodeId, range } = operation;

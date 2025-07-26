@@ -64,15 +64,21 @@ function domToCaretPosition(node: Node, offset: number) {
   };
 }
 
-export function setSelectionRange({
-  start,
-  end,
-}: {
-  start: CaretPosition;
-  end?: CaretPosition;
-}) {
-  const anchorPoint = caretPositionToDom(start);
-  const focusPoint = end ? caretPositionToDom(end) : anchorPoint;
+export function setSelectionRange(
+  range:
+    | CaretPosition
+    | {
+        start: CaretPosition;
+        end: CaretPosition;
+      },
+) {
+  const anchorPoint =
+    "start" in range
+      ? caretPositionToDom(range.start)
+      : caretPositionToDom(range);
+  const focusPoint =
+    "end" in range ? caretPositionToDom(range.end) : anchorPoint;
+
   if (!anchorPoint || !focusPoint) return;
 
   const domRange = document.createRange();
@@ -117,4 +123,17 @@ function caretPositionToDom(position: CaretPosition) {
 
 function isRangeCollapsed(start: CaretPosition, end: CaretPosition) {
   return start.nodeId === end.nodeId && start.offset === end.offset;
+}
+
+export function compareSelectionRanges(
+  range1: SelectionRange | null,
+  range2: SelectionRange | null,
+) {
+  if (!range1 || !range2) return false;
+  return (
+    range1.start.nodeId === range2.start.nodeId &&
+    range1.start.offset === range2.start.offset &&
+    range1.end.nodeId === range2.end.nodeId &&
+    range1.end.offset === range2.end.offset
+  );
 }

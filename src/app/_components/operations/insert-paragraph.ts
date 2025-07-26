@@ -1,4 +1,4 @@
-import { adjustMarks, createDeleteChange } from "../utils/marks";
+import { adjustMarks, createDeleteChange } from "../utils/adjust-marks";
 import type {
   EditorNode,
   InsertParagraphOperation,
@@ -13,9 +13,7 @@ export function insertParagraph(
 ) {
   const { range, newNodeId } = operation;
 
-  const newNodes = range.isCollapsed
-    ? nodes
-    : deleteBetween(nodes, activeMarks, range);
+  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
   const nodeIndex = newNodes.findIndex((n) => n.id === range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 

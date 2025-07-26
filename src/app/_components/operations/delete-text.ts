@@ -1,4 +1,4 @@
-import { adjustMarks, createDeleteChange } from "../utils/marks";
+import { adjustMarks, createDeleteChange } from "../utils/adjust-marks";
 import type {
   EditorNode,
   DeleteTextOperation,
@@ -42,7 +42,7 @@ export function deleteText(
   }
 
   return {
-    nodes: deleteBetween(nodes, activeMarks, range),
+    nodes: deleteBetween(nodes, range),
     newCaretPosition,
   };
 }

@@ -81,7 +81,7 @@ function createTextSegments(text: string, marks: Mark[]) {
 
     const textSegment = text.slice(start, end);
     const activeMarks = marks.filter(
-      (mark) => mark.start <= start && mark.end >= end - 1,
+      (mark) => mark.start <= start && mark.end >= end,
     );
 
     segments.push({ text: textSegment, marks: activeMarks });

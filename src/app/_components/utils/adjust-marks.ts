@@ -14,13 +14,11 @@ function adjustMark(mark: Mark, change: TextChange) {
 
   // If the mark is before the change - no adjustment
   if (mark.end <= offset) {
-    console.log("CASE 1", mark);
     return mark;
   }
 
   // If the mark is after the change - adjust the start and end
   if (mark.start >= changeEnd) {
-    console.log("CASE 2", mark);
     return {
       ...mark,
       start: mark.start + netChange,
@@ -30,13 +28,11 @@ function adjustMark(mark: Mark, change: TextChange) {
 
   // If the mark is completely within the change - remove it
   if (mark.start >= offset && mark.end <= changeEnd) {
-    console.log("CASE 3", mark);
     return null;
   }
 
   // Mark starts before the change and ends after the change - adjust the end
   if (mark.start < offset && mark.end > changeEnd) {
-    console.log("CASE 4", mark);
     return {
       ...mark,
       end: mark.end + netChange,
@@ -45,7 +41,6 @@ function adjustMark(mark: Mark, change: TextChange) {
 
   // Mark starts before the change and ends within the change - truncate the end
   if (mark.start < offset && mark.end <= changeEnd) {
-    console.log("CASE 5", mark);
     return {
       ...mark,
       end: offset,
@@ -54,7 +49,6 @@ function adjustMark(mark: Mark, change: TextChange) {
 
   // Mark starts within the change and ends after the change - move the start
   if (mark.start >= offset && mark.end > changeEnd) {
-    console.log("CASE 6", mark);
     return {
       ...mark,
       start: offset + insertedLength,

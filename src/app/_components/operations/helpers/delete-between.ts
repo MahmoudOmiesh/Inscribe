@@ -2,14 +2,10 @@ import {
   adjustMarks,
   createDeleteChange,
   createReplaceChange,
-} from "../../utils/marks";
-import type { EditorNode, Mark, SelectionRange } from "../../utils/types";
+} from "../../utils/adjust-marks";
+import type { EditorNode, SelectionRange } from "../../utils/types";
 
-export function deleteBetween(
-  nodes: EditorNode[],
-  activeMarks: Mark["type"][],
-  range: SelectionRange,
-) {
+export function deleteBetween(nodes: EditorNode[], range: SelectionRange) {
   const startNodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
   const endNodeIndex = nodes.findIndex((n) => n.id === range.end.nodeId);
 
