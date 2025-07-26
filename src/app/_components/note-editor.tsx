@@ -25,22 +25,24 @@ export function NoteEditor() {
       id: "20ce649b-df96-447c-b90a-5715989b02c4",
       type: "heading",
       text: "Heading bold not bold",
-      marks: [
-        { type: "italic", start: 3, end: 4 },
-        { type: "bold", start: 8, end: 12 },
-      ],
+      marks: [],
+      // marks: [
+      //   { type: "italic", start: 3, end: 4 },
+      //   { type: "bold", start: 8, end: 12 },
+      // ],
     },
     {
       id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
       type: "paragraph",
       text: "Hello, world!",
-      marks: [
-        {
-          type: "bold",
-          start: 0,
-          end: 5,
-        },
-      ],
+      marks: [],
+      // marks: [
+      //   {
+      //     type: "bold",
+      //     start: 0,
+      //     end: 5,
+      //   },
+      // ],
     },
     {
       id: "12345678-1234-1234-1234-123456789012",
@@ -286,7 +288,7 @@ export function NoteEditor() {
           <NoteContent nodes={nodes} />
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-wrap gap-2">
         <Button
           variant={`${activeMarks.includes("bold") ? "default" : "outline"}`}
           onClick={() => toggleMark("bold")}
@@ -311,7 +313,43 @@ export function NoteEditor() {
         >
           Strikethrough
         </Button>
+        <Button
+          variant={`${activeMarks.includes("superscript") ? "default" : "outline"}`}
+          onClick={() => toggleMark("superscript")}
+        >
+          Superscript
+        </Button>
+        <Button
+          variant={`${activeMarks.includes("subscript") ? "default" : "outline"}`}
+          onClick={() => toggleMark("subscript")}
+        >
+          Subscript
+        </Button>
+        <Button
+          variant={`${activeMarks.includes("highlight-yellow") ? "default" : "outline"}`}
+          onClick={() => toggleMark("highlight-yellow")}
+        >
+          Highlight Yellow
+        </Button>
       </CardFooter>
     </Card>
   );
 }
+
+// TODO
+// - deal with new line handling (br)
+// - fix the mark renderer
+// - make the active marks update after a toggle mark operation
+// - insertReplacementText operation
+// - support for copy, paste, cut
+// - support for undo, redo
+// - performance improvements (map for getting idx from id, etc)
+// - deal with other input types (deleteForward, etc)
+// - changing the alignment of the text
+// - support for more heading levels
+// - support for lists (unordered, ordered, task)
+// - imrpove the ui
+
+// - support for images
+// - support for links
+// - support for code blocks and blockquotes

@@ -7,6 +7,9 @@ export const MARK_TYPES = [
   "italic",
   "underline",
   "strikethrough",
+  "superscript",
+  "subscript",
+  "highlight-yellow",
 ] as const;
 
 export interface Mark {

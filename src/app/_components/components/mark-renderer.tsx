@@ -6,6 +6,9 @@ const MARK_PRIORITY: Record<Mark["type"], number> = {
   italic: 2,
   underline: 3,
   strikethrough: 4,
+  superscript: 5,
+  subscript: 6,
+  "highlight-yellow": 7,
 };
 
 //TODO still not wrapping the marks correctly
@@ -54,8 +57,15 @@ function wrapWithMarks(text: string, marks: Mark[]) {
         return <u>{acc}</u>;
       case "strikethrough":
         return <s>{acc}</s>;
+      case "superscript":
+        return <sup>{acc}</sup>;
+      case "subscript":
+        return <sub>{acc}</sub>;
+      case "highlight-yellow":
+        return <span className="bg-yellow-200/80">{acc}</span>;
       default:
-        return acc;
+        const _exhaustiveCheck: never = mark.type;
+        return _exhaustiveCheck;
     }
   }, text);
 }
