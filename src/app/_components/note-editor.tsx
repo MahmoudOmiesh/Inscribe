@@ -222,6 +222,16 @@ export function NoteEditor() {
           toggleMark("italic");
           break;
         }
+        case "formatUnderline": {
+          e.preventDefault();
+          toggleMark("underline");
+          break;
+        }
+        case "formatStrikethrough": {
+          e.preventDefault();
+          toggleMark("strikethrough");
+          break;
+        }
       }
     },
     [nodes, activeMarks, toggleMark],
@@ -288,6 +298,18 @@ export function NoteEditor() {
           onClick={() => toggleMark("italic")}
         >
           Italic
+        </Button>
+        <Button
+          variant={`${activeMarks.includes("underline") ? "default" : "outline"}`}
+          onClick={() => toggleMark("underline")}
+        >
+          Underline
+        </Button>
+        <Button
+          variant={`${activeMarks.includes("strikethrough") ? "default" : "outline"}`}
+          onClick={() => toggleMark("strikethrough")}
+        >
+          Strikethrough
         </Button>
       </CardFooter>
     </Card>
