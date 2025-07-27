@@ -5,7 +5,7 @@ import type {
   OperationResult,
 } from "../utils/types";
 import { insertText } from "./insert-text";
-import { deleteText } from "./delete-text";
+import { deleteText } from "./delete-text-backward";
 import { mergeNodes } from "./merge-nodes";
 import { insertParagraph } from "./insert-paragraph";
 import { insertReplacementText } from "./insert-replacement-text";
@@ -20,7 +20,10 @@ export function applyOperation(
     case "insertText": {
       return insertText(nodes, activeMarks, operation);
     }
-    case "deleteText": {
+    case "deleteTextBackward": {
+      return deleteText(nodes, activeMarks, operation);
+    }
+    case "deleteTextForward": {
       return deleteText(nodes, activeMarks, operation);
     }
     case "mergeNodes": {

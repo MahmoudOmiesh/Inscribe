@@ -1,26 +1,33 @@
 import { adjustMarks, createDeleteChange } from "../utils/adjust-marks";
 import type {
   EditorNode,
-  DeleteTextOperation,
+  DeleteTextBackwardOperation,
   SelectionRange,
   Mark,
+  DeleteTextForwardOperation,
 } from "../utils/types";
 import { deleteBetween } from "./helpers/delete-between";
 
 export function deleteText(
   nodes: EditorNode[],
   activeMarks: Mark["type"][],
-  operation: DeleteTextOperation,
+  operation: DeleteTextBackwardOperation | DeleteTextForwardOperation,
 ) {
   const { range } = operation;
-  const newCaretPosition = getCaretPositionAfterDeleteText(range);
+  const newCaretPosition = getCaretPositionAfterDeleteText(
+    range,
+    operation.type === "deleteTextBackward" ? "backward" : "forward",
+  );
 
   if (range.isCollapsed) {
     const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
     if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
     const node = nodes[nodeIndex]!;
-    const deletePosition = range.start.offset - 1;
+    const deletePosition =
+      operation.type === "deleteTextBackward"
+        ? range.start.offset - 1
+        : range.start.offset;
 
     const newText =
       node.text.slice(0, deletePosition) + node.text.slice(deletePosition + 1);
@@ -47,11 +54,16 @@ export function deleteText(
   };
 }
 
-function getCaretPositionAfterDeleteText(range: SelectionRange) {
+function getCaretPositionAfterDeleteText(
+  range: SelectionRange,
+  direction: "backward" | "forward",
+) {
   return {
     ...range.start,
     offset: Math.max(
-      range.isCollapsed ? range.start.offset - 1 : range.start.offset,
+      range.isCollapsed
+        ? range.start.offset - (direction === "backward" ? 1 : 0)
+        : range.start.offset,
       0,
     ),
   };

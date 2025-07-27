@@ -1,5 +1,5 @@
 import { adjustMarks, createInsertChange } from "../utils/adjust-marks";
-import type { EditorNode, Mark, SelectionRange } from "../utils/types";
+import type { EditorNode, Mark } from "../utils/types";
 import type { MergeNodesOperation } from "../utils/types";
 
 export function mergeNodes(
@@ -7,7 +7,7 @@ export function mergeNodes(
   activeMarks: Mark["type"][],
   operation: MergeNodesOperation,
 ) {
-  const { firstNodeId, secondNodeId, range } = operation;
+  const { firstNodeId, secondNodeId } = operation;
   const firstNodeIndex = nodes.findIndex((n) => n.id === firstNodeId);
   const secondNodeIndex = nodes.findIndex((n) => n.id === secondNodeId);
   if (firstNodeIndex === -1 || secondNodeIndex === -1)
@@ -30,21 +30,13 @@ export function mergeNodes(
       newNode,
       ...nodes.slice(secondNodeIndex + 1),
     ],
-    newCaretPosition: getCaretPositionAfterMergeNodes(nodes, range),
+    newCaretPosition: getCaretPositionAfterMergeNodes(firstNode),
   };
 }
 
-function getCaretPositionAfterMergeNodes(
-  nodes: EditorNode[],
-  range: SelectionRange,
-) {
-  const nodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
-  if (nodeIdx === -1 || nodeIdx === 0) return range.start;
-
-  const prevNode = nodes[nodeIdx - 1]!;
-
+function getCaretPositionAfterMergeNodes(firstNode: EditorNode) {
   return {
-    nodeId: prevNode.id,
-    offset: prevNode.text.length,
+    nodeId: firstNode.id,
+    offset: firstNode.text.length,
   };
 }

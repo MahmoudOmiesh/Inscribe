@@ -25,42 +25,22 @@ export function NoteEditor() {
       id: "20ce649b-df96-447c-b90a-5715989b02c4",
       type: "heading-1",
       text: "Heading bold not bold",
-      marks: [],
-      // marks: [
-      //   { type: "italic", start: 3, end: 4 },
-      //   { type: "bold", start: 8, end: 12 },
-      // ],
-    },
-    {
-      id: "20ce649b-df96-447c-b90a-5715989b02c5",
-      type: "heading-2",
-      text: "Heading 2",
-      marks: [],
-    },
-    {
-      id: "20ce649b-df96-447c-b90a-5715989b02c6",
-      type: "heading-3",
-      text: "Heading 3",
-      marks: [],
-    },
-    {
-      id: "20ce649b-df96-447c-b90a-5715989b02c7",
-      type: "heading-4",
-      text: "Heading 4",
-      marks: [],
+      marks: [
+        { type: "italic", start: 3, end: 4 },
+        { type: "bold", start: 8, end: 12 },
+      ],
     },
     {
       id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
       type: "paragraph",
       text: "Hello, world!",
-      marks: [],
-      // marks: [
-      //   {
-      //     type: "bold",
-      //     start: 0,
-      //     end: 5,
-      //   },
-      // ],
+      marks: [
+        {
+          type: "bold",
+          start: 0,
+          end: 5,
+        },
+      ],
     },
     {
       id: "12345678-1234-1234-1234-123456789012",
@@ -208,7 +188,49 @@ export function NoteEditor() {
             nodes,
             activeMarks,
             {
-              type: "deleteText",
+              type: "deleteTextBackward",
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
+        case "deleteContentForward": {
+          e.preventDefault();
+          const nodeIdx = nodes.findIndex(
+            (n) => n.id === selectionRange.start.nodeId,
+          );
+          if (nodeIdx === -1) return;
+
+          if (
+            selectionRange.isCollapsed &&
+            selectionRange.start.offset === nodes[nodeIdx]!.text.length
+          ) {
+            if (nodeIdx === nodes.length - 1) return;
+
+            const node = nodes[nodeIdx]!;
+            const nextNode = nodes[nodeIdx + 1]!;
+
+            const { nodes: newNodes, newCaretPosition } = applyOperation(
+              nodes,
+              activeMarks,
+              {
+                type: "mergeNodes",
+                firstNodeId: node.id,
+                secondNodeId: nextNode.id,
+                range: selectionRange,
+              },
+            );
+            setNodes(newNodes);
+            pendingCaretPositionRef.current = newCaretPosition;
+            break;
+          }
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "deleteTextForward",
               range: selectionRange,
             },
           );
@@ -364,8 +386,8 @@ export function NoteEditor() {
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
 // - changing the alignment of the text
-// - support for more heading levels
 // - support for lists (unordered, ordered, task)
+// - general clean up for the code
 // - imrpove the ui
 
 // - support for images
