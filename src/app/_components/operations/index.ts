@@ -5,11 +5,12 @@ import type {
   OperationResult,
 } from "../utils/types";
 import { insertText } from "./insert-text";
-import { deleteText } from "./delete-text-backward";
+import { deleteText } from "./delete-text";
 import { mergeNodes } from "./merge-nodes";
 import { insertParagraph } from "./insert-paragraph";
 import { insertReplacementText } from "./insert-replacement-text";
 import { toggleMark } from "./toggle-mark";
+import { deleteWord } from "./delete-word";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -37,6 +38,16 @@ export function applyOperation(
     }
     case "insertReplacementText": {
       return insertReplacementText(nodes, operation);
+    }
+    case "deleteWordBackward": {
+      return deleteWord(nodes, activeMarks, operation);
+    }
+    case "deleteWordForward": {
+      return deleteWord(nodes, activeMarks, operation);
+    }
+    default: {
+      const _exhaustiveCheck: never = operation;
+      return _exhaustiveCheck;
     }
   }
 }

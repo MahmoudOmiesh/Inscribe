@@ -238,6 +238,87 @@ export function NoteEditor() {
           pendingCaretPositionRef.current = newCaretPosition;
           break;
         }
+        case "deleteWordBackward": {
+          e.preventDefault();
+          console.log("DELETE WORD BACKWARD");
+          if (selectionRange.isCollapsed && selectionRange.start.offset === 0) {
+            console.log("HI");
+            const nodeIdx = nodes.findIndex(
+              (n) => n.id === selectionRange.start.nodeId,
+            );
+            if (nodeIdx === -1 || nodeIdx === 0) return;
+
+            const node = nodes[nodeIdx]!;
+            const prevNode = nodes[nodeIdx - 1]!;
+
+            const { nodes: newNodes, newCaretPosition } = applyOperation(
+              nodes,
+              activeMarks,
+              {
+                type: "mergeNodes",
+                firstNodeId: prevNode.id,
+                secondNodeId: node.id,
+                range: selectionRange,
+              },
+            );
+            setNodes(newNodes);
+            pendingCaretPositionRef.current = newCaretPosition;
+            break;
+          }
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "deleteWordBackward",
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
+        case "deleteWordForward": {
+          e.preventDefault();
+          const nodeIdx = nodes.findIndex(
+            (n) => n.id === selectionRange.start.nodeId,
+          );
+          if (nodeIdx === -1) return;
+
+          if (
+            selectionRange.isCollapsed &&
+            selectionRange.start.offset === nodes[nodeIdx]!.text.length
+          ) {
+            if (nodeIdx === nodes.length - 1) return;
+
+            const node = nodes[nodeIdx]!;
+            const nextNode = nodes[nodeIdx + 1]!;
+
+            const { nodes: newNodes, newCaretPosition } = applyOperation(
+              nodes,
+              activeMarks,
+              {
+                type: "mergeNodes",
+                firstNodeId: node.id,
+                secondNodeId: nextNode.id,
+                range: selectionRange,
+              },
+            );
+            setNodes(newNodes);
+            pendingCaretPositionRef.current = newCaretPosition;
+            break;
+          }
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "deleteWordForward",
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
         case "insertParagraph": {
           e.preventDefault();
           const newNodeId = crypto.randomUUID();
@@ -393,3 +474,4 @@ export function NoteEditor() {
 // - support for images
 // - support for links
 // - support for code blocks and blockquotes
+// - support for arabic?

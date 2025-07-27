@@ -78,6 +78,14 @@ export type DeleteTextForwardOperation = {
   type: "deleteTextForward";
 } & OperationBase;
 
+export type DeleteWordBackwardOperation = {
+  type: "deleteWordBackward";
+} & OperationBase;
+
+export type DeleteWordForwardOperation = {
+  type: "deleteWordForward";
+} & OperationBase;
+
 export type MergeNodesOperation = {
   type: "mergeNodes";
   firstNodeId: string;
@@ -101,7 +109,9 @@ export type Operation =
   | MergeNodesOperation
   | InsertParagraphOperation
   | InsertReplacementTextOperation
-  | ToggleMarkOperation;
+  | ToggleMarkOperation
+  | DeleteWordBackwardOperation
+  | DeleteWordForwardOperation;
 
 export type OperationResult = {
   nodes: EditorNode[];
