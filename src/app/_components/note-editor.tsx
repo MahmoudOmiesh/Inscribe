@@ -367,6 +367,7 @@ export function NoteEditor() {
     if (compareSelectionRanges(currentSelectionRange, previousSelectionRange))
       return;
 
+    console.log("CURRENT SELECTION RANGE", currentSelectionRange);
     const activeMarks = getActiveMarks();
     previousSelectionRangeRef.current = currentSelectionRange;
     setActiveMarks(activeMarks ?? []);
