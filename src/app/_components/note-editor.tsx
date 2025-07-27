@@ -1,21 +1,22 @@
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { NoteContent } from "./components/note-content";
+import { applyOperation } from "./operations";
+import {
+  compareSelectionRanges,
+  getSelectionRange,
+  setSelectionRange,
+} from "./utils/range";
 import type {
   CaretPosition,
   EditorNode,
   Mark,
   SelectionRange,
 } from "./utils/types";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  compareSelectionRanges,
-  getSelectionRange,
-  setSelectionRange,
-} from "./utils/range";
-import { applyOperation } from "./operations";
-import { NoteContent } from "./components/note-content";
-import { Button } from "@/components/ui/button";
 
 export function NoteEditor() {
   const [activeMarks, setActiveMarks] = useState<Mark["type"][]>([]);
@@ -55,6 +56,8 @@ export function NoteEditor() {
   const pendingCaretPositionRef = useRef<
     CaretPosition | { start: CaretPosition; end: CaretPosition } | null
   >(null);
+
+  const [test, setTest] = useState("");
 
   function getActiveMarks() {
     const range = getSelectionRange();
@@ -140,6 +143,7 @@ export function NoteEditor() {
       if (!selectionRange) return;
 
       const { inputType, data } = e;
+      setTest(`${inputType} ${data}`);
       console.log("INPUT TYPE", inputType);
 
       switch (inputType) {
@@ -321,7 +325,7 @@ export function NoteEditor() {
         }
         case "insertParagraph": {
           e.preventDefault();
-          const newNodeId = crypto.randomUUID();
+          const newNodeId = uuidv4();
           const { nodes: newNodes, newCaretPosition } = applyOperation(
             nodes,
             activeMarks,
@@ -398,7 +402,7 @@ export function NoteEditor() {
   }, [nodes]);
 
   return (
-    <Card className="w-xl">
+    <Card className="md:w-xl">
       <CardContent>
         <div
           ref={editorRef}
@@ -453,13 +457,13 @@ export function NoteEditor() {
         >
           Highlight Yellow
         </Button>
+        <p>{test}</p>
       </CardFooter>
     </Card>
   );
 }
 
 // TODO
-// - deal with new line handling (br)
 // - fix the mark renderer
 // - make the active marks update after a toggle mark operation
 // - insertReplacementText operation

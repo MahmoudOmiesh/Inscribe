@@ -44,13 +44,16 @@ export function insertText(
       },
       ...newNodes.slice(nodeIndex + 1),
     ],
-    newCaretPosition: getCaretPositionAfterInsertText(range),
+    newCaretPosition: getCaretPositionAfterInsertText(range, text.length),
   };
 }
 
-function getCaretPositionAfterInsertText(range: SelectionRange) {
+function getCaretPositionAfterInsertText(
+  range: SelectionRange,
+  offset: number,
+) {
   return {
     ...range.start,
-    offset: range.start.offset + 1,
+    offset: range.start.offset + offset,
   };
 }
