@@ -23,13 +23,31 @@ export function NoteEditor() {
   const [nodes, setNodes] = useState<EditorNode[]>([
     {
       id: "20ce649b-df96-447c-b90a-5715989b02c4",
-      type: "heading",
+      type: "heading-1",
       text: "Heading bold not bold",
       marks: [],
       // marks: [
       //   { type: "italic", start: 3, end: 4 },
       //   { type: "bold", start: 8, end: 12 },
       // ],
+    },
+    {
+      id: "20ce649b-df96-447c-b90a-5715989b02c5",
+      type: "heading-2",
+      text: "Heading 2",
+      marks: [],
+    },
+    {
+      id: "20ce649b-df96-447c-b90a-5715989b02c6",
+      type: "heading-3",
+      text: "Heading 3",
+      marks: [],
+    },
+    {
+      id: "20ce649b-df96-447c-b90a-5715989b02c7",
+      type: "heading-4",
+      text: "Heading 4",
+      marks: [],
     },
     {
       id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",

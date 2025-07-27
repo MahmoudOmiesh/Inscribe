@@ -24,9 +24,27 @@ export interface BaseNode {
   marks: Mark[];
 }
 
-export type HeadingNode = BaseNode & {
-  type: "heading";
+export type HeadingOneNode = BaseNode & {
+  type: "heading-1";
 };
+
+export type HeadingTwoNode = BaseNode & {
+  type: "heading-2";
+};
+
+export type HeadingThreeNode = BaseNode & {
+  type: "heading-3";
+};
+
+export type HeadingFourNode = BaseNode & {
+  type: "heading-4";
+};
+
+export type HeadingNode =
+  | HeadingOneNode
+  | HeadingTwoNode
+  | HeadingThreeNode
+  | HeadingFourNode;
 
 export type ParagraphNode = BaseNode & {
   type: "paragraph";
