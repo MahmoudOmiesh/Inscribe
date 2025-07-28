@@ -17,6 +17,7 @@ import type {
   Mark,
   SelectionRange,
 } from "./utils/types";
+import { waitForDebugger } from "inspector";
 
 export function NoteEditor() {
   const [activeMarks, setActiveMarks] = useState<Mark["type"][]>([]);
@@ -147,22 +148,6 @@ export function NoteEditor() {
       console.log("INPUT TYPE", inputType);
 
       switch (inputType) {
-        case "insertText": {
-          e.preventDefault();
-          const text = data ?? "";
-          const { nodes: newNodes, newCaretPosition } = applyOperation(
-            nodes,
-            activeMarks,
-            {
-              type: "insertText",
-              text,
-              range: selectionRange,
-            },
-          );
-          setNodes(newNodes);
-          pendingCaretPositionRef.current = newCaretPosition;
-          break;
-        }
         case "deleteContentBackward": {
           e.preventDefault();
           if (selectionRange.isCollapsed && selectionRange.start.offset === 0) {
@@ -244,9 +229,7 @@ export function NoteEditor() {
         }
         case "deleteWordBackward": {
           e.preventDefault();
-          console.log("DELETE WORD BACKWARD");
           if (selectionRange.isCollapsed && selectionRange.start.offset === 0) {
-            console.log("HI");
             const nodeIdx = nodes.findIndex(
               (n) => n.id === selectionRange.start.nodeId,
             );
@@ -323,6 +306,38 @@ export function NoteEditor() {
           pendingCaretPositionRef.current = newCaretPosition;
           break;
         }
+        case "insertText": {
+          e.preventDefault();
+          const text = data ?? "";
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "insertText",
+              text,
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
+        case "insertReplacementText": {
+          e.preventDefault();
+          const replacementText = e.dataTransfer?.getData("text/plain") ?? "";
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "insertText",
+              text: replacementText,
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
         case "insertParagraph": {
           e.preventDefault();
           const newNodeId = uuidv4();
@@ -333,6 +348,22 @@ export function NoteEditor() {
               type: "insertParagraph",
               range: selectionRange,
               newNodeId,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
+        case "insertLineBreak": {
+          e.preventDefault();
+          const text = "\n";
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "insertText",
+              text,
+              range: selectionRange,
             },
           );
           setNodes(newNodes);
@@ -371,7 +402,6 @@ export function NoteEditor() {
     if (compareSelectionRanges(currentSelectionRange, previousSelectionRange))
       return;
 
-    console.log("CURRENT SELECTION RANGE", currentSelectionRange);
     const activeMarks = getActiveMarks();
     previousSelectionRangeRef.current = currentSelectionRange;
     setActiveMarks(activeMarks ?? []);
@@ -472,6 +502,7 @@ export function NoteEditor() {
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
 // - changing the alignment of the text
+// - changing between different types of nodes
 // - support for lists (unordered, ordered, task)
 // - general clean up for the code
 // - imrpove the ui
