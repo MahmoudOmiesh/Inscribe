@@ -79,7 +79,7 @@ export function useEditorOperations({
 
   const toggleMark = useCallback(
     (mark: Mark["type"]) => {
-      const operation = commands.mark.createToggleMarkCommand(mark);
+      const operation = commands.node.createToggleMarkCommand(mark);
       if (!operation) return;
 
       executeOperation(operation);
@@ -195,8 +195,15 @@ export function useEditorOperations({
       executeOperation(operation);
     }, [executeOperation]),
 
-    // Mark operations
+    // Node operations
     toggleMark,
+    toggleNodeType: useCallback(
+      (nodeType: EditorNode["type"]) => {
+        const operation = commands.node.createToggleNodeTypeCommand(nodeType);
+        executeOperation(operation);
+      },
+      [executeOperation],
+    ),
 
     // Undo/Redo operations
     undo,

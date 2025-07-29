@@ -57,61 +57,99 @@ export function NoteEditor() {
           </div>
         </EditorInputHandler>
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
-        <Button
-          disabled={!operations.canUndo}
-          onClick={() => operations.undo()}
-        >
-          Undo
-        </Button>
-        <Button
-          disabled={!operations.canRedo}
-          onClick={() => operations.redo()}
-        >
-          Redo
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("bold") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("bold")}
-        >
-          Bold
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("italic") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("italic")}
-        >
-          Italic
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("underline") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("underline")}
-        >
-          Underline
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("strikethrough") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("strikethrough")}
-        >
-          Strikethrough
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("superscript") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("superscript")}
-        >
-          Superscript
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("subscript") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("subscript")}
-        >
-          Subscript
-        </Button>
-        <Button
-          variant={`${editor.activeMarks.includes("highlight-yellow") ? "default" : "outline"}`}
-          onClick={() => operations.toggleMark("highlight-yellow")}
-        >
-          Highlight Yellow
-        </Button>
+      <CardFooter className="flex flex-col items-start gap-2">
+        <div>
+          <Button
+            disabled={!operations.canUndo}
+            onClick={() => operations.undo()}
+          >
+            Undo
+          </Button>
+          <Button
+            disabled={!operations.canRedo}
+            onClick={() => operations.redo()}
+          >
+            Redo
+          </Button>
+        </div>
+
+        <div>
+          <Button
+            variant={`${editor.activeNodeType === "heading-1" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("heading-1")}
+          >
+            H1
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "heading-2" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("heading-2")}
+          >
+            H2
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "heading-3" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("heading-3")}
+          >
+            H3
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "heading-4" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("heading-4")}
+          >
+            H4
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "paragraph" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("paragraph")}
+          >
+            Paragraph
+          </Button>
+        </div>
+
+        <div>
+          <Button
+            variant={`${editor.activeMarks.includes("bold") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("bold")}
+          >
+            Bold
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("italic") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("italic")}
+          >
+            Italic
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("underline") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("underline")}
+          >
+            Underline
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("strikethrough") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("strikethrough")}
+          >
+            Strikethrough
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("superscript") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("superscript")}
+          >
+            Superscript
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("subscript") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("subscript")}
+          >
+            Subscript
+          </Button>
+          <Button
+            variant={`${editor.activeMarks.includes("highlight-yellow") ? "default" : "outline"}`}
+            onClick={() => operations.toggleMark("highlight-yellow")}
+          >
+            Highlight Yellow
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

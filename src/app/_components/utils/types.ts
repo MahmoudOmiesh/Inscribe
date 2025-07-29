@@ -106,6 +106,11 @@ export type ToggleMarkOperation = {
   markType: Mark["type"];
 } & OperationBase;
 
+export type ToggleNodeTypeOperation = {
+  type: "toggleNodeType";
+  nodeType: EditorNode["type"];
+} & OperationBase;
+
 export type PasteTextOperation = {
   type: "pasteText";
   content: string;
@@ -120,6 +125,7 @@ export type Operation =
   | InsertParagraphOperation
   | InsertReplacementTextOperation
   | ToggleMarkOperation
+  | ToggleNodeTypeOperation
   | DeleteWordBackwardOperation
   | DeleteWordForwardOperation
   | DeleteByCutOperation

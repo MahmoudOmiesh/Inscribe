@@ -13,6 +13,7 @@ import { toggleMark } from "./toggle-mark";
 import { deleteWord } from "./delete-word";
 import { pasteText } from "./paste-text";
 import { deleteByCut } from "./delete-by-cut";
+import { toggleNodeType } from "./toggle-node-type";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -52,6 +53,9 @@ export function applyOperation(
     }
     case "pasteText": {
       return pasteText(nodes, activeMarks, operation);
+    }
+    case "toggleNodeType": {
+      return toggleNodeType(nodes, operation);
     }
     default: {
       const _exhaustiveCheck: never = operation;
