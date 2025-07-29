@@ -59,6 +59,18 @@ export function NoteEditor() {
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">
         <Button
+          disabled={!operations.canUndo}
+          onClick={() => operations.undo()}
+        >
+          Undo
+        </Button>
+        <Button
+          disabled={!operations.canRedo}
+          onClick={() => operations.redo()}
+        >
+          Redo
+        </Button>
+        <Button
           variant={`${editor.activeMarks.includes("bold") ? "default" : "outline"}`}
           onClick={() => operations.toggleMark("bold")}
         >
@@ -108,8 +120,8 @@ export function NoteEditor() {
 // TODO
 // - fix the mark renderer
 // - fix the insertLineBreak (doesn't work at end of a node)
+// - handle losing focus
 // - make the active marks update after a toggle mark operation
-// - support for undo, redo
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
 // - changing the alignment of the text

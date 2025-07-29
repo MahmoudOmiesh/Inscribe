@@ -72,6 +72,15 @@ export function EditorInputHandler({
           break;
         }
 
+        case "historyUndo": {
+          operations.undo();
+          break;
+        }
+        case "historyRedo": {
+          operations.redo();
+          break;
+        }
+
         case "formatBold": {
           operations.toggleMark("bold");
           break;

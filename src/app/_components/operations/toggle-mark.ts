@@ -176,7 +176,11 @@ function toggleMarkAtCursor(
     // don't do anything
     // the mark will be applied automatically
     // during the next insert operation
-    return { nodes, newCaretPosition: range.start };
+
+    // returning a new array of nodes
+    // is important to trigger a re-render
+    // to update the caret position
+    return { nodes: [...nodes], newCaretPosition: range.start };
   }
 
   const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);

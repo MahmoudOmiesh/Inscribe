@@ -1,4 +1,4 @@
-import { useCallback, type RefObject } from "react";
+import { useCallback, useRef, useState } from "react";
 import { applyOperation } from "../operations";
 import type {
   EditorNode,
@@ -8,7 +8,8 @@ import type {
   SelectionRange,
 } from "../utils/types";
 import { commands } from "../commands";
-import { setSelectionRange } from "../utils/range";
+import { getSelectionRange } from "../utils/range";
+import { useThrottleCallback } from "@/hooks/use-throttle-callback";
 
 interface useEditorOperationsProps {
   nodes: EditorNode[];
@@ -16,18 +17,12 @@ interface useEditorOperationsProps {
   activeMarks: Mark["type"][];
   setActiveMarks: (activeMarks: Mark["type"][]) => void;
   setPendingCaretPosition: (position: PendingCaretPosition) => void;
-  undoStackRef: RefObject<
-    {
-      nodes: EditorNode[];
-      selectionRange: SelectionRange;
-    }[]
-  >;
-  redoStackRef: RefObject<
-    {
-      nodes: EditorNode[];
-      selectionRange: SelectionRange;
-    }[]
-  >;
+}
+
+const UNDO_REDO_STACK_MAX_LENGTH = 5;
+interface UndoRedoStack {
+  nodes: EditorNode[];
+  selectionRange: SelectionRange;
 }
 
 export function useEditorOperations({
@@ -36,12 +31,40 @@ export function useEditorOperations({
   activeMarks,
   setActiveMarks,
   setPendingCaretPosition,
-  undoStackRef,
-  redoStackRef,
 }: useEditorOperationsProps) {
+  const [canUndoRedo, setCanUndoRedo] = useState([false, false]);
+  const undoStackRef = useRef<UndoRedoStack[]>([]);
+  const redoStackRef = useRef<UndoRedoStack[]>([]);
+
+  const updateCanUndoRedo = useCallback(() => {
+    const undoStack = undoStackRef.current;
+    const redoStack = redoStackRef.current;
+    setCanUndoRedo([undoStack.length > 0, redoStack.length > 0] as const);
+  }, []);
+
+  const updateUndoStack = useThrottleCallback(
+    (nodes: EditorNode[], selectionRange: SelectionRange) => {
+      const undoStack = undoStackRef.current;
+      if (undoStack.length >= UNDO_REDO_STACK_MAX_LENGTH) {
+        undoStack.shift();
+      }
+      undoStack.push({ nodes, selectionRange });
+
+      redoStackRef.current = [];
+
+      updateCanUndoRedo();
+    },
+    500,
+  );
+
   const executeOperation = useCallback(
     (operation: Operation | null) => {
       if (!operation) return;
+
+      const selectionRange = getSelectionRange();
+      if (selectionRange) {
+        updateUndoStack(nodes, selectionRange);
+      }
 
       const { nodes: newNodes, newCaretPosition } = applyOperation(
         nodes,
@@ -51,7 +74,7 @@ export function useEditorOperations({
       setNodes(newNodes);
       if (newCaretPosition) setPendingCaretPosition(newCaretPosition);
     },
-    [nodes, activeMarks, setNodes, setPendingCaretPosition],
+    [nodes, activeMarks, setNodes, setPendingCaretPosition, updateUndoStack],
   );
 
   const toggleMark = useCallback(
@@ -59,14 +82,7 @@ export function useEditorOperations({
       const operation = commands.mark.createToggleMarkCommand(mark);
       if (!operation) return;
 
-      const { nodes: newNodes, newCaretPosition } = applyOperation(
-        nodes,
-        activeMarks,
-        operation,
-      );
-
-      setNodes(newNodes);
-      if (newCaretPosition) setPendingCaretPosition(newCaretPosition);
+      executeOperation(operation);
 
       if (operation.range.isCollapsed) {
         setActiveMarks(
@@ -74,16 +90,64 @@ export function useEditorOperations({
             ? activeMarks.filter((m) => m !== mark)
             : [...activeMarks, mark],
         );
-
-        // if the range is collapsed and the mark is to be added
-        // the nodes don't change
-        // so we need to set the selection range manually
-        if (newCaretPosition && newNodes === nodes)
-          setSelectionRange(newCaretPosition);
       }
     },
-    [activeMarks, setActiveMarks, setPendingCaretPosition, setNodes, nodes],
+    [activeMarks, setActiveMarks, executeOperation],
   );
+
+  const undo = useCallback(() => {
+    const undoStack = undoStackRef.current;
+    const selectionRange = getSelectionRange();
+    if (undoStack.length === 0 || !selectionRange) return;
+
+    const { nodes: previousNodes, selectionRange: previousSelectionRange } =
+      undoStack.pop()!;
+    setNodes(previousNodes);
+    setPendingCaretPosition(previousSelectionRange);
+
+    const redoStack = redoStackRef.current;
+    if (redoStack.length >= UNDO_REDO_STACK_MAX_LENGTH) {
+      redoStack.shift();
+    }
+    redoStack.push({
+      nodes,
+      selectionRange,
+    });
+
+    updateCanUndoRedo();
+  }, [
+    nodes,
+    undoStackRef,
+    redoStackRef,
+    setNodes,
+    setPendingCaretPosition,
+    updateCanUndoRedo,
+  ]);
+
+  const redo = useCallback(() => {
+    const redoStack = redoStackRef.current;
+    const selectionRange = getSelectionRange();
+    if (redoStack.length === 0 || !selectionRange) return;
+
+    const { nodes: previousNodes, selectionRange: previousSelectionRange } =
+      redoStack.pop()!;
+    setNodes(previousNodes);
+    setPendingCaretPosition(previousSelectionRange);
+
+    undoStackRef.current.push({
+      nodes,
+      selectionRange,
+    });
+
+    updateCanUndoRedo();
+  }, [
+    nodes,
+    redoStackRef,
+    undoStackRef,
+    setNodes,
+    setPendingCaretPosition,
+    updateCanUndoRedo,
+  ]);
 
   return {
     // Text operations
@@ -133,5 +197,11 @@ export function useEditorOperations({
 
     // Mark operations
     toggleMark,
+
+    // Undo/Redo operations
+    undo,
+    canUndo: canUndoRedo[0],
+    redo,
+    canRedo: canUndoRedo[1],
   };
 }

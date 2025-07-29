@@ -11,8 +11,6 @@ import {
   setSelectionRange,
 } from "../utils/range";
 
-export const UNDO_STACK_MAX_LENGTH = 5;
-
 export function useEditor(initialNodes: EditorNode[]) {
   const [nodes, setNodes] = useState(initialNodes);
   const [activeMarks, setActiveMarks] = useState<Mark["type"][]>([]);
@@ -20,19 +18,6 @@ export function useEditor(initialNodes: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement>(null);
   const previousSelectionRangeRef = useRef<SelectionRange | null>(null);
   const pendingCaretPositionRef = useRef<PendingCaretPosition | null>(null);
-
-  const undoStackRef = useRef<
-    {
-      nodes: EditorNode[];
-      selectionRange: SelectionRange;
-    }[]
-  >([]);
-  const redoStackRef = useRef<
-    {
-      nodes: EditorNode[];
-      selectionRange: SelectionRange;
-    }[]
-  >([]);
 
   const getActiveMarks = useCallback(() => {
     const range = getSelectionRange();
@@ -117,7 +102,5 @@ export function useEditor(initialNodes: EditorNode[]) {
     setPendingCaretPosition,
     handleSelect,
     ref: editorRef,
-    undoStackRef,
-    redoStackRef,
   };
 }
