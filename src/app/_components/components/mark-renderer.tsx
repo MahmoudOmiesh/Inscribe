@@ -62,7 +62,7 @@ function wrapWithMarks(text: string, marks: Mark[]) {
       case "subscript":
         return <sub>{acc}</sub>;
       case "highlight-yellow":
-        return <span className="bg-yellow-200/80">{acc}</span>;
+        return <mark className="bg-yellow-200/80 text-inherit">{acc}</mark>;
       default:
         const _exhaustiveCheck: never = mark.type;
         return _exhaustiveCheck;

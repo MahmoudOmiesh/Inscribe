@@ -86,6 +86,10 @@ export type DeleteWordForwardOperation = {
   type: "deleteWordForward";
 } & OperationBase;
 
+export type DeleteByCutOperation = {
+  type: "deleteByCut";
+} & OperationBase;
+
 export type MergeNodesOperation = {
   type: "mergeNodes";
   firstNodeId: string;
@@ -102,6 +106,12 @@ export type ToggleMarkOperation = {
   markType: Mark["type"];
 } & OperationBase;
 
+export type PasteTextOperation = {
+  type: "pasteText";
+  content: string;
+  contentType: "plain" | "html";
+} & OperationBase;
+
 export type Operation =
   | InsertTextOperation
   | DeleteTextBackwardOperation
@@ -111,7 +121,9 @@ export type Operation =
   | InsertReplacementTextOperation
   | ToggleMarkOperation
   | DeleteWordBackwardOperation
-  | DeleteWordForwardOperation;
+  | DeleteWordForwardOperation
+  | DeleteByCutOperation
+  | PasteTextOperation;
 
 export type OperationResult = {
   nodes: EditorNode[];

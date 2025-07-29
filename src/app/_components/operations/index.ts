@@ -11,6 +11,8 @@ import { insertParagraph } from "./insert-paragraph";
 import { insertReplacementText } from "./insert-replacement-text";
 import { toggleMark } from "./toggle-mark";
 import { deleteWord } from "./delete-word";
+import { pasteText } from "./paste-text";
+import { deleteByCut } from "./delete-by-cut";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -44,6 +46,12 @@ export function applyOperation(
     }
     case "deleteWordForward": {
       return deleteWord(nodes, activeMarks, operation);
+    }
+    case "deleteByCut": {
+      return deleteByCut(nodes, activeMarks, operation);
+    }
+    case "pasteText": {
+      return pasteText(nodes, activeMarks, operation);
     }
     default: {
       const _exhaustiveCheck: never = operation;

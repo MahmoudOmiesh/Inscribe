@@ -1,6 +1,6 @@
-import { adjustMarks, createInsertChange } from "../utils/adjust-marks";
 import type { EditorNode, Mark } from "../utils/types";
 import type { MergeNodesOperation } from "../utils/types";
+import { mergeNodes as mergeNodesHelper } from "./helpers/marge-nodes";
 
 export function mergeNodes(
   nodes: EditorNode[],
@@ -16,13 +16,7 @@ export function mergeNodes(
   const firstNode = nodes[firstNodeIndex]!;
   const secondNode = nodes[secondNodeIndex]!;
 
-  const secondNodeChange = createInsertChange(0, firstNode.text.length);
-  const secondNodeMarks = adjustMarks(secondNode.marks, secondNodeChange);
-  const newNode = {
-    ...firstNode,
-    text: firstNode.text + secondNode.text,
-    marks: [...firstNode.marks, ...secondNodeMarks],
-  };
+  const newNode = mergeNodesHelper(firstNode, secondNode);
 
   return {
     nodes: [

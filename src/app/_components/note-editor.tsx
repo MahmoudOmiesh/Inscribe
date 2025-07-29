@@ -17,7 +17,6 @@ import type {
   Mark,
   SelectionRange,
 } from "./utils/types";
-import { waitForDebugger } from "inspector";
 
 export function NoteEditor() {
   const [activeMarks, setActiveMarks] = useState<Mark["type"][]>([]);
@@ -28,7 +27,7 @@ export function NoteEditor() {
       type: "heading-1",
       text: "Heading bold not bold",
       marks: [
-        { type: "italic", start: 3, end: 4 },
+        { type: "italic", start: 9, end: 10 },
         { type: "bold", start: 8, end: 12 },
       ],
     },
@@ -306,6 +305,46 @@ export function NoteEditor() {
           pendingCaretPositionRef.current = newCaretPosition;
           break;
         }
+        case "deleteByCut": {
+          e.preventDefault();
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "deleteByCut",
+              range: selectionRange,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
+        case "insertFromPaste": {
+          e.preventDefault();
+          const dataTransfer = e.dataTransfer;
+          if (!dataTransfer) return;
+
+          const contentType = dataTransfer.types.includes("text/html")
+            ? "html"
+            : "plain";
+          const content = dataTransfer.getData(
+            contentType === "html" ? "text/html" : "text/plain",
+          );
+
+          const { nodes: newNodes, newCaretPosition } = applyOperation(
+            nodes,
+            activeMarks,
+            {
+              type: "pasteText",
+              range: selectionRange,
+              content,
+              contentType,
+            },
+          );
+          setNodes(newNodes);
+          pendingCaretPositionRef.current = newCaretPosition;
+          break;
+        }
         case "insertText": {
           e.preventDefault();
           const text = data ?? "";
@@ -487,7 +526,7 @@ export function NoteEditor() {
         >
           Highlight Yellow
         </Button>
-        <p>{test}</p>
+        <pre>{test}</pre>
       </CardFooter>
     </Card>
   );
@@ -496,8 +535,6 @@ export function NoteEditor() {
 // TODO
 // - fix the mark renderer
 // - make the active marks update after a toggle mark operation
-// - insertReplacementText operation
-// - support for copy, paste, cut
 // - support for undo, redo
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
@@ -511,3 +548,4 @@ export function NoteEditor() {
 // - support for links
 // - support for code blocks and blockquotes
 // - support for arabic?
+// - support for vim?

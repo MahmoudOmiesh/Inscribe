@@ -1,10 +1,10 @@
-import { adjustMarks, createDeleteChange } from "../utils/adjust-marks";
 import type {
   EditorNode,
   InsertParagraphOperation,
   Mark,
 } from "../utils/types";
 import { deleteBetween } from "./helpers/delete-between";
+import { splitNode } from "./helpers/split-node";
 
 export function insertParagraph(
   nodes: EditorNode[],
@@ -38,35 +38,6 @@ export function insertParagraph(
     ],
     newCaretPosition: getCaretPositionAfterInsertParagraph(newNodeId),
   };
-}
-
-function splitNode({
-  node,
-  offset,
-  newNodeId,
-}: {
-  node: EditorNode;
-  offset: number;
-  newNodeId: string;
-}) {
-  const leftChange = createDeleteChange(offset, node.text.length - offset);
-  const leftMarks = adjustMarks(node.marks, leftChange);
-  const left: EditorNode = {
-    ...node,
-    text: node.text.slice(0, offset),
-    marks: leftMarks,
-  };
-
-  const rightChange = createDeleteChange(0, offset);
-  const rightMarks = adjustMarks(node.marks, rightChange);
-  const right: EditorNode = {
-    ...node,
-    id: newNodeId,
-    text: node.text.slice(offset),
-    marks: rightMarks,
-  };
-
-  return [left, right] as const;
 }
 
 function getCaretPositionAfterInsertParagraph(newNodeId: string) {
