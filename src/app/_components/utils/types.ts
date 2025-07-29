@@ -127,13 +127,7 @@ export type Operation =
 
 export type OperationResult = {
   nodes: EditorNode[];
-  newCaretPosition:
-    | CaretPosition
-    | {
-        start: CaretPosition;
-        end: CaretPosition;
-      }
-    | null;
+  newCaretPosition: PendingCaretPosition | null;
 };
 
 /////////////////////
@@ -144,6 +138,10 @@ export interface CaretPosition {
   nodeId: string;
   offset: number;
 }
+
+export type PendingCaretPosition =
+  | CaretPosition
+  | { start: CaretPosition; end: CaretPosition };
 
 export interface SelectionRange {
   start: CaretPosition;

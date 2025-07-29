@@ -1,4 +1,8 @@
-import type { CaretPosition, SelectionRange } from "./types";
+import type {
+  CaretPosition,
+  PendingCaretPosition,
+  SelectionRange,
+} from "./types";
 
 export function getSelectionRange(): SelectionRange | null {
   const selection = window.getSelection();
@@ -64,14 +68,7 @@ function domToCaretPosition(node: Node, offset: number) {
   };
 }
 
-export function setSelectionRange(
-  range:
-    | CaretPosition
-    | {
-        start: CaretPosition;
-        end: CaretPosition;
-      },
-) {
+export function setSelectionRange(range: PendingCaretPosition) {
   const anchorPoint =
     "start" in range
       ? caretPositionToDom(range.start)
