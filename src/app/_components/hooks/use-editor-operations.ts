@@ -14,9 +14,12 @@ import { useThrottleCallback } from "@/hooks/use-throttle-callback";
 interface useEditorOperationsProps {
   nodes: EditorNode[];
   setNodes: (nodes: EditorNode[]) => void;
+  setPendingCaretPosition: (position: PendingCaretPosition) => void;
+
   activeMarks: Mark["type"][];
   setActiveMarks: (activeMarks: Mark["type"][]) => void;
-  setPendingCaretPosition: (position: PendingCaretPosition) => void;
+
+  preserveActiveMarksAtCurrentPosition: () => void;
 }
 
 const UNDO_REDO_STACK_MAX_LENGTH = 5;
@@ -31,6 +34,7 @@ export function useEditorOperations({
   activeMarks,
   setActiveMarks,
   setPendingCaretPosition,
+  preserveActiveMarksAtCurrentPosition,
 }: useEditorOperationsProps) {
   const [canUndoRedo, setCanUndoRedo] = useState([false, false]);
   const undoStackRef = useRef<UndoRedoStack[]>([]);
@@ -90,9 +94,16 @@ export function useEditorOperations({
             ? activeMarks.filter((m) => m !== mark)
             : [...activeMarks, mark],
         );
+
+        preserveActiveMarksAtCurrentPosition();
       }
     },
-    [activeMarks, setActiveMarks, executeOperation],
+    [
+      activeMarks,
+      setActiveMarks,
+      executeOperation,
+      preserveActiveMarksAtCurrentPosition,
+    ],
   );
 
   const undo = useCallback(() => {

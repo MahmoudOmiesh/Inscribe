@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   PendingCaretPosition,
+  CaretPosition,
   EditorNode,
   Mark,
   SelectionRange,
@@ -19,6 +20,7 @@ export function useEditor(initialNodes: EditorNode[]) {
 
   const editorRef = useRef<HTMLDivElement>(null);
   const pendingCaretPositionRef = useRef<PendingCaretPosition | null>(null);
+  const preserveActiveMarksAtPositionRef = useRef<CaretPosition | null>(null);
 
   const getActiveMarks = useCallback(
     (range: SelectionRange) => {
@@ -111,14 +113,26 @@ export function useEditor(initialNodes: EditorNode[]) {
 
     if (!currentSelectionRange) return;
 
-    const activeMarks = getActiveMarks(currentSelectionRange);
-    setActiveMarks(activeMarks ?? []);
-
     const activeNodeType = getActiveNodeType(currentSelectionRange);
     setActiveNodeType(activeNodeType);
 
     const activeNodeAlignment = getActiveNodeAlignment(currentSelectionRange);
     setActiveNodeAlignment(activeNodeAlignment);
+
+    const preservePosition = preserveActiveMarksAtPositionRef.current;
+    const shouldPreserveActiveMarks =
+      currentSelectionRange.isCollapsed &&
+      preservePosition &&
+      preservePosition.nodeId === currentSelectionRange.start.nodeId &&
+      preservePosition.offset === currentSelectionRange.start.offset;
+
+    if (shouldPreserveActiveMarks) {
+      return;
+    }
+
+    const activeMarks = getActiveMarks(currentSelectionRange);
+    setActiveMarks(activeMarks ?? []);
+    preserveActiveMarksAtPositionRef.current = null;
   }, [getActiveMarks, getActiveNodeType, getActiveNodeAlignment]);
 
   const setPendingCaretPosition = useCallback(
@@ -127,6 +141,13 @@ export function useEditor(initialNodes: EditorNode[]) {
     },
     [],
   );
+
+  const preserveActiveMarksAtCurrentPosition = useCallback(() => {
+    const range = getSelectionRange();
+    if (!range?.isCollapsed) return;
+
+    preserveActiveMarksAtPositionRef.current = range.start;
+  }, []);
 
   useEffect(() => {
     // console.log("NODES", nodes);
@@ -143,12 +164,17 @@ export function useEditor(initialNodes: EditorNode[]) {
   return {
     nodes,
     setNodes,
+    setPendingCaretPosition,
+
     activeMarks,
     setActiveMarks,
+    preserveActiveMarksAtCurrentPosition,
+
     activeNodeType,
     activeNodeAlignment,
-    setPendingCaretPosition,
+
     handleSelect,
+
     ref: editorRef,
   };
 }
