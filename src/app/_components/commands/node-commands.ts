@@ -26,3 +26,16 @@ export function createToggleNodeTypeCommand(
     range,
   };
 }
+
+export function createToggleAlignmentCommand(
+  alignment: EditorNode["alignment"],
+): Operation | null {
+  const range = getSelectionRange();
+  if (!range) return null;
+
+  return {
+    type: "toggleNodeAlignment",
+    alignment,
+    range,
+  };
+}

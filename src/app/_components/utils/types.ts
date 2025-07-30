@@ -21,6 +21,7 @@ export interface Mark {
 export interface BaseNode {
   id: string;
   text: string;
+  alignment: "left" | "center" | "right" | "justify";
   marks: Mark[];
 }
 
@@ -111,6 +112,11 @@ export type ToggleNodeTypeOperation = {
   nodeType: EditorNode["type"];
 } & OperationBase;
 
+export type ToggleNodeAlignmentOperation = {
+  type: "toggleNodeAlignment";
+  alignment: EditorNode["alignment"];
+} & OperationBase;
+
 export type PasteTextOperation = {
   type: "pasteText";
   content: string;
@@ -126,6 +132,7 @@ export type Operation =
   | InsertReplacementTextOperation
   | ToggleMarkOperation
   | ToggleNodeTypeOperation
+  | ToggleNodeAlignmentOperation
   | DeleteWordBackwardOperation
   | DeleteWordForwardOperation
   | DeleteByCutOperation

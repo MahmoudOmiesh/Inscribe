@@ -13,6 +13,7 @@ const DEFAULT_NODES: EditorNode[] = [
     id: "20ce649b-df96-447c-b90a-5715989b02c4",
     type: "heading-1",
     text: "Heading bold not bold",
+    alignment: "left",
     marks: [
       { type: "italic", start: 9, end: 10 },
       { type: "bold", start: 8, end: 12 },
@@ -22,6 +23,7 @@ const DEFAULT_NODES: EditorNode[] = [
     id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
     type: "paragraph",
     text: "Hello, world!",
+    alignment: "left",
     marks: [
       {
         type: "bold",
@@ -34,6 +36,7 @@ const DEFAULT_NODES: EditorNode[] = [
     id: "12345678-1234-1234-1234-123456789012",
     type: "paragraph",
     text: "",
+    alignment: "left",
     marks: [],
   },
 ];
@@ -105,6 +108,32 @@ export function NoteEditor() {
             Paragraph
           </Button>
         </div>
+        <div>
+          <Button
+            variant={`${editor.activeNodeAlignment === "left" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeAlignment("left")}
+          >
+            Left
+          </Button>
+          <Button
+            variant={`${editor.activeNodeAlignment === "center" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeAlignment("center")}
+          >
+            Center
+          </Button>
+          <Button
+            variant={`${editor.activeNodeAlignment === "right" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeAlignment("right")}
+          >
+            Right
+          </Button>
+          <Button
+            variant={`${editor.activeNodeAlignment === "justify" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeAlignment("justify")}
+          >
+            Justify
+          </Button>
+        </div>
 
         <div>
           <Button
@@ -162,8 +191,6 @@ export function NoteEditor() {
 // - make the active marks update after a toggle mark operation
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
-// - changing the alignment of the text
-// - changing between different types of nodes
 // - support for lists (unordered, ordered, task)
 // - general clean up for the code
 // - imrpove the ui

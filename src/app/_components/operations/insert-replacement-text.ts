@@ -18,8 +18,6 @@ export function insertReplacementText(
     text +
     node.text.slice(range.end.offset);
 
-  console.log("NEW TEXT", newText);
-
   return {
     nodes: [
       ...nodes.slice(0, nodeIndex),

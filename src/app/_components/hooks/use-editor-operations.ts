@@ -204,6 +204,13 @@ export function useEditorOperations({
       },
       [executeOperation],
     ),
+    toggleNodeAlignment: useCallback(
+      (alignment: EditorNode["alignment"]) => {
+        const operation = commands.node.createToggleAlignmentCommand(alignment);
+        executeOperation(operation);
+      },
+      [executeOperation],
+    ),
 
     // Undo/Redo operations
     undo,

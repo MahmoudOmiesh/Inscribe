@@ -26,6 +26,7 @@ export function insertParagraph(
 
   if (right.text.length === 0) {
     right.type = "paragraph";
+    right.alignment = "left";
     right.marks = [];
   }
 

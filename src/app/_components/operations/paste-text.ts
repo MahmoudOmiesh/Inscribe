@@ -18,6 +18,7 @@ function htmlToEditorNodes(html: string) {
     nodes.push({
       id: uuidv4(),
       type: nodeType,
+      alignment: "left",
       text,
       marks,
     });

@@ -17,6 +17,9 @@ export function useEditor(initialNodes: EditorNode[]) {
   const [activeNodeType, setActiveNodeType] = useState<
     EditorNode["type"] | null
   >(null);
+  const [activeNodeAlignment, setActiveNodeAlignment] = useState<
+    EditorNode["alignment"] | null
+  >(null);
 
   const editorRef = useRef<HTMLDivElement>(null);
   const previousSelectionRangeRef = useRef<SelectionRange | null>(null);
@@ -89,6 +92,25 @@ export function useEditor(initialNodes: EditorNode[]) {
     [nodes],
   );
 
+  const getActiveNodeAlignment = useCallback(
+    (range: SelectionRange) => {
+      const firstNodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
+      const lastNodeIdx = nodes.findIndex((n) => n.id === range.end.nodeId);
+      if (firstNodeIdx === -1 || lastNodeIdx === -1) return null;
+
+      const firstNode = nodes[firstNodeIdx]!;
+
+      const alignment = firstNode.alignment;
+      for (let i = firstNodeIdx + 1; i <= lastNodeIdx; i++) {
+        const node = nodes[i]!;
+        if (node.alignment !== alignment) return null;
+      }
+
+      return alignment;
+    },
+    [nodes],
+  );
+
   const handleSelect = useCallback(() => {
     const currentSelectionRange = getSelectionRange();
     const previousSelectionRange = previousSelectionRangeRef.current;
@@ -106,7 +128,10 @@ export function useEditor(initialNodes: EditorNode[]) {
 
     const activeNodeType = getActiveNodeType(currentSelectionRange);
     setActiveNodeType(activeNodeType);
-  }, [getActiveMarks, getActiveNodeType]);
+
+    const activeNodeAlignment = getActiveNodeAlignment(currentSelectionRange);
+    setActiveNodeAlignment(activeNodeAlignment);
+  }, [getActiveMarks, getActiveNodeType, getActiveNodeAlignment]);
 
   const setPendingCaretPosition = useCallback(
     (position: PendingCaretPosition) => {
@@ -131,6 +156,7 @@ export function useEditor(initialNodes: EditorNode[]) {
     activeMarks,
     setActiveMarks,
     activeNodeType,
+    activeNodeAlignment,
     setPendingCaretPosition,
     handleSelect,
     ref: editorRef,

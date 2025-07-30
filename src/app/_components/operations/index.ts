@@ -14,6 +14,7 @@ import { deleteWord } from "./delete-word";
 import { pasteText } from "./paste-text";
 import { deleteByCut } from "./delete-by-cut";
 import { toggleNodeType } from "./toggle-node-type";
+import { toggleNodeAlignment } from "./toggle-node-alignment";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -56,6 +57,9 @@ export function applyOperation(
     }
     case "toggleNodeType": {
       return toggleNodeType(nodes, operation);
+    }
+    case "toggleNodeAlignment": {
+      return toggleNodeAlignment(nodes, operation);
     }
     default: {
       const _exhaustiveCheck: never = operation;

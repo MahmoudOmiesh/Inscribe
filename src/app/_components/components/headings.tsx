@@ -4,7 +4,12 @@ import type { HeadingNode } from "../utils/types";
 import { MarkRenderer } from "./mark-renderer";
 
 export const Heading = memo(({ node }: { node: HeadingNode }) => {
-  const commonClassNames = "whitespace-pre-wrap";
+  const commonClassNames = cn(
+    "whitespace-pre-wrap",
+    node.alignment === "center" && "text-center",
+    node.alignment === "right" && "text-right",
+    node.alignment === "justify" && "text-justify",
+  );
 
   switch (node.type) {
     case "heading-1":
