@@ -191,7 +191,6 @@ export function NoteEditor() {
 // - fix the mark renderer
 // - fix the insertLineBreak (doesn't work at end of a node)
 // - handle losing focus
-// - make the active marks update after a toggle mark operation
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)
 // - support for lists (unordered, ordered, task)

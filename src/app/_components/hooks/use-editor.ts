@@ -5,11 +5,7 @@ import type {
   Mark,
   SelectionRange,
 } from "../utils/types";
-import {
-  compareSelectionRanges,
-  getSelectionRange,
-  setSelectionRange,
-} from "../utils/range";
+import { getSelectionRange, setSelectionRange } from "../utils/range";
 
 export function useEditor(initialNodes: EditorNode[]) {
   const [nodes, setNodes] = useState(initialNodes);
@@ -22,7 +18,6 @@ export function useEditor(initialNodes: EditorNode[]) {
   >(null);
 
   const editorRef = useRef<HTMLDivElement>(null);
-  const previousSelectionRangeRef = useRef<SelectionRange | null>(null);
   const pendingCaretPositionRef = useRef<PendingCaretPosition | null>(null);
 
   const getActiveMarks = useCallback(
@@ -113,15 +108,8 @@ export function useEditor(initialNodes: EditorNode[]) {
 
   const handleSelect = useCallback(() => {
     const currentSelectionRange = getSelectionRange();
-    const previousSelectionRange = previousSelectionRangeRef.current;
 
-    if (
-      !currentSelectionRange ||
-      compareSelectionRanges(currentSelectionRange, previousSelectionRange)
-    )
-      return;
-
-    previousSelectionRangeRef.current = currentSelectionRange;
+    if (!currentSelectionRange) return;
 
     const activeMarks = getActiveMarks(currentSelectionRange);
     setActiveMarks(activeMarks ?? []);
@@ -141,14 +129,16 @@ export function useEditor(initialNodes: EditorNode[]) {
   );
 
   useEffect(() => {
-    console.log("NODES", nodes);
+    // console.log("NODES", nodes);
 
     const position = pendingCaretPositionRef.current;
     if (!position) return;
 
     setSelectionRange(position);
     pendingCaretPositionRef.current = null;
-  }, [nodes]);
+
+    handleSelect();
+  }, [nodes, handleSelect]);
 
   return {
     nodes,
