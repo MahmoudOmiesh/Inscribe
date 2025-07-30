@@ -52,6 +52,9 @@ export function NoteEditor() {
           <div
             ref={editor.ref}
             onSelect={editor.handleSelect}
+            onDragStart={(e) => {
+              e.preventDefault();
+            }}
             contentEditable
             suppressContentEditableWarning
             className="space-y-2 p-0.5 whitespace-pre outline-none"

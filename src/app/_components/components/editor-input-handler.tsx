@@ -105,6 +105,22 @@ export function EditorInputHandler({
           operations.toggleMark("subscript");
           break;
         }
+        case "formatJustifyLeft": {
+          operations.toggleNodeAlignment("left");
+          break;
+        }
+        case "formatJustifyCenter": {
+          operations.toggleNodeAlignment("center");
+          break;
+        }
+        case "formatJustifyRight": {
+          operations.toggleNodeAlignment("right");
+          break;
+        }
+        case "formatJustifyFull": {
+          operations.toggleNodeAlignment("justify");
+          break;
+        }
       }
     },
     [operations],
