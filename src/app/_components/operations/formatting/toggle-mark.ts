@@ -3,8 +3,12 @@ import type {
   Mark,
   SelectionRange,
   ToggleMarkOperation,
-} from "../utils/types";
-import { mergeOverlappingMarks } from "./helpers/merge-marks";
+} from "../../utils/types";
+import { mergeOverlappingMarks } from "../shared/merge-marks";
+import {
+  findNodeIndexById,
+  replaceNodeAtIndex,
+} from "../shared/node-operations";
 
 export function toggleMark(
   nodes: EditorNode[],
@@ -27,28 +31,39 @@ function toggleMarkAtRange(
   markType: Mark["type"],
   shouldAddMark: boolean,
 ) {
-  const startNodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
-  const endNodeIndex = nodes.findIndex((n) => n.id === range.end.nodeId);
+  const startNodeIndex = findNodeIndexById(nodes, range.start.nodeId);
+  const endNodeIndex = findNodeIndexById(nodes, range.end.nodeId);
 
   if (startNodeIndex === -1 || endNodeIndex === -1)
     return { nodes, newCaretPosition: null };
 
   if (startNodeIndex === endNodeIndex) {
-    return toggleMarkAtSingleNode(nodes, range, markType, shouldAddMark);
+    return toggleMarkAtSingleNode(
+      nodes,
+      startNodeIndex,
+      range,
+      markType,
+      shouldAddMark,
+    );
   }
 
-  return toggleMarkAtMultipleNodes(nodes, range, markType, shouldAddMark);
+  return toggleMarkAtMultipleNodes(
+    nodes,
+    startNodeIndex,
+    endNodeIndex,
+    range,
+    markType,
+    shouldAddMark,
+  );
 }
 
 function toggleMarkAtSingleNode(
   nodes: EditorNode[],
+  nodeIndex: number,
   range: SelectionRange,
   markType: Mark["type"],
   shouldAddMark: boolean,
 ) {
-  const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
-  if (nodeIndex === -1) return { nodes, newCaretPosition: null };
-
   const node = nodes[nodeIndex]!;
   let newMarks = [...node.marks];
 
@@ -69,13 +84,10 @@ function toggleMarkAtSingleNode(
     );
   }
 
-  const newNodes = [
-    ...nodes.slice(0, nodeIndex),
-    { ...node, marks: newMarks },
-    ...nodes.slice(nodeIndex + 1),
-  ];
-
-  return { nodes: newNodes, newCaretPosition: range };
+  return {
+    nodes: replaceNodeAtIndex(nodes, nodeIndex, { ...node, marks: newMarks }),
+    newCaretPosition: range,
+  };
 }
 
 function removeMarkFromRange(
@@ -125,16 +137,12 @@ function removeMarkFromRange(
 
 function toggleMarkAtMultipleNodes(
   nodes: EditorNode[],
+  startNodeIndex: number,
+  endNodeIndex: number,
   range: SelectionRange,
   markType: Mark["type"],
   shouldAddMark: boolean,
 ) {
-  const startNodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
-  const endNodeIndex = nodes.findIndex((n) => n.id === range.end.nodeId);
-
-  if (startNodeIndex === -1 || endNodeIndex === -1)
-    return { nodes, newCaretPosition: null };
-
   const newNodes = [...nodes];
 
   for (let i = startNodeIndex; i <= endNodeIndex; i++) {
@@ -166,6 +174,7 @@ function toggleMarkAtMultipleNodes(
 
   return { nodes: newNodes, newCaretPosition: range };
 }
+
 function toggleMarkAtCursor(
   nodes: EditorNode[],
   range: SelectionRange,
@@ -183,23 +192,17 @@ function toggleMarkAtCursor(
     return { nodes: [...nodes], newCaretPosition: range.start };
   }
 
-  const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
+  const nodeIndex = findNodeIndexById(nodes, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const node = nodes[nodeIndex]!;
   const splitOffset = range.start.offset;
   const newMarks = splitMarkAtPosition(node.marks, markType, splitOffset);
 
-  const newNodes = [
-    ...nodes.slice(0, nodeIndex),
-    {
-      ...node,
-      marks: newMarks,
-    },
-    ...nodes.slice(nodeIndex + 1),
-  ];
-
-  return { nodes: newNodes, newCaretPosition: range.start };
+  return {
+    nodes: replaceNodeAtIndex(nodes, nodeIndex, { ...node, marks: newMarks }),
+    newCaretPosition: range.start,
+  };
 }
 
 function splitMarkAtPosition(

@@ -190,6 +190,7 @@ export function NoteEditor() {
 // TODO
 // - fix the mark renderer
 // - fix the insertLineBreak (doesn't work at end of a node)
+// - fix if I turn off a mark in collapsed state, it splits the node even if the user didn't type
 // - handle losing focus
 // - performance improvements (map for getting idx from id, etc)
 // - deal with other input types (deleteForward, etc)

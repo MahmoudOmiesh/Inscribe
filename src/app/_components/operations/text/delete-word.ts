@@ -2,13 +2,58 @@ import type {
   DeleteWordBackwardOperation,
   DeleteWordForwardOperation,
   EditorNode,
-  Mark,
-  SelectionRange,
-} from "../utils/types";
-import { deleteBetween } from "./helpers/delete-between";
+} from "../../utils/types";
+import { deleteBetween } from "../shared/delete-between";
+import { findNodeIndexById } from "../shared/node-operations";
 
 //TODO: browser support isn't great for this, we need to use a polyfill
 const wordSegmenter = new Intl.Segmenter("en", { granularity: "word" });
+
+export function deleteWord(
+  nodes: EditorNode[],
+  operation: DeleteWordBackwardOperation | DeleteWordForwardOperation,
+) {
+  const { range } = operation;
+
+  if (!range.isCollapsed) {
+    return {
+      nodes: deleteBetween(nodes, range),
+      newCaretPosition: {
+        nodeId: range.start.nodeId,
+        offset: range.start.offset,
+      },
+    };
+  }
+
+  const nodeIndex = findNodeIndexById(nodes, range.start.nodeId);
+  if (nodeIndex === -1) return { nodes, newCaretPosition: null };
+
+  const direction =
+    operation.type === "deleteWordBackward" ? "backward" : "forward";
+  const node = nodes[nodeIndex]!;
+
+  const currentPosition = range.start.offset;
+  const targetPosition = findWordBoundary(
+    node.text,
+    currentPosition,
+    direction,
+  );
+
+  const deleteRange = getDeleteRange(
+    node,
+    currentPosition,
+    targetPosition,
+    direction,
+  );
+
+  return {
+    nodes: deleteBetween(nodes, deleteRange),
+    newCaretPosition: {
+      nodeId: node.id,
+      offset: deleteRange.start.offset,
+    },
+  };
+}
 
 function findWordBoundary(
   text: string,
@@ -64,57 +109,18 @@ function findWordBoundary(
   }
 }
 
-export function deleteWord(
-  nodes: EditorNode[],
-  activeMarks: Mark["type"][],
-  operation: DeleteWordBackwardOperation | DeleteWordForwardOperation,
+function getDeleteRange(
+  node: EditorNode,
+  currentPosition: number,
+  targetPosition: number,
+  direction: "backward" | "forward",
 ) {
-  const { range } = operation;
-
-  if (!range.isCollapsed) {
-    return {
-      nodes: deleteBetween(nodes, range),
-      newCaretPosition: {
-        nodeId: range.start.nodeId,
-        offset: range.start.offset,
-      },
-    };
-  }
-
-  const nodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
-  if (nodeIdx === -1) return { nodes, newCaretPosition: null };
-
-  const direction =
-    operation.type === "deleteWordBackward" ? "backward" : "forward";
-  const node = nodes[nodeIdx]!;
-
-  const currentPosition = range.start.offset;
-  const targetPosition = findWordBoundary(
-    node.text,
-    currentPosition,
-    direction,
-  );
-
-  let deleteRange: SelectionRange;
-  if (direction === "backward") {
-    deleteRange = {
-      start: { nodeId: node.id, offset: targetPosition },
-      end: { nodeId: node.id, offset: currentPosition },
-      isCollapsed: false,
-    };
-  } else {
-    deleteRange = {
-      start: { nodeId: node.id, offset: currentPosition },
-      end: { nodeId: node.id, offset: targetPosition },
-      isCollapsed: false,
-    };
-  }
+  const start = direction === "backward" ? targetPosition : currentPosition;
+  const end = direction === "backward" ? currentPosition : targetPosition;
 
   return {
-    nodes: deleteBetween(nodes, deleteRange),
-    newCaretPosition: {
-      nodeId: node.id,
-      offset: direction === "backward" ? targetPosition : currentPosition,
-    },
+    start: { nodeId: node.id, offset: start },
+    end: { nodeId: node.id, offset: end },
+    isCollapsed: false,
   };
 }

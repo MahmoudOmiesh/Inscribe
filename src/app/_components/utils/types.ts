@@ -66,11 +66,6 @@ export type InsertTextOperation = {
   text: string;
 } & OperationBase;
 
-export type InsertReplacementTextOperation = {
-  type: "insertReplacementText";
-  text: string;
-} & OperationBase;
-
 export type DeleteTextBackwardOperation = {
   type: "deleteTextBackward";
 } & OperationBase;
@@ -129,7 +124,6 @@ export type Operation =
   | DeleteTextForwardOperation
   | MergeNodesOperation
   | InsertParagraphOperation
-  | InsertReplacementTextOperation
   | ToggleMarkOperation
   | ToggleNodeTypeOperation
   | ToggleNodeAlignmentOperation

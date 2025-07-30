@@ -4,17 +4,16 @@ import type {
   Operation,
   OperationResult,
 } from "../utils/types";
-import { insertText } from "./insert-text";
-import { deleteText } from "./delete-text";
-import { mergeNodes } from "./merge-nodes";
-import { insertParagraph } from "./insert-paragraph";
-import { insertReplacementText } from "./insert-replacement-text";
-import { toggleMark } from "./toggle-mark";
-import { deleteWord } from "./delete-word";
-import { pasteText } from "./paste-text";
-import { deleteByCut } from "./delete-by-cut";
-import { toggleNodeType } from "./toggle-node-type";
-import { toggleNodeAlignment } from "./toggle-node-alignment";
+import { insertText } from "./text/insert-text";
+import { deleteText } from "./text/delete-text";
+import { mergeNodes } from "./structure/merge-nodes";
+import { insertParagraph } from "./structure/insert-paragraph";
+import { toggleMark } from "./formatting/toggle-mark";
+import { deleteWord } from "./text/delete-word";
+import { pasteText } from "./text/paste-text";
+import { deleteByCut } from "./structure/delete-by-cut";
+import { toggleNodeType } from "./formatting/toggle-node-type";
+import { toggleNodeAlignment } from "./formatting/toggle-node-alignment";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -26,31 +25,28 @@ export function applyOperation(
       return insertText(nodes, activeMarks, operation);
     }
     case "deleteTextBackward": {
-      return deleteText(nodes, activeMarks, operation);
+      return deleteText(nodes, operation);
     }
     case "deleteTextForward": {
-      return deleteText(nodes, activeMarks, operation);
+      return deleteText(nodes, operation);
     }
     case "mergeNodes": {
-      return mergeNodes(nodes, activeMarks, operation);
+      return mergeNodes(nodes, operation);
     }
     case "insertParagraph": {
-      return insertParagraph(nodes, activeMarks, operation);
+      return insertParagraph(nodes, operation);
     }
     case "toggleMark": {
       return toggleMark(nodes, activeMarks, operation);
     }
-    case "insertReplacementText": {
-      return insertReplacementText(nodes, operation);
-    }
     case "deleteWordBackward": {
-      return deleteWord(nodes, activeMarks, operation);
+      return deleteWord(nodes, operation);
     }
     case "deleteWordForward": {
-      return deleteWord(nodes, activeMarks, operation);
+      return deleteWord(nodes, operation);
     }
     case "deleteByCut": {
-      return deleteByCut(nodes, activeMarks, operation);
+      return deleteByCut(nodes, operation);
     }
     case "pasteText": {
       return pasteText(nodes, activeMarks, operation);

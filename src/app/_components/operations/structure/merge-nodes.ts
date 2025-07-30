@@ -1,15 +1,18 @@
-import type { EditorNode, Mark } from "../utils/types";
-import type { MergeNodesOperation } from "../utils/types";
-import { mergeNodes as mergeNodesHelper } from "./helpers/marge-nodes";
+import type { EditorNode } from "../../utils/types";
+import type { MergeNodesOperation } from "../../utils/types";
+import { mergeTwoNodes as mergeNodesHelper } from "../shared/merge-two-nodes";
+import {
+  findNodeIndexById,
+  replaceNodeAtIndex,
+} from "../shared/node-operations";
 
 export function mergeNodes(
   nodes: EditorNode[],
-  activeMarks: Mark["type"][],
   operation: MergeNodesOperation,
 ) {
   const { firstNodeId, secondNodeId } = operation;
-  const firstNodeIndex = nodes.findIndex((n) => n.id === firstNodeId);
-  const secondNodeIndex = nodes.findIndex((n) => n.id === secondNodeId);
+  const firstNodeIndex = findNodeIndexById(nodes, firstNodeId);
+  const secondNodeIndex = findNodeIndexById(nodes, secondNodeId);
   if (firstNodeIndex === -1 || secondNodeIndex === -1)
     return { nodes, newCaretPosition: null };
 
@@ -19,11 +22,7 @@ export function mergeNodes(
   const newNode = mergeNodesHelper(firstNode, secondNode);
 
   return {
-    nodes: [
-      ...nodes.slice(0, firstNodeIndex),
-      newNode,
-      ...nodes.slice(secondNodeIndex + 1),
-    ],
+    nodes: replaceNodeAtIndex(nodes, firstNodeIndex, newNode),
     newCaretPosition: getCaretPositionAfterMergeNodes(firstNode),
   };
 }

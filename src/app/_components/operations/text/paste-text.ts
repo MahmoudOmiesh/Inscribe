@@ -1,31 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import type { PasteTextOperation } from "../utils/types";
-import type { EditorNode, Mark } from "../utils/types";
+import type { PasteTextOperation } from "../../utils/types";
+import type { EditorNode, Mark } from "../../utils/types";
 import { insertText } from "./insert-text";
-import { mergeOverlappingMarks } from "./helpers/merge-marks";
-import { splitNode } from "./helpers/split-node";
-import { mergeNodes } from "./helpers/marge-nodes";
-import { deleteBetween } from "./helpers/delete-between";
-
-function htmlToEditorNodes(html: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const nodes: EditorNode[] = [];
-
-  for (const child of doc.body.children) {
-    const nodeType = getNodeType(child);
-    const { text, marks } = getTextAndMarks(child);
-    nodes.push({
-      id: uuidv4(),
-      type: nodeType,
-      alignment: "left",
-      text,
-      marks,
-    });
-  }
-
-  return nodes;
-}
+import { mergeOverlappingMarks } from "../shared/merge-marks";
+import { splitNode } from "../shared/split-node";
+import { mergeTwoNodes } from "../shared/merge-two-nodes";
+import { deleteBetween } from "../shared/delete-between";
+import {
+  findNodeIndexById,
+  replaceNodeAtIndex,
+} from "../shared/node-operations";
 
 export function pasteText(
   nodes: EditorNode[],
@@ -42,23 +26,19 @@ export function pasteText(
     });
   }
 
-  nodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
-  const newNodes = htmlToEditorNodes(content);
+  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
+  const pastedNodes = htmlToEditorNodes(content);
 
-  const nodeIndex = nodes.findIndex((n) => n.id === range.start.nodeId);
+  const nodeIndex = findNodeIndexById(newNodes, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
-  const node = nodes[nodeIndex]!;
+  const node = newNodes[nodeIndex]!;
   const isNodeEmpty = node.text.length === 0;
 
   if (isNodeEmpty) {
     // if we are in an empty node, replace it with the new nodes
     return {
-      nodes: [
-        ...nodes.slice(0, nodeIndex),
-        ...newNodes,
-        ...nodes.slice(nodeIndex + 1),
-      ],
+      nodes: replaceNodeAtIndex(nodes, nodeIndex, pastedNodes),
       newCaretPosition: {
         nodeId: newNodes[newNodes.length - 1]!.id,
         offset: newNodes[newNodes.length - 1]!.text.length,
@@ -86,26 +66,44 @@ export function pasteText(
     });
 
     const firstPart =
-      left.text.length === 0 ? newNodes[0]! : mergeNodes(left, newNodes[0]!);
+      left.text.length === 0 ? newNodes[0]! : mergeTwoNodes(left, newNodes[0]!);
     const lastPart =
       right.text.length === 0
         ? newNodes[newNodes.length - 1]!
-        : mergeNodes(right, newNodes[newNodes.length - 1]!);
+        : mergeTwoNodes(right, newNodes[newNodes.length - 1]!);
 
     return {
-      nodes: [
-        ...nodes.slice(0, nodeIndex),
+      nodes: replaceNodeAtIndex(nodes, nodeIndex, [
         firstPart,
         ...newNodes.slice(1, -1),
         lastPart,
-        ...nodes.slice(nodeIndex + 1),
-      ],
+      ]),
       newCaretPosition: {
         nodeId: lastPart.id,
         offset: lastPart.text.length,
       },
     };
   }
+}
+
+function htmlToEditorNodes(html: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const nodes: EditorNode[] = [];
+
+  for (const child of doc.body.children) {
+    const nodeType = getNodeType(child);
+    const { text, marks } = getTextAndMarks(child);
+    nodes.push({
+      id: uuidv4(),
+      type: nodeType,
+      alignment: "left",
+      text,
+      marks,
+    });
+  }
+
+  return nodes;
 }
 
 function getNodeType(node: Node): EditorNode["type"] {
