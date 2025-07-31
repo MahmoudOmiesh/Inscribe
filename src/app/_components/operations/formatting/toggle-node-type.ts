@@ -9,12 +9,13 @@ import {
 
 export function toggleNodeType(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: ToggleNodeTypeOperation,
 ) {
   const { nodeType, range } = operation;
 
-  const firstNodeIdx = findNodeIndexById(nodes, range.start.nodeId);
-  const lastNodeIdx = findNodeIndexById(nodes, range.end.nodeId);
+  const firstNodeIdx = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
+  const lastNodeIdx = findNodeIndexById(nodeIdIndexMap, range.end.nodeId);
 
   if (firstNodeIdx === -1 || lastNodeIdx === -1) {
     return {

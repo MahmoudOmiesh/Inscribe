@@ -8,11 +8,12 @@ import {
 
 export function mergeNodes(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: MergeNodesOperation,
 ) {
   const { firstNodeId, secondNodeId } = operation;
-  const firstNodeIndex = findNodeIndexById(nodes, firstNodeId);
-  const secondNodeIndex = findNodeIndexById(nodes, secondNodeId);
+  const firstNodeIndex = findNodeIndexById(nodeIdIndexMap, firstNodeId);
+  const secondNodeIndex = findNodeIndexById(nodeIdIndexMap, secondNodeId);
   if (firstNodeIndex === -1 || secondNodeIndex === -1)
     return { nodes, newCaretPosition: null };
 

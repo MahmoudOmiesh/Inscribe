@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   PendingCaretPosition,
   CaretPosition,
@@ -7,6 +7,7 @@ import type {
   SelectionRange,
 } from "../utils/types";
 import { getSelectionRange, setSelectionRange } from "../utils/range";
+import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
 export function useEditor(initialNodes: EditorNode[]) {
   const [nodes, setNodes] = useState(initialNodes);
@@ -19,15 +20,25 @@ export function useEditor(initialNodes: EditorNode[]) {
   >(null);
 
   const editorRef = useRef<HTMLDivElement>(null);
+  const nodeIdIndexMapRef = useRef<Map<string, number>>(
+    new Map(initialNodes.map((node, index) => [node.id, index])),
+  );
   const pendingCaretPositionRef = useRef<PendingCaretPosition | null>(null);
   const preserveActiveMarksAtPositionRef = useRef<CaretPosition | null>(null);
 
-  const getActiveMarks = useCallback(
-    (range: SelectionRange) => {
-      if (range.start.nodeId === range.end.nodeId) {
-        const node = nodes.find((n) => n.id === range.start.nodeId);
-        if (!node) return;
+  const getActiveMarks = useMemo(() => {
+    const cache = new Map<string, Mark["type"][]>();
 
+    return (range: SelectionRange) => {
+      const cacheKey = `${range.start.nodeId}:${range.start.offset}-${range.end.nodeId}:${range.end.offset}`;
+      const cachedMarks = cache.get(cacheKey);
+      if (cachedMarks) return cachedMarks;
+
+      if (range.start.nodeId === range.end.nodeId) {
+        const nodeIndex = nodeIdIndexMapRef.current.get(range.start.nodeId);
+        if (nodeIndex === undefined) return;
+
+        const node = nodes[nodeIndex]!;
         const marks = node.marks.filter(
           (m) =>
             m.start <= range.start.offset - Number(range.isCollapsed) &&
@@ -37,18 +48,18 @@ export function useEditor(initialNodes: EditorNode[]) {
         return marks.map((m) => m.type);
       }
 
-      const firstNodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
-      const lastNodeIdx = nodes.findIndex((n) => n.id === range.end.nodeId);
-      if (firstNodeIdx === -1 || lastNodeIdx === -1) return;
+      const firstNodeIndex = nodeIdIndexMapRef.current.get(range.start.nodeId);
+      const lastNodeIndex = nodeIdIndexMapRef.current.get(range.end.nodeId);
+      if (firstNodeIndex === undefined || lastNodeIndex === undefined) return;
 
-      const firstNode = nodes[firstNodeIdx]!;
-      const lastNode = nodes[lastNodeIdx]!;
+      const firstNode = nodes[firstNodeIndex]!;
+      const lastNode = nodes[lastNodeIndex]!;
 
       const firstNodeMarks = firstNode.marks.filter(
         (m) => m.start <= range.start.offset && m.end === firstNode.text.length,
       );
       const middleMarks = nodes
-        .slice(firstNodeIdx + 1, lastNodeIdx)
+        .slice(firstNodeIndex + 1, lastNodeIndex)
         .flatMap((n) =>
           n.marks.filter((m) => m.start === 0 && m.end === n.text.length),
         );
@@ -57,7 +68,7 @@ export function useEditor(initialNodes: EditorNode[]) {
       );
 
       const commonMarks = firstNodeMarks.filter((m) => {
-        const doesMiddleExist = lastNodeIdx - firstNodeIdx > 1;
+        const doesMiddleExist = lastNodeIndex - firstNodeIndex > 1;
         return (
           (doesMiddleExist
             ? middleMarks.some((m2) => m.type === m2.type)
@@ -65,21 +76,23 @@ export function useEditor(initialNodes: EditorNode[]) {
         );
       });
 
-      return commonMarks.map((m) => m.type);
-    },
-    [nodes],
-  );
+      const marks = commonMarks.map((m) => m.type);
+      cache.set(cacheKey, marks);
+      return marks;
+    };
+  }, [nodes]);
 
   const getActiveNodeType = useCallback(
     (range: SelectionRange) => {
-      const firstNodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
-      const lastNodeIdx = nodes.findIndex((n) => n.id === range.end.nodeId);
-      if (firstNodeIdx === -1 || lastNodeIdx === -1) return null;
+      const firstNodeIndex = nodeIdIndexMapRef.current.get(range.start.nodeId);
+      const lastNodeIndex = nodeIdIndexMapRef.current.get(range.end.nodeId);
+      if (firstNodeIndex === undefined || lastNodeIndex === undefined)
+        return null;
 
-      const firstNode = nodes[firstNodeIdx]!;
+      const firstNode = nodes[firstNodeIndex]!;
 
       const type = firstNode.type;
-      for (let i = firstNodeIdx + 1; i <= lastNodeIdx; i++) {
+      for (let i = firstNodeIndex + 1; i <= lastNodeIndex; i++) {
         const node = nodes[i]!;
         if (node.type !== type) return null;
       }
@@ -91,14 +104,15 @@ export function useEditor(initialNodes: EditorNode[]) {
 
   const getActiveNodeAlignment = useCallback(
     (range: SelectionRange) => {
-      const firstNodeIdx = nodes.findIndex((n) => n.id === range.start.nodeId);
-      const lastNodeIdx = nodes.findIndex((n) => n.id === range.end.nodeId);
-      if (firstNodeIdx === -1 || lastNodeIdx === -1) return null;
+      const firstNodeIndex = nodeIdIndexMapRef.current.get(range.start.nodeId);
+      const lastNodeIndex = nodeIdIndexMapRef.current.get(range.end.nodeId);
+      if (firstNodeIndex === undefined || lastNodeIndex === undefined)
+        return null;
 
-      const firstNode = nodes[firstNodeIdx]!;
+      const firstNode = nodes[firstNodeIndex]!;
 
       const alignment = firstNode.alignment;
-      for (let i = firstNodeIdx + 1; i <= lastNodeIdx; i++) {
+      for (let i = firstNodeIndex + 1; i <= lastNodeIndex; i++) {
         const node = nodes[i]!;
         if (node.alignment !== alignment) return null;
       }
@@ -108,7 +122,7 @@ export function useEditor(initialNodes: EditorNode[]) {
     [nodes],
   );
 
-  const handleSelect = useCallback(() => {
+  const _handleSelect = useCallback(() => {
     const currentSelectionRange = getSelectionRange();
 
     if (!currentSelectionRange) return;
@@ -135,6 +149,8 @@ export function useEditor(initialNodes: EditorNode[]) {
     preserveActiveMarksAtPositionRef.current = null;
   }, [getActiveMarks, getActiveNodeType, getActiveNodeAlignment]);
 
+  const handleSelect = useDebouncedCallback(_handleSelect, 16);
+
   const setPendingCaretPosition = useCallback(
     (position: PendingCaretPosition) => {
       pendingCaretPositionRef.current = position;
@@ -150,14 +166,14 @@ export function useEditor(initialNodes: EditorNode[]) {
   }, []);
 
   useEffect(() => {
-    // console.log("NODES", nodes);
-
     const position = pendingCaretPositionRef.current;
     if (!position) return;
 
     setSelectionRange(position);
     pendingCaretPositionRef.current = null;
+  }, [nodes]);
 
+  useEffect(() => {
     handleSelect();
   }, [nodes, handleSelect]);
 
@@ -176,5 +192,6 @@ export function useEditor(initialNodes: EditorNode[]) {
     handleSelect,
 
     ref: editorRef,
+    nodeIdIndexMapRef: nodeIdIndexMapRef,
   };
 }

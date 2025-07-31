@@ -9,13 +9,16 @@ import {
 
 export function insertText(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   activeMarks: Mark["type"][],
   operation: InsertTextOperation,
 ) {
   const { range, text } = operation;
-  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
+  const newNodes = range.isCollapsed
+    ? nodes
+    : deleteBetween(nodes, nodeIdIndexMap, range);
 
-  const nodeIndex = findNodeIndexById(newNodes, range.start.nodeId);
+  const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const node = newNodes[nodeIndex]!;

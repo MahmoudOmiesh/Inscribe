@@ -4,12 +4,13 @@ import { deleteBetween } from "../shared/delete-between";
 
 export function deleteByCut(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: DeleteByCutOperation,
 ) {
   const { range } = operation;
 
   return {
-    nodes: deleteBetween(nodes, range),
+    nodes: deleteBetween(nodes, nodeIdIndexMap, range),
     newCaretPosition: {
       ...range.start,
     },

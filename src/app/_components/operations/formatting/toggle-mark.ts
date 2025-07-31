@@ -12,6 +12,7 @@ import {
 
 export function toggleMark(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   activeMarks: Mark["type"][],
   operation: ToggleMarkOperation,
 ) {
@@ -19,20 +20,33 @@ export function toggleMark(
   const shouldAddMark = !activeMarks.includes(markType);
 
   if (range.isCollapsed) {
-    return toggleMarkAtCursor(nodes, range, markType, shouldAddMark);
+    return toggleMarkAtCursor(
+      nodes,
+      nodeIdIndexMap,
+      range,
+      markType,
+      shouldAddMark,
+    );
   }
 
-  return toggleMarkAtRange(nodes, range, markType, shouldAddMark);
+  return toggleMarkAtRange(
+    nodes,
+    nodeIdIndexMap,
+    range,
+    markType,
+    shouldAddMark,
+  );
 }
 
 function toggleMarkAtRange(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   range: SelectionRange,
   markType: Mark["type"],
   shouldAddMark: boolean,
 ) {
-  const startNodeIndex = findNodeIndexById(nodes, range.start.nodeId);
-  const endNodeIndex = findNodeIndexById(nodes, range.end.nodeId);
+  const startNodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
+  const endNodeIndex = findNodeIndexById(nodeIdIndexMap, range.end.nodeId);
 
   if (startNodeIndex === -1 || endNodeIndex === -1)
     return { nodes, newCaretPosition: null };
@@ -177,6 +191,7 @@ function toggleMarkAtMultipleNodes(
 
 function toggleMarkAtCursor(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   range: SelectionRange,
   markType: Mark["type"],
   shouldAddMark: boolean,
@@ -192,7 +207,7 @@ function toggleMarkAtCursor(
     return { nodes: [...nodes], newCaretPosition: range.start };
   }
 
-  const nodeIndex = findNodeIndexById(nodes, range.start.nodeId);
+  const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const node = nodes[nodeIndex]!;

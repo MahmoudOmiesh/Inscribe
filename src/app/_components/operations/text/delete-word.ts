@@ -11,13 +11,14 @@ const wordSegmenter = new Intl.Segmenter("en", { granularity: "word" });
 
 export function deleteWord(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: DeleteWordBackwardOperation | DeleteWordForwardOperation,
 ) {
   const { range } = operation;
 
   if (!range.isCollapsed) {
     return {
-      nodes: deleteBetween(nodes, range),
+      nodes: deleteBetween(nodes, nodeIdIndexMap, range),
       newCaretPosition: {
         nodeId: range.start.nodeId,
         offset: range.start.offset,
@@ -25,7 +26,7 @@ export function deleteWord(
     };
   }
 
-  const nodeIndex = findNodeIndexById(nodes, range.start.nodeId);
+  const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const direction =
@@ -47,7 +48,7 @@ export function deleteWord(
   );
 
   return {
-    nodes: deleteBetween(nodes, deleteRange),
+    nodes: deleteBetween(nodes, nodeIdIndexMap, deleteRange),
     newCaretPosition: {
       nodeId: node.id,
       offset: deleteRange.start.offset,

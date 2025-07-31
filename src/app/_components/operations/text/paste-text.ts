@@ -13,23 +13,26 @@ import {
 
 export function pasteText(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   activeMarks: Mark["type"][],
   operation: PasteTextOperation,
 ) {
   const { content, contentType, range } = operation;
 
   if (contentType === "plain") {
-    return insertText(nodes, activeMarks, {
+    return insertText(nodes, nodeIdIndexMap, activeMarks, {
       type: "insertText",
       text: operation.content,
       range: operation.range,
     });
   }
 
-  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
+  const newNodes = range.isCollapsed
+    ? nodes
+    : deleteBetween(nodes, nodeIdIndexMap, range);
   const pastedNodes = htmlToEditorNodes(content);
 
-  const nodeIndex = findNodeIndexById(newNodes, range.start.nodeId);
+  const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const node = newNodes[nodeIndex]!;
@@ -47,7 +50,7 @@ export function pasteText(
   } else {
     if (newNodes.length === 1) {
       // if we are pasting a single node, we just insert it
-      return insertText(nodes, activeMarks, {
+      return insertText(nodes, nodeIdIndexMap, activeMarks, {
         type: "insertText",
         text: newNodes[0]!.text,
         range,

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import { applyOperation } from "../operations";
 import type {
   EditorNode,
@@ -20,6 +20,8 @@ interface useEditorOperationsProps {
   setActiveMarks: (activeMarks: Mark["type"][]) => void;
 
   preserveActiveMarksAtCurrentPosition: () => void;
+
+  nodeIdIndexMapRef: RefObject<Map<string, number>>;
 }
 
 const UNDO_REDO_STACK_MAX_LENGTH = 5;
@@ -35,6 +37,7 @@ export function useEditorOperations({
   setActiveMarks,
   setPendingCaretPosition,
   preserveActiveMarksAtCurrentPosition,
+  nodeIdIndexMapRef,
 }: useEditorOperationsProps) {
   const [canUndoRedo, setCanUndoRedo] = useState([false, false]);
   const undoStackRef = useRef<UndoRedoStack[]>([]);
@@ -61,6 +64,21 @@ export function useEditorOperations({
     500,
   );
 
+  const updateNodeIdIndexMap = useCallback(
+    (oldNodes: EditorNode[], newNodes: EditorNode[]) => {
+      if (
+        newNodes.length !== oldNodes.length ||
+        newNodes.some((node, i) => node.id !== oldNodes[i]?.id)
+      ) {
+        nodeIdIndexMapRef.current.clear();
+        newNodes.forEach((node, index) => {
+          nodeIdIndexMapRef.current.set(node.id, index);
+        });
+      }
+    },
+    [nodeIdIndexMapRef],
+  );
+
   const executeOperation = useCallback(
     (operation: Operation | null) => {
       if (!operation) return;
@@ -72,13 +90,24 @@ export function useEditorOperations({
 
       const { nodes: newNodes, newCaretPosition } = applyOperation(
         nodes,
+        nodeIdIndexMapRef.current,
         activeMarks,
         operation,
       );
+
+      updateNodeIdIndexMap(nodes, newNodes);
       setNodes(newNodes);
       if (newCaretPosition) setPendingCaretPosition(newCaretPosition);
     },
-    [nodes, activeMarks, setNodes, setPendingCaretPosition, updateUndoStack],
+    [
+      nodes,
+      activeMarks,
+      setNodes,
+      setPendingCaretPosition,
+      updateUndoStack,
+      nodeIdIndexMapRef,
+      updateNodeIdIndexMap,
+    ],
   );
 
   const toggleMark = useCallback(

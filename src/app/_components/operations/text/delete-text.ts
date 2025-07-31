@@ -13,6 +13,7 @@ import {
 
 export function deleteText(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: DeleteTextBackwardOperation | DeleteTextForwardOperation,
 ) {
   const { range } = operation;
@@ -22,7 +23,7 @@ export function deleteText(
   );
 
   if (range.isCollapsed) {
-    const nodeIndex = findNodeIndexById(nodes, range.start.nodeId);
+    const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
     if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
     const node = nodes[nodeIndex]!;
@@ -35,7 +36,7 @@ export function deleteText(
   }
 
   return {
-    nodes: deleteBetween(nodes, range),
+    nodes: deleteBetween(nodes, nodeIdIndexMap, range),
     newCaretPosition,
   };
 }

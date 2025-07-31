@@ -7,9 +7,13 @@ import {
   replaceNodesInRange,
 } from "./node-operations";
 
-export function deleteBetween(nodes: EditorNode[], range: SelectionRange) {
-  const startNodeIndex = findNodeIndexById(nodes, range.start.nodeId);
-  const endNodeIndex = findNodeIndexById(nodes, range.end.nodeId);
+export function deleteBetween(
+  nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
+  range: SelectionRange,
+) {
+  const startNodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
+  const endNodeIndex = findNodeIndexById(nodeIdIndexMap, range.end.nodeId);
 
   if (startNodeIndex === -1 || endNodeIndex === -1) return nodes;
 

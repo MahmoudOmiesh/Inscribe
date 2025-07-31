@@ -1,11 +1,20 @@
 import type { EditorNode } from "../../utils/types";
 
-export function findNodeIndexById(nodes: EditorNode[], id: string) {
-  return nodes.findIndex((node) => node.id === id);
+export function findNodeIndexById(
+  nodeIdIndexMap: Map<string, number>,
+  id: string,
+) {
+  return nodeIdIndexMap.get(id) ?? -1;
 }
 
-export function findNodeById(nodes: EditorNode[], id: string) {
-  return nodes.find((node) => node.id === id);
+export function findNodeById(
+  nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
+  id: string,
+) {
+  const index = findNodeIndexById(nodeIdIndexMap, id);
+  if (index === -1) return null;
+  return nodes[index]!;
 }
 
 export function replaceNodeAtIndex(

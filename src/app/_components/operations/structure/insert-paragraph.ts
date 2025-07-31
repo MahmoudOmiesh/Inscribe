@@ -8,12 +8,15 @@ import { splitNode } from "../shared/split-node";
 
 export function insertParagraph(
   nodes: EditorNode[],
+  nodeIdIndexMap: Map<string, number>,
   operation: InsertParagraphOperation,
 ) {
   const { range, newNodeId } = operation;
 
-  const newNodes = range.isCollapsed ? nodes : deleteBetween(nodes, range);
-  const nodeIndex = findNodeIndexById(newNodes, range.start.nodeId);
+  const newNodes = range.isCollapsed
+    ? nodes
+    : deleteBetween(nodes, nodeIdIndexMap, range);
+  const nodeIndex = findNodeIndexById(nodeIdIndexMap, range.start.nodeId);
   if (nodeIndex === -1) return { nodes, newCaretPosition: null };
 
   const node = newNodes[nodeIndex]!;
