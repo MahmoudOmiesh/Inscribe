@@ -19,26 +19,26 @@ const DEFAULT_NODES: EditorNode[] = [
       { type: "bold", start: 8, end: 12 },
     ],
   },
-  {
-    id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
-    type: "paragraph",
-    text: "Hello, world!",
-    alignment: "left",
-    marks: [
-      {
-        type: "bold",
-        start: 0,
-        end: 5,
-      },
-    ],
-  },
-  {
-    id: "12345678-1234-1234-1234-123456789012",
-    type: "paragraph",
-    text: "",
-    alignment: "left",
-    marks: [],
-  },
+  // {
+  //   id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
+  //   type: "paragraph",
+  //   text: "Hello, world!",
+  //   alignment: "left",
+  //   marks: [
+  //     {
+  //       type: "bold",
+  //       start: 0,
+  //       end: 5,
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "12345678-1234-1234-1234-123456789012",
+  //   type: "paragraph",
+  //   text: "",
+  //   alignment: "left",
+  //   marks: [],
+  // },
 ];
 
 export function NoteEditor() {
@@ -188,16 +188,14 @@ export function NoteEditor() {
 }
 
 // TODO
-// - fix the mark renderer
 // - fix the insertLineBreak (doesn't work at end of a node)
 // - fix if I turn off a mark in collapsed state, it splits the node even if the user didn't type
 // - handle losing focus
-// - performance improvements (map for getting idx from id, etc)
-// - deal with other input types (deleteForward, etc)
 // - support for lists (unordered, ordered, task)
-// - general clean up for the code
 // - imrpove the ui
 
+// - performance
+// - general clean up for the code
 // - support for images
 // - support for links
 // - support for code blocks and blockquotes

@@ -2,7 +2,7 @@ import { memo, type ReactNode } from "react";
 import type { Mark } from "../utils/types";
 
 const MARK_PRIORITY: Record<Mark["type"], number> = {
-  bold: 1,
+  bold: 7,
   italic: 2,
   underline: 3,
   strikethrough: 4,
@@ -11,91 +11,118 @@ const MARK_PRIORITY: Record<Mark["type"], number> = {
   "highlight-yellow": 7,
 };
 
-//TODO still not wrapping the marks correctly
-// <strong>bo</strong><strong>ld <em>italic</em></strong>
-// instead of
-// <strong>bold <em>italic</em></strong>
-
 export const MarkRenderer = memo(
   ({ text, marks }: { text: string; marks: Mark[] }) => {
     if (marks.length === 0) {
       return <>{text}</>;
     }
 
-    const segments = createTextSegments(text, marks);
-
-    return (
-      <>
-        {segments.map((segment, index) => (
-          <TextSegment key={index} {...segment} />
-        ))}
-      </>
-    );
+    return <>{buildMarkTree(text, marks, 0, text.length)}</>;
   },
 );
 
 MarkRenderer.displayName = "MarkRenderer";
 
-const TextSegment = memo(({ text, marks }: { text: string; marks: Mark[] }) => {
-  return <>{wrapWithMarks(text, marks)}</>;
-});
+function buildMarkTree(
+  text: string,
+  marks: Mark[],
+  start: number,
+  end: number,
+): ReactNode {
+  if (start >= end) return null;
 
-TextSegment.displayName = "TextSegment";
-
-function wrapWithMarks(text: string, marks: Mark[]) {
-  const sortedMarks = [...marks].sort(
-    (a, b) => MARK_PRIORITY[a.type] - MARK_PRIORITY[b.type],
+  // Find marks that start exactly at this position
+  const activeMarks = marks.filter(
+    (mark) => mark.start <= start && mark.end > start,
   );
 
-  return sortedMarks.reduceRight<ReactNode>((acc, mark) => {
-    switch (mark.type) {
-      case "bold":
-        return <strong>{acc}</strong>;
-      case "italic":
-        return <em>{acc}</em>;
-      case "underline":
-        return <u>{acc}</u>;
-      case "strikethrough":
-        return <s>{acc}</s>;
-      case "superscript":
-        return <sup>{acc}</sup>;
-      case "subscript":
-        return <sub>{acc}</sub>;
-      case "highlight-yellow":
-        return <mark className="bg-yellow-200/80 text-inherit">{acc}</mark>;
-      default:
-        const _exhaustiveCheck: never = mark.type;
-        return _exhaustiveCheck;
+  if (activeMarks.length === 0) {
+    // No marks starting here, find the next boundary
+    const nextBoundary = findNextStartBoundary(marks, start, end);
+
+    if (nextBoundary === end) {
+      // No more boundaries, return the remaining text
+      return text.slice(start, end);
     }
-  }, text);
+
+    // Return text up to next boundary + continue from there
+    return (
+      <>
+        {text.slice(start, nextBoundary)}
+        {buildMarkTree(text, marks, nextBoundary, end)}
+      </>
+    );
+  }
+
+  // Find the mark that starts here and ends furthest
+  const longestMark = activeMarks.reduce((longest, current) => {
+    const currentLength = current.end - current.start;
+    const longestLength = longest.end - longest.start;
+    if (currentLength === longestLength) {
+      return MARK_PRIORITY[current.type] > MARK_PRIORITY[longest.type]
+        ? current
+        : longest;
+    }
+    return currentLength > longestLength ? current : longest;
+  });
+
+  // Build content for this mark
+  const markEnd = Math.min(longestMark.end, end);
+  const innerContent = buildMarkTree(
+    text,
+    marks.filter((mark) => mark !== longestMark),
+    start,
+    markEnd,
+  );
+  const wrappedContent = wrapWithMark(innerContent, longestMark);
+
+  // Continue after this mark ends
+  if (markEnd < end) {
+    return (
+      <>
+        {wrappedContent}
+        {buildMarkTree(text, marks, markEnd, end)}
+      </>
+    );
+  }
+
+  return wrappedContent;
 }
 
-function createTextSegments(text: string, marks: Mark[]) {
-  const boundaries = new Set<number>();
-
-  boundaries.add(0);
-  boundaries.add(text.length);
+function findNextStartBoundary(
+  marks: Mark[],
+  start: number,
+  end: number,
+): number {
+  let nextBoundary = end;
 
   for (const mark of marks) {
-    boundaries.add(mark.start);
-    boundaries.add(mark.end);
+    if (mark.start > start && mark.start < nextBoundary) {
+      nextBoundary = mark.start;
+    }
   }
 
-  const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+  return nextBoundary;
+}
 
-  const segments: { text: string; marks: Mark[] }[] = [];
-
-  for (let i = 0; i < sortedBoundaries.length - 1; i++) {
-    const start = sortedBoundaries[i]!;
-    const end = sortedBoundaries[i + 1]!;
-
-    const textSegment = text.slice(start, end);
-    const activeMarks = marks.filter(
-      (mark) => mark.start <= start && mark.end >= end,
-    );
-
-    segments.push({ text: textSegment, marks: activeMarks });
+function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
+  switch (mark.type) {
+    case "bold":
+      return <strong>{content}</strong>;
+    case "italic":
+      return <em>{content}</em>;
+    case "underline":
+      return <u>{content}</u>;
+    case "strikethrough":
+      return <s>{content}</s>;
+    case "superscript":
+      return <sup>{content}</sup>;
+    case "subscript":
+      return <sub>{content}</sub>;
+    case "highlight-yellow":
+      return <mark className="bg-yellow-200/80 text-inherit">{content}</mark>;
+    default:
+      const _exhaustiveCheck: never = mark.type;
+      return _exhaustiveCheck;
   }
-
-  return segments;
 }

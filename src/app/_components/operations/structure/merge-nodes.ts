@@ -3,7 +3,7 @@ import type { MergeNodesOperation } from "../../utils/types";
 import { mergeTwoNodes as mergeNodesHelper } from "../shared/merge-two-nodes";
 import {
   findNodeIndexById,
-  replaceNodeAtIndex,
+  replaceNodesInRange,
 } from "../shared/node-operations";
 
 export function mergeNodes(
@@ -23,7 +23,7 @@ export function mergeNodes(
   const newNode = mergeNodesHelper(firstNode, secondNode);
 
   return {
-    nodes: replaceNodeAtIndex(nodes, firstNodeIndex, newNode),
+    nodes: replaceNodesInRange(nodes, firstNodeIndex, secondNodeIndex, newNode),
     newCaretPosition: getCaretPositionAfterMergeNodes(firstNode),
   };
 }

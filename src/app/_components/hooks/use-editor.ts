@@ -166,6 +166,8 @@ export function useEditor(initialNodes: EditorNode[]) {
   }, []);
 
   useEffect(() => {
+    console.log("NODES", nodes);
+
     const position = pendingCaretPositionRef.current;
     if (!position) return;
 
