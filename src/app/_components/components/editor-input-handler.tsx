@@ -15,6 +15,7 @@ export function EditorInputHandler({
   const handleBeforeInput = useCallback(
     (e: InputEvent) => {
       const { inputType, data, dataTransfer } = e;
+      console.log("inputType", inputType);
       e.preventDefault();
 
       switch (inputType) {

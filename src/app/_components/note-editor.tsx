@@ -19,6 +19,39 @@ const DEFAULT_NODES: EditorNode[] = [
       { type: "bold", start: 8, end: 12 },
     ],
   },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c5",
+    type: "unordered-list-item",
+    text: "unordered 1",
+    alignment: "left",
+    marks: [],
+    listId: "123",
+  },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c6",
+    type: "unordered-list-item",
+    text: "unordered 2",
+    alignment: "left",
+    marks: [],
+    listId: "123",
+  },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c7",
+    type: "ordered-list-item",
+    text: "ordered 1",
+    alignment: "left",
+    marks: [],
+    listId: "456",
+  },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c8",
+    type: "ordered-list-item",
+    text: "ordered 2",
+    alignment: "left",
+    marks: [],
+    listId: "456",
+  },
+
   // {
   //   id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
   //   type: "paragraph",
@@ -109,6 +142,18 @@ export function NoteEditor() {
             onClick={() => operations.toggleNodeType("paragraph")}
           >
             Paragraph
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "unordered-list-item" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("unordered-list-item")}
+          >
+            Unordered List Item
+          </Button>
+          <Button
+            variant={`${editor.activeNodeType === "ordered-list-item" ? "default" : "outline"}`}
+            onClick={() => operations.toggleNodeType("ordered-list-item")}
+          >
+            Ordered List Item
           </Button>
         </div>
         <div>

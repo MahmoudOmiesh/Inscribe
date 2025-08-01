@@ -42,15 +42,21 @@ export function replaceNodesInRange(
   ];
 }
 
-export function updateNodesInRange(
-  nodes: EditorNode[],
+export function updateNodesInRange<T extends EditorNode>(
+  nodes: T[],
   startIndex: number,
   endIndex: number,
-  updates: Partial<EditorNode>,
+  updates: Partial<T>,
 ) {
   const newNodes = [...nodes];
   for (let i = startIndex; i <= endIndex; i++) {
     newNodes[i] = { ...newNodes[i]!, ...updates };
   }
   return newNodes;
+}
+
+export function isListItem(node: EditorNode) {
+  return (
+    node.type === "unordered-list-item" || node.type === "ordered-list-item"
+  );
 }

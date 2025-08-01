@@ -51,7 +51,23 @@ export type ParagraphNode = BaseNode & {
   type: "paragraph";
 };
 
-export type EditorNode = HeadingNode | ParagraphNode;
+export type UnorderedListItemNode = BaseNode & {
+  type: "unordered-list-item";
+  listId: string;
+};
+
+export type OrderedListItemNode = BaseNode & {
+  type: "ordered-list-item";
+  listId: string;
+};
+
+export type ListItemNode = UnorderedListItemNode | OrderedListItemNode;
+
+export type EditorNode =
+  | HeadingNode
+  | ParagraphNode
+  | UnorderedListItemNode
+  | OrderedListItemNode;
 
 /////////////////////
 // Operation Types
