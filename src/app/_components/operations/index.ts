@@ -14,6 +14,8 @@ import { pasteText } from "./text/paste-text";
 import { deleteByCut } from "./structure/delete-by-cut";
 import { toggleNodeType } from "./formatting/toggle-node-type";
 import { toggleNodeAlignment } from "./formatting/toggle-node-alignment";
+import { indentListItem } from "./structure/indent-list-item";
+import { unindentListItem } from "./structure/unindent-list-item";
 
 export function applyOperation(
   nodes: EditorNode[],
@@ -57,6 +59,12 @@ export function applyOperation(
     }
     case "toggleNodeAlignment": {
       return toggleNodeAlignment(nodes, nodeIdIndexMap, operation);
+    }
+    case "indentListItem": {
+      return indentListItem(nodes, nodeIdIndexMap, operation);
+    }
+    case "unindentListItem": {
+      return unindentListItem(nodes, nodeIdIndexMap, operation);
     }
     default: {
       const _exhaustiveCheck: never = operation;

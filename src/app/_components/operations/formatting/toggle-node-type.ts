@@ -1,3 +1,4 @@
+import { cleanNode } from "../../utils/clean-node";
 import {
   type EditorNode,
   type ToggleNodeTypeOperation,
@@ -32,7 +33,7 @@ export function toggleNodeType(
       nodes: updateNodesInRange(nodes, firstNodeIdx, lastNodeIdx, {
         type: nodeType,
         listId,
-      }),
+      }).map(cleanNode),
       newCaretPosition: range,
     };
   }
@@ -40,7 +41,7 @@ export function toggleNodeType(
   return {
     nodes: updateNodesInRange(nodes, firstNodeIdx, lastNodeIdx, {
       type: nodeType,
-    }),
+    }).map(cleanNode),
     newCaretPosition: range,
   };
 }

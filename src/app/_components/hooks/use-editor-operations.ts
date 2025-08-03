@@ -199,9 +199,9 @@ export function useEditorOperations({
       [executeOperation],
     ),
     insertParagraph: useCallback(() => {
-      const operation = commands.text.createInsertParagraphCommand();
+      const operation = commands.text.createInsertParagraphCommand(nodes);
       executeOperation(operation);
-    }, [executeOperation]),
+    }, [nodes, executeOperation]),
     pasteText: useCallback(
       (content: string, contentType: "plain" | "html") => {
         const operation = commands.text.createPasteTextCommand(
@@ -257,5 +257,15 @@ export function useEditorOperations({
     canUndo: canUndoRedo[0],
     redo,
     canRedo: canUndoRedo[1],
+
+    // List operations
+    indentListItem: useCallback(() => {
+      const operation = commands.node.createIndentListItemCommand();
+      executeOperation(operation);
+    }, [executeOperation]),
+    unindentListItem: useCallback(() => {
+      const operation = commands.node.createUnindentListItemCommand(nodes);
+      executeOperation(operation);
+    }, [nodes, executeOperation]),
   };
 }

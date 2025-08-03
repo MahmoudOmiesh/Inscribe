@@ -54,11 +54,13 @@ export type ParagraphNode = BaseNode & {
 export type UnorderedListItemNode = BaseNode & {
   type: "unordered-list-item";
   listId: string;
+  indentLevel: number;
 };
 
 export type OrderedListItemNode = BaseNode & {
   type: "ordered-list-item";
   listId: string;
+  indentLevel: number;
 };
 
 export type ListItemNode = UnorderedListItemNode | OrderedListItemNode;
@@ -134,6 +136,14 @@ export type PasteTextOperation = {
   contentType: "plain" | "html";
 } & OperationBase;
 
+export type IndentListItemOperation = {
+  type: "indentListItem";
+} & OperationBase;
+
+export type UnindentListItemOperation = {
+  type: "unindentListItem";
+} & OperationBase;
+
 export type Operation =
   | InsertTextOperation
   | DeleteTextBackwardOperation
@@ -146,7 +156,9 @@ export type Operation =
   | DeleteWordBackwardOperation
   | DeleteWordForwardOperation
   | DeleteByCutOperation
-  | PasteTextOperation;
+  | PasteTextOperation
+  | IndentListItemOperation
+  | UnindentListItemOperation;
 
 export type OperationResult = {
   nodes: EditorNode[];

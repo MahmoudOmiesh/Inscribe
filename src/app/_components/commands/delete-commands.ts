@@ -4,6 +4,7 @@ import {
   findAdjacentNodes,
   shouldMergeNodesBackward,
   shouldMergeNodesForward,
+  shouldUnindentListItem,
 } from "./helpers";
 
 export function createDeleteBackwardCommand(
@@ -11,6 +12,13 @@ export function createDeleteBackwardCommand(
 ): Operation | null {
   const range = getSelectionRange();
   if (!range) return null;
+
+  if (shouldUnindentListItem(range, nodes)) {
+    return {
+      type: "unindentListItem",
+      range,
+    };
+  }
 
   if (shouldMergeNodesBackward(range)) {
     const nodeIds = findAdjacentNodes(nodes, range.start.nodeId, "backward");
@@ -37,6 +45,13 @@ export function createDeleteWordBackwardCommand(
 ): Operation | null {
   const range = getSelectionRange();
   if (!range) return null;
+
+  if (shouldUnindentListItem(range, nodes)) {
+    return {
+      type: "unindentListItem",
+      range,
+    };
+  }
 
   if (shouldMergeNodesBackward(range)) {
     const nodeIds = findAdjacentNodes(nodes, range.start.nodeId, "backward");

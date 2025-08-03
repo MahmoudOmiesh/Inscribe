@@ -15,7 +15,6 @@ export function EditorInputHandler({
   const handleBeforeInput = useCallback(
     (e: InputEvent) => {
       const { inputType, data, dataTransfer } = e;
-      console.log("inputType", inputType);
       e.preventDefault();
 
       switch (inputType) {
@@ -125,6 +124,23 @@ export function EditorInputHandler({
     [operations],
   );
 
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "Tab": {
+          e.preventDefault();
+          if (e.shiftKey) {
+            operations.unindentListItem();
+          } else {
+            operations.indentListItem();
+          }
+          break;
+        }
+      }
+    },
+    [operations],
+  );
+
   useEffect(() => {
     // on before input is added with an event listener
     // rather than with onBeforeInput prop
@@ -139,6 +155,15 @@ export function EditorInputHandler({
       editor.removeEventListener("beforeinput", handleBeforeInput);
     };
   }, [handleBeforeInput, editorRef]);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.addEventListener("keydown", handleKeyDown);
+    return () => {
+      editor.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown, editorRef]);
 
   return children;
 }

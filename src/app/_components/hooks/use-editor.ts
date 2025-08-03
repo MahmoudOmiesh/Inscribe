@@ -124,7 +124,6 @@ export function useEditor(initialNodes: EditorNode[]) {
 
   const _handleSelect = useCallback(() => {
     const currentSelectionRange = getSelectionRange();
-
     if (!currentSelectionRange) return;
 
     const activeNodeType = getActiveNodeType(currentSelectionRange);
