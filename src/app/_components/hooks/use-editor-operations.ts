@@ -10,6 +10,7 @@ import type {
 import { commands } from "../commands";
 import { getSelectionRange } from "../utils/range";
 import { useThrottleCallback } from "@/hooks/use-throttle-callback";
+import { normalizeList } from "../operations/structure/normalize-list";
 
 interface useEditorOperationsProps {
   nodes: EditorNode[];
@@ -28,6 +29,21 @@ const UNDO_REDO_STACK_MAX_LENGTH = 5;
 interface UndoRedoStack {
   nodes: EditorNode[];
   selectionRange: SelectionRange;
+}
+
+function shouldNormalizeList(operation: Operation) {
+  const operations: Operation["type"][] = [
+    "mergeNodes",
+    "deleteByCut",
+    "deleteTextBackward",
+    "deleteTextForward",
+    "deleteWordBackward",
+    "deleteWordForward",
+    "toggleNodeType",
+    "pasteText",
+  ];
+
+  return operations.includes(operation.type);
 }
 
 export function useEditorOperations({
@@ -95,8 +111,12 @@ export function useEditorOperations({
         operation,
       );
 
-      updateNodeIdIndexMap(nodes, newNodes);
-      setNodes(newNodes);
+      const normalizedNodes = shouldNormalizeList(operation)
+        ? normalizeList(newNodes)
+        : newNodes;
+
+      updateNodeIdIndexMap(nodes, normalizedNodes);
+      setNodes(normalizedNodes);
       if (newCaretPosition) setPendingCaretPosition(newCaretPosition);
     },
     [
@@ -254,9 +274,9 @@ export function useEditorOperations({
 
     // Undo/Redo operations
     undo,
-    canUndo: canUndoRedo[0],
+    canUndo: canUndoRedo[0]!,
     redo,
-    canRedo: canUndoRedo[1],
+    canRedo: canUndoRedo[1]!,
 
     // List operations
     indentListItem: useCallback(() => {

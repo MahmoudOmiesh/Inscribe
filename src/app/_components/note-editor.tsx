@@ -65,7 +65,7 @@ export function NoteEditor() {
   const operations = useEditorOperations(editor);
 
   return (
-    <Card className="md:w-xl">
+    <Card className="md:w-3xl">
       <CardHeader>
         <EditorToolbar editor={editor} operations={operations} />
       </CardHeader>
@@ -98,6 +98,7 @@ export function NoteEditor() {
 
 // - fix randoms bugs with lists, when merging and deleting
 
+// - make marks non overlapping and add different colors
 // - handle losing focus
 // - support for lists (unordered, ordered, task)
 // - imrpove the ui

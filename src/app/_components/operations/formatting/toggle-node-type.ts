@@ -33,6 +33,7 @@ export function toggleNodeType(
       nodes: updateNodesInRange(nodes, firstNodeIdx, lastNodeIdx, {
         type: nodeType,
         listId,
+        indentLevel: 0,
       }).map(cleanNode),
       newCaretPosition: range,
     };

@@ -12,6 +12,25 @@ export const MARK_TYPES = [
   "highlight-yellow",
 ] as const;
 
+export const HEADING_TYPES = [
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "heading-4",
+] as const satisfies HeadingNode["type"][];
+
+export const LIST_TYPES = [
+  "unordered-list-item",
+  "ordered-list-item",
+] as const satisfies ListItemNode["type"][];
+
+export const ALIGNMENT_TYPES = [
+  "left",
+  "center",
+  "right",
+  "justify",
+] as const satisfies EditorNode["alignment"][];
+
 export interface Mark {
   type: (typeof MARK_TYPES)[number];
   start: number;
