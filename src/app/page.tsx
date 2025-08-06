@@ -1,9 +1,8 @@
-import { NoteEditor } from "./_components/note-editor";
-
 export default async function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
-      <NoteEditor />
+    <div className="flex-1">
+      <h1 className="text-4xl font-bold">Hello World</h1>
+      <div className="my-[150vh]"></div>
     </div>
   );
 }

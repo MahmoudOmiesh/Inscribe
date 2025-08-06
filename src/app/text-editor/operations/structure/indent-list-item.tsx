@@ -2,7 +2,7 @@ import type {
   EditorNode,
   IndentListItemOperation,
   ListItemNode,
-} from "@/app/_components/utils/types";
+} from "@/app/text-editor/utils/types";
 import { findNodeIndexById, isListItem } from "../shared/node-operations";
 
 const MAX_INDENT_LEVEL = 5;

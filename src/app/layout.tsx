@@ -1,10 +1,13 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { cn } from "@/lib/utils";
+import { Header } from "../components/header";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Keep",
@@ -12,16 +15,16 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-inter",
 });
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(geist.variable, "dark")}>
+    <html lang="en" className={cn(inter.variable)} suppressHydrationWarning>
       {/* <head>
         <script
           crossOrigin="anonymous"
@@ -29,7 +32,18 @@ export default function RootLayout({
         />
       </head> */}
       <body className="flex min-h-screen flex-col">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );
