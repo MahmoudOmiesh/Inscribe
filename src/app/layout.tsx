@@ -5,9 +5,7 @@ import { Inter } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { cn } from "@/lib/utils";
-import { Header } from "../components/header";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Keep",
@@ -39,9 +37,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
-            <main className="flex flex-1 flex-col">{children}</main>
-            <Footer />
+            {children}
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

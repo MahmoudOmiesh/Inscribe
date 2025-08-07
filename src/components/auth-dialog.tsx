@@ -94,7 +94,8 @@ export function AuthDialog({
             disabled={isLoading}
             onClick={() => githubSignInMutation.mutate()}
           >
-            <GithubIcon className="size-4 text-white" /> Continue with Github
+            <GithubIcon className="size-4 text-black dark:text-white" />{" "}
+            Continue with Github
             {githubSignInMutation.isPending && (
               <Spinner className="absolute top-1/2 right-4 -translate-y-1/2" />
             )}
