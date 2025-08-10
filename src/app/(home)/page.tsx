@@ -1,8 +1,11 @@
+import { NoteEditor } from "@/new-text-editor/note-editor";
+
 export default function Home() {
   return (
-    <div className="flex-1">
-      <h1 className="text-4xl font-bold">Hello World</h1>
-      <div className="my-[150vh]"></div>
+    <div className="grid flex-1 place-items-center">
+      <div className="w-full max-w-2xl">
+        <NoteEditor />
+      </div>
     </div>
   );
 }

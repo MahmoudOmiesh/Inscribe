@@ -1,0 +1,50 @@
+import { useCallback } from "react";
+import type { EditorState } from "../state/editor-state";
+import type { Transaction } from "../state/transaction";
+import {
+  textCommands,
+  deleteCommands,
+  formatCommands,
+  listCommands,
+} from "../commands";
+import type {
+  ActiveMarkDescriptor,
+  Alignment,
+  BlockType,
+} from "../model/schema";
+
+export function useEditorActions(
+  getState: () => EditorState,
+  dispatch: (tx: Transaction) => void,
+) {
+  const doTx = useCallback(
+    (build: (s: EditorState) => Transaction | null) => {
+      const s = getState();
+      const tx = build(s);
+      if (tx) dispatch(tx);
+    },
+    [getState, dispatch],
+  );
+
+  return {
+    insertText: (text: string) => doTx((s) => textCommands.insertText(s, text)),
+    insertParagraph: () => doTx((s) => textCommands.insertParagraph(s)),
+    paste: (content: string, type: "plain" | "html") =>
+      doTx((s) => textCommands.paste(s, content, type)),
+
+    deleteBackward: () => doTx((s) => deleteCommands.deleteBackward(s)),
+    deleteForward: () => doTx((s) => deleteCommands.deleteForward(s)),
+    deleteWordBackward: () => doTx((s) => deleteCommands.deleteWordBackward(s)),
+    deleteWordForward: () => doTx((s) => deleteCommands.deleteWordForward(s)),
+
+    toggleMark: (mark: ActiveMarkDescriptor) =>
+      doTx((s) => formatCommands.toggleMark(s, mark)),
+    toggleBlock: (blockType: BlockType) =>
+      doTx((s) => formatCommands.toggleBlockType(s, blockType)),
+    toggleBlockAlignment: (alignment: Alignment) =>
+      doTx((s) => formatCommands.toggleAlignment(s, alignment)),
+
+    indent: () => doTx((s) => listCommands.indent(s)),
+    outdent: () => doTx((s) => listCommands.outdent(s)),
+  };
+}

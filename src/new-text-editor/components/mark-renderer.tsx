@@ -1,14 +1,15 @@
 import { memo, type ReactNode } from "react";
-import type { Mark } from "../utils/types";
+import type { Mark } from "../model/schema";
 
 const MARK_PRIORITY: Record<Mark["type"], number> = {
-  bold: 7,
+  bold: 1,
   italic: 2,
   underline: 3,
   strikethrough: 4,
   superscript: 5,
   subscript: 6,
-  "highlight-yellow": 7,
+  highlight: 7,
+  code: 8,
 };
 
 export const MarkRenderer = memo(
@@ -119,10 +120,16 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
       return <sup>{content}</sup>;
     case "subscript":
       return <sub>{content}</sub>;
-    case "highlight-yellow":
+    case "highlight":
       return <mark className="bg-yellow-200/80 text-inherit">{content}</mark>;
+    case "code":
+      return (
+        <code className="rounded-sm bg-gray-700 p-1 text-inherit">
+          {content}
+        </code>
+      );
     default:
-      const _exhaustiveCheck: never = mark.type;
+      const _exhaustiveCheck: never = mark;
       return _exhaustiveCheck;
   }
 }

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { useEditor } from "../hooks/use-editor";
-import type { useEditorOperations } from "../hooks/use-editor-operations";
+import type { useEditorActions } from "../hooks/use-editor-actions";
 import type { ReactNode } from "react";
 import {
   Heading1Icon,
@@ -24,6 +24,7 @@ import {
   AlignJustifyIcon,
   AlignRightIcon,
   AlignCenterIcon,
+  CodeIcon,
 } from "lucide-react";
 import {
   Tooltip,
@@ -38,15 +39,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ALIGNMENT_TYPES,
-  HEADING_TYPES,
-  LIST_TYPES,
-  MARK_TYPES,
+  type ActiveMarkDescriptor,
   type EditorNode,
   type HeadingNode,
   type ListItemNode,
   type Mark,
-} from "../utils/types";
+} from "../model/schema";
 import { cn } from "@/lib/utils";
 
 type NodeType = EditorNode["type"];
@@ -55,30 +53,49 @@ type ListType = ListItemNode["type"];
 type MarkType = Mark["type"];
 type AlignmentType = EditorNode["alignment"];
 
+const HEADING_TYPES = [
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "heading-4",
+] as const;
+const LIST_TYPES = ["unordered-list-item", "ordered-list-item"] as const;
+const MARK_TYPES = [
+  "bold",
+  "italic",
+  "underline",
+  "strikethrough",
+  "superscript",
+  "subscript",
+  "highlight",
+  "code",
+] as const;
+const ALIGNMENT_TYPES = ["left", "center", "right", "justify"] as const;
+
 export function EditorToolbar({
   editor,
-  operations,
+  actions,
 }: {
   editor: ReturnType<typeof useEditor>;
-  operations: ReturnType<typeof useEditorOperations>;
+  actions: ReturnType<typeof useEditorActions>;
 }) {
   const activeHeading = HEADING_TYPES.includes(
-    editor.activeNodeType as HeadingType,
+    editor.activeBlockType as HeadingType,
   )
-    ? (editor.activeNodeType as HeadingType)
+    ? (editor.activeBlockType as HeadingType)
     : null;
 
-  const activeList = LIST_TYPES.includes(editor.activeNodeType as ListType)
-    ? (editor.activeNodeType as ListType)
+  const activeList = LIST_TYPES.includes(editor.activeBlockType as ListType)
+    ? (editor.activeBlockType as ListType)
     : null;
 
   return (
     <div className="flex items-center justify-center gap-2">
       <UndoRedo
-        undo={operations.undo}
-        redo={operations.redo}
-        canUndo={operations.canUndo}
-        canRedo={operations.canRedo}
+        undo={editor.undo}
+        redo={editor.redo}
+        canUndo={editor.canUndo}
+        canRedo={editor.canRedo}
       />
 
       <Separator
@@ -88,12 +105,12 @@ export function EditorToolbar({
 
       <HeadingDropdown
         activeHeading={activeHeading}
-        toggleNodeTypeOperation={operations.toggleNodeType}
+        toggleNodeTypeOperation={actions.toggleBlock}
       />
 
       <ListDropdown
         activeList={activeList}
-        toggleNodeTypeOperation={operations.toggleNodeType}
+        toggleNodeTypeOperation={actions.toggleBlock}
       />
 
       <Separator
@@ -103,7 +120,7 @@ export function EditorToolbar({
 
       <Marks
         activeMarks={editor.activeMarks}
-        toggleMarkOperation={operations.toggleMark}
+        toggleMarkOperation={actions.toggleMark}
       />
 
       <Separator
@@ -112,8 +129,8 @@ export function EditorToolbar({
       />
 
       <Alignment
-        activeAlignment={editor.activeNodeAlignment}
-        toggleAlignmentOperation={operations.toggleNodeAlignment}
+        activeAlignment={editor.activeAlignment}
+        toggleAlignmentOperation={actions.toggleBlockAlignment}
       />
     </div>
   );
@@ -252,17 +269,25 @@ function Marks({
   activeMarks,
   toggleMarkOperation,
 }: {
-  activeMarks: MarkType[];
-  toggleMarkOperation: (markType: MarkType) => void;
+  activeMarks: ActiveMarkDescriptor[];
+  toggleMarkOperation: (mark: ActiveMarkDescriptor) => void;
 }) {
-  const isActive = (markType: MarkType) => activeMarks.includes(markType);
+  const isActive = (markType: MarkType) =>
+    activeMarks.some((m) => m.type === markType);
+
+  const getOperation = (markType: MarkType) => {
+    if (markType === "highlight") {
+      return () => toggleMarkOperation({ type: markType, color: "yellow" });
+    }
+    return () => toggleMarkOperation({ type: markType });
+  };
 
   return (
     <div className="flex items-center gap-1">
       {MARK_TYPES.map((markType) => (
         <EditorToolbarToggle
           key={markType}
-          operation={() => toggleMarkOperation(markType)}
+          operation={getOperation(markType)}
           isActive={isActive(markType)}
           tooltip={getMarkLabel(markType)}
         >
@@ -441,8 +466,10 @@ function MarkIcon({
       return <SuperscriptIcon className={className} />;
     case "subscript":
       return <SubscriptIcon className={className} />;
-    case "highlight-yellow":
+    case "highlight":
       return <Pencil className={className} />;
+    case "code":
+      return <CodeIcon className={className} />;
     default:
       const _exhaustiveCheck: never = markType;
       return _exhaustiveCheck;
@@ -463,8 +490,10 @@ function getMarkLabel(markType: MarkType) {
       return "Superscript";
     case "subscript":
       return "Subscript";
-    case "highlight-yellow":
+    case "highlight":
       return "Highlight";
+    case "code":
+      return "Code";
     default:
       const _exhaustiveCheck: never = markType;
       return _exhaustiveCheck;

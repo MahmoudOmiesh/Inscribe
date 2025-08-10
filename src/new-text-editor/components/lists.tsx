@@ -4,7 +4,7 @@ import type {
   ListItemNode as ListItemNodeType,
   OrderedListItemNode,
   UnorderedListItemNode,
-} from "../utils/types";
+} from "../model/schema";
 import { MarkRenderer } from "./mark-renderer";
 import { cn } from "@/lib/utils";
 

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { ParagraphNode as ParagraphNodeType } from "../utils/types";
+import type { ParagraphNode as ParagraphNodeType } from "../model/schema";
 import { MarkRenderer } from "./mark-renderer";
 import { cn } from "@/lib/utils";
 

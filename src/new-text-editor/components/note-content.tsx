@@ -4,7 +4,7 @@ import type {
   ListItemNode,
   OrderedListItemNode,
   UnorderedListItemNode,
-} from "../utils/types";
+} from "../model/schema";
 import { Paragraph } from "./paragraph";
 import { Heading } from "./headings";
 import { OrderedList, UnorderedList } from "./lists";
