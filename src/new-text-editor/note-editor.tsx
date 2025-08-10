@@ -96,7 +96,6 @@ export function NoteEditor() {
 // TODO
 // - fix the insertLineBreak (doesn't work at end of a node)
 
-// - make marks non overlapping and add different colors
 // - group operations together in undo/redo
 // - handle losing focus
 // - support for lists (unordered, ordered, task)

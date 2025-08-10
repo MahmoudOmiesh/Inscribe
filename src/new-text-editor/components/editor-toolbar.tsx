@@ -52,6 +52,7 @@ type HeadingType = HeadingNode["type"];
 type ListType = ListItemNode["type"];
 type MarkType = Mark["type"];
 type AlignmentType = EditorNode["alignment"];
+type HighlightType = Extract<ActiveMarkDescriptor, { type: "highlight" }>;
 
 const HEADING_TYPES = [
   "heading-1",
@@ -60,16 +61,17 @@ const HEADING_TYPES = [
   "heading-4",
 ] as const;
 const LIST_TYPES = ["unordered-list-item", "ordered-list-item"] as const;
-const MARK_TYPES = [
+const BASIC_MARK_TYPES = [
   "bold",
   "italic",
   "underline",
   "strikethrough",
   "superscript",
   "subscript",
-  "highlight",
   "code",
 ] as const;
+
+const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "red"] as const;
 const ALIGNMENT_TYPES = ["left", "center", "right", "justify"] as const;
 
 export function EditorToolbar({
@@ -275,19 +277,15 @@ function Marks({
   const isActive = (markType: MarkType) =>
     activeMarks.some((m) => m.type === markType);
 
-  const getOperation = (markType: MarkType) => {
-    if (markType === "highlight") {
-      return () => toggleMarkOperation({ type: markType, color: "yellow" });
-    }
-    return () => toggleMarkOperation({ type: markType });
-  };
+  const activeHighlight =
+    activeMarks.find((m) => m.type === "highlight") ?? null;
 
   return (
     <div className="flex items-center gap-1">
-      {MARK_TYPES.map((markType) => (
+      {BASIC_MARK_TYPES.map((markType) => (
         <EditorToolbarToggle
           key={markType}
-          operation={getOperation(markType)}
+          operation={() => toggleMarkOperation({ type: markType })}
           isActive={isActive(markType)}
           tooltip={getMarkLabel(markType)}
         >
@@ -297,7 +295,55 @@ function Marks({
           />
         </EditorToolbarToggle>
       ))}
+      <Highlight
+        activeHighlight={activeHighlight}
+        toggleMarkOperation={toggleMarkOperation}
+      />
     </div>
+  );
+}
+
+function Highlight({
+  activeHighlight,
+  toggleMarkOperation,
+}: {
+  activeHighlight: HighlightType | null;
+  toggleMarkOperation: (mark: ActiveMarkDescriptor) => void;
+}) {
+  return (
+    <DropdownMenu>
+      <EditorToolTip tooltip="Heading">
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative cursor-pointer">
+            <HighlightIcon highlightType={activeHighlight} className="size-4" />
+            <ChevronDown className="absolute top-1/2 right-[2px] size-2 -translate-y-1/2" />
+          </Button>
+        </DropdownMenuTrigger>
+      </EditorToolTip>
+      <DropdownMenuContent align="start">
+        {HIGHLIGHT_COLORS.map((highlightColor) => (
+          <DropdownMenuItem
+            key={highlightColor}
+            onClick={() =>
+              toggleMarkOperation({ type: "highlight", color: highlightColor })
+            }
+            className={cn(
+              "cursor-pointer",
+              activeHighlight?.color === highlightColor && "bg-accent",
+            )}
+          >
+            <HighlightIcon
+              highlightType={{ type: "highlight", color: highlightColor }}
+              className={cn(
+                activeHighlight?.color === highlightColor && "text-green-500",
+                "size-4",
+              )}
+            />
+            Highlight {highlightColor}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -396,6 +442,31 @@ function EditorToolTip({
   );
 }
 
+function HighlightIcon({
+  highlightType,
+  className,
+}: {
+  highlightType: HighlightType | null;
+  className?: string;
+}) {
+  if (!highlightType) {
+    return <Pencil className={className} />;
+  }
+
+  switch (highlightType.color) {
+    case "yellow":
+      return <Pencil className={cn(className, "text-yellow-500")} />;
+    case "green":
+      return <Pencil className={cn(className, "text-green-500")} />;
+    case "blue":
+      return <Pencil className={cn(className, "text-blue-500")} />;
+    case "red":
+      return <Pencil className={cn(className, "text-red-500")} />;
+    default:
+      const _exhaustiveCheck: never = highlightType.color;
+      return _exhaustiveCheck;
+  }
+}
 function HeadingIcon({
   headingType,
   className,

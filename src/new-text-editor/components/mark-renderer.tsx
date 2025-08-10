@@ -121,7 +121,16 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
     case "subscript":
       return <sub>{content}</sub>;
     case "highlight":
-      return <mark className="bg-yellow-200/80 text-inherit">{content}</mark>;
+      return (
+        <mark
+          style={{
+            backgroundColor: HighlighColors[mark.color],
+            color: "inherit",
+          }}
+        >
+          {content}
+        </mark>
+      );
     case "code":
       return (
         <code className="rounded-sm bg-gray-700 p-1 text-inherit">
@@ -133,3 +142,10 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
       return _exhaustiveCheck;
   }
 }
+
+const HighlighColors = {
+  red: "rgb(244 67 54 / 0.28)",
+  yellow: "rgb(255 193 7 / 0.28)",
+  green: "rgb(76 175 80 / 0.28)",
+  blue: "rgb(33 150 243 / 0.28)",
+};

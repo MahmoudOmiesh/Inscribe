@@ -6,10 +6,9 @@ export function normalizeMarks(nodes: EditorNode[]) {
     let marks = [...node.marks];
 
     marks = clampMarks(marks, node.text.length);
-
-    marks = mergeSameTypeMarks(marks);
-
     marks = enforceCodeExclusivity(marks);
+    marks = enforceHighlightExclusivity(marks);
+    marks = mergeSameTypeMarks(marks);
 
     return {
       ...node,
@@ -46,7 +45,27 @@ function enforceCodeExclusivity(marks: Mark[]) {
     result.push(...subtracted);
   });
 
-  return mergeSameTypeMarks(result);
+  return result;
 }
 
-// enforce highlight exclusivity
+function enforceHighlightExclusivity(marks: Mark[]) {
+  // for each highlight, remove any highlight that overlaps with it
+
+  const highlightMarks = marks.filter((mark) => mark.type === "highlight");
+  const otherMarks = marks.filter((mark) => mark.type !== "highlight");
+
+  const result: Mark[] = [...otherMarks];
+  const lastHighlight = highlightMarks[highlightMarks.length - 1];
+
+  if (!lastHighlight) return marks;
+
+  for (let i = 0; i < highlightMarks.length - 1; i++) {
+    const highlight = highlightMarks[i]!;
+    const subtracted = subtractMark(highlight, lastHighlight);
+    result.push(...subtracted);
+  }
+
+  result.push(lastHighlight);
+
+  return result;
+}
