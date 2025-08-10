@@ -37,6 +37,10 @@ export function insertParagraphStep(): Step {
       right.marks = [];
     }
 
+    if (right.text.length === 0 && right.type === "check-list-item") {
+      right.checked = false;
+    }
+
     const updatedNodes = replaceNodeAtIndex(base, nodeIndex, [left, right]);
     const caret = {
       nodeId: rightNodeId,

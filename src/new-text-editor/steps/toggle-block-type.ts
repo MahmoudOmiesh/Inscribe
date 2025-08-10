@@ -4,6 +4,7 @@ import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { findNodeIndex } from "./shared";
 import { getListBoundaries } from "../model/lists";
+import { createListItem } from "../model/nodes";
 
 export function toggleBlockTypeStep(blockType: BlockType): Step {
   return (state: EditorState) => {
@@ -16,7 +17,9 @@ export function toggleBlockTypeStep(blockType: BlockType): Step {
 
     const updatedNodes = [...nodes];
     const isList =
-      blockType === "unordered-list-item" || blockType === "ordered-list-item";
+      blockType === "unordered-list-item" ||
+      blockType === "ordered-list-item" ||
+      blockType === "check-list-item";
     const listId = isList ? nanoid() : undefined;
 
     for (let i = startNodeIndex; i <= endNodeIndex; i++) {
@@ -29,12 +32,13 @@ export function toggleBlockTypeStep(blockType: BlockType): Step {
         const node = updatedNodes[j]!;
 
         if (isList) {
-          updatedNodes[j] = {
+          const listItem = createListItem({
             ...node,
             type: blockType,
             listId: listId!,
             indentLevel: 0,
-          };
+          });
+          updatedNodes[j] = listItem;
         } else {
           updatedNodes[j] = { ...node, type: blockType };
         }

@@ -4,7 +4,9 @@ const MAX_INDENT_LEVEL = 5;
 
 export function isListItem(node: EditorNode) {
   return (
-    node.type === "unordered-list-item" || node.type === "ordered-list-item"
+    node.type === "unordered-list-item" ||
+    node.type === "ordered-list-item" ||
+    node.type === "check-list-item"
   );
 }
 

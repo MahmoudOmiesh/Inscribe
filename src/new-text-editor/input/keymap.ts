@@ -4,6 +4,10 @@ function isMod(e: KeyboardEvent) {
   return e.metaKey || e.ctrlKey;
 }
 
+function isModAndShift(e: KeyboardEvent) {
+  return isMod(e) && e.shiftKey;
+}
+
 export function handleKeyDown(
   e: KeyboardEvent,
   actions: ReturnType<typeof useEditorActions>,
@@ -17,6 +21,16 @@ export function handleKeyDown(
     case e.key === "Tab" && e.shiftKey: {
       e.preventDefault();
       actions.outdent();
+      return;
+    }
+    case e.code === "Digit7" && isModAndShift(e): {
+      e.preventDefault();
+      actions.toggleBlock("ordered-list-item");
+      return;
+    }
+    case e.code === "Digit8" && isModAndShift(e): {
+      e.preventDefault();
+      actions.toggleBlock("unordered-list-item");
       return;
     }
     default:

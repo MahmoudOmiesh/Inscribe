@@ -25,12 +25,21 @@ export function cleanNode(node: EditorNode): EditorNode {
   };
 
   if (isListItem(node)) {
-    return {
+    const listItem = {
       ...base,
       type: node.type,
       listId: node.listId,
       indentLevel: node.indentLevel,
     };
+
+    if (node.type === "check-list-item") {
+      return {
+        ...listItem,
+        checked: node.checked,
+      };
+    }
+
+    return listItem as ListItemNode;
   }
 
   // Non-list blocks: strip list-specific props
@@ -72,7 +81,7 @@ export function createListItem(
     listId: ListItemNode["listId"];
   },
 ): ListItemNode {
-  return {
+  const base = {
     id: listItem.id ?? nanoid(),
     type: listItem.type,
     listId: listItem.listId,
@@ -81,4 +90,13 @@ export function createListItem(
     marks: listItem.marks ?? [],
     alignment: listItem.alignment ?? "left",
   };
+
+  if (listItem.type === "check-list-item") {
+    return {
+      ...base,
+      checked: false,
+    };
+  }
+
+  return base as ListItemNode;
 }

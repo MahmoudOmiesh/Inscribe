@@ -51,5 +51,7 @@ export function useEditorActions(
 
     indent: () => doTx((s) => listCommands.indent(s)),
     outdent: () => doTx((s) => listCommands.outdent(s)),
+    toggleCheckbox: (nodeId: string) =>
+      doTx((s) => listCommands.toggleCheckbox(s, nodeId)),
   };
 }

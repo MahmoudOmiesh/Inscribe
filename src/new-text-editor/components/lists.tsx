@@ -1,12 +1,13 @@
 import { memo } from "react";
 import type {
+  CheckListItemNode,
   ListItemNode,
-  ListItemNode as ListItemNodeType,
   OrderedListItemNode,
   UnorderedListItemNode,
 } from "../model/schema";
 import { MarkRenderer } from "./mark-renderer";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type NestedListItemNode<T extends ListItemNode> = {
   item: T;
@@ -91,24 +92,118 @@ function OrderedListNested({
   );
 }
 
-export const ListItem = memo(
+export const CheckList = memo(
+  ({
+    items,
+    toggleCheckbox,
+  }: {
+    items: CheckListItemNode[];
+    toggleCheckbox: (nodeId: string) => void;
+  }) => {
+    const nestedItems = createNestedListItems(items);
+    return (
+      <CheckListNested items={nestedItems} toggleCheckbox={toggleCheckbox} />
+    );
+  },
+);
+
+CheckList.displayName = "CheckList";
+
+function CheckListNested({
+  items,
+  toggleCheckbox,
+}: {
+  items: NestedListItemNode<CheckListItemNode>[];
+  toggleCheckbox: (nodeId: string) => void;
+}) {
+  return (
+    <ul data-type="tasklist">
+      {items.map((item) => (
+        <CheckListItem
+          key={item.item.id}
+          node={item.item}
+          toggleCheckbox={toggleCheckbox}
+        >
+          {item.children.length > 0 && (
+            <CheckListNested
+              items={item.children}
+              toggleCheckbox={toggleCheckbox}
+            />
+          )}
+        </CheckListItem>
+      ))}
+    </ul>
+  );
+}
+
+export const CheckListItem = memo(
   ({
     node,
+    toggleCheckbox,
     children,
   }: {
-    node: ListItemNodeType;
+    node: CheckListItemNode;
+    toggleCheckbox: (nodeId: string) => void;
     children?: React.ReactNode;
   }) => {
     return (
       <li
         className={cn(
-          "whitespace-pre-wrap",
+          "flex items-start gap-2 whitespace-pre-wrap",
           node.alignment === "center" && "text-center",
           node.alignment === "right" && "text-right",
           node.alignment === "justify" && "text-justify",
         )}
       >
-        <p data-node-id={node.id}>
+        <Checkbox
+          checked={node.checked}
+          onCheckedChange={() => toggleCheckbox(node.id)}
+          className="mt-1.5 cursor-pointer select-none"
+        />
+        <div>
+          <p
+            data-node-id={node.id}
+            className={cn(
+              node.type === "check-list-item" &&
+                node.checked &&
+                "text-muted-foreground line-through",
+            )}
+          >
+            {node.text.length > 0 ? (
+              <MarkRenderer text={node.text} marks={node.marks} />
+            ) : (
+              <br />
+            )}
+          </p>
+          {children}
+        </div>
+      </li>
+    );
+  },
+);
+
+CheckListItem.displayName = "CheckListItem";
+
+export const ListItem = memo(
+  ({ node, children }: { node: ListItemNode; children?: React.ReactNode }) => {
+    return (
+      <li
+        className={cn(
+          "whitespace-pre-wrap",
+          node.type === "check-list-item" && "flex items-center gap-2",
+          node.alignment === "center" && "text-center",
+          node.alignment === "right" && "text-right",
+          node.alignment === "justify" && "text-justify",
+        )}
+      >
+        <p
+          data-node-id={node.id}
+          className={cn(
+            node.type === "check-list-item" &&
+              node.checked &&
+              "text-muted-foreground line-through",
+          )}
+        >
           {node.text.length > 0 ? (
             <MarkRenderer text={node.text} marks={node.marks} />
           ) : (

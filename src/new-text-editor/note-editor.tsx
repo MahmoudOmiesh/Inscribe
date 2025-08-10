@@ -37,6 +37,16 @@ const DEFAULT_NODES: EditorNode[] = [
     indentLevel: 0,
     marks: [],
   },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c7",
+    type: "check-list-item",
+    text: "Check list item 1",
+    checked: true,
+    alignment: "left",
+    listId: "456",
+    indentLevel: 0,
+    marks: [],
+  },
 
   // {
   //   id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
@@ -85,7 +95,10 @@ export function NoteEditor() {
             suppressContentEditableWarning
             className="space-y-2 p-0.5 whitespace-pre outline-none"
           >
-            <NoteContent nodes={editor.state.nodes} />
+            <NoteContent
+              nodes={editor.state.nodes}
+              toggleCheckbox={actions.toggleCheckbox}
+            />
           </div>
         </EditorInputHandler>
       </CardContent>

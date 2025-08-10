@@ -60,7 +60,11 @@ const HEADING_TYPES = [
   "heading-3",
   "heading-4",
 ] as const;
-const LIST_TYPES = ["unordered-list-item", "ordered-list-item"] as const;
+const LIST_TYPES = [
+  "unordered-list-item",
+  "ordered-list-item",
+  "check-list-item",
+] as const;
 const BASIC_MARK_TYPES = [
   "bold",
   "italic",
@@ -511,6 +515,8 @@ function getListLabel(listType: ListType) {
       return "Bulleted List";
     case "ordered-list-item":
       return "Ordered List";
+    case "check-list-item":
+      return "Check List";
     default:
       const _exhaustiveCheck: never = listType;
       return _exhaustiveCheck;

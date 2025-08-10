@@ -5,7 +5,8 @@ export type BlockType =
   | "heading-4"
   | "paragraph"
   | "unordered-list-item"
-  | "ordered-list-item";
+  | "ordered-list-item"
+  | "check-list-item";
 
 export type MarkType =
   | "bold"
@@ -72,10 +73,16 @@ export type OrderedListItemNode = BaseNode & {
   indentLevel: number;
 };
 
-export type ListItemNode = UnorderedListItemNode | OrderedListItemNode;
+export type CheckListItemNode = BaseNode & {
+  type: "check-list-item";
+  listId: string;
+  indentLevel: number;
+  checked: boolean;
+};
 
-export type EditorNode =
-  | HeadingNode
-  | ParagraphNode
+export type ListItemNode =
   | UnorderedListItemNode
-  | OrderedListItemNode;
+  | OrderedListItemNode
+  | CheckListItemNode;
+
+export type EditorNode = HeadingNode | ParagraphNode | ListItemNode;
