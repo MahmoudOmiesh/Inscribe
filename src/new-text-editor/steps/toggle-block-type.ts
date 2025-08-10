@@ -3,6 +3,7 @@ import type { BlockType } from "../model/schema";
 import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { findNodeIndex } from "./shared";
+import { getListBoundaries } from "../model/lists";
 
 export function toggleBlockTypeStep(blockType: BlockType): Step {
   return (state: EditorState) => {
@@ -19,18 +20,27 @@ export function toggleBlockTypeStep(blockType: BlockType): Step {
     const listId = isList ? nanoid() : undefined;
 
     for (let i = startNodeIndex; i <= endNodeIndex; i++) {
-      const node = updatedNodes[i]!;
+      const listBoundaries = getListBoundaries(updatedNodes, i);
 
-      if (isList) {
-        updatedNodes[i] = {
-          ...node,
-          type: blockType,
-          listId: listId!,
-          indentLevel: 0,
-        };
-      } else {
-        updatedNodes[i] = { ...node, type: blockType };
+      const start = listBoundaries?.start ?? i;
+      const end = listBoundaries?.end ?? i;
+
+      for (let j = start; j <= end; j++) {
+        const node = updatedNodes[j]!;
+
+        if (isList) {
+          updatedNodes[j] = {
+            ...node,
+            type: blockType,
+            listId: listId!,
+            indentLevel: 0,
+          };
+        } else {
+          updatedNodes[j] = { ...node, type: blockType };
+        }
       }
+
+      i = end;
     }
 
     return {

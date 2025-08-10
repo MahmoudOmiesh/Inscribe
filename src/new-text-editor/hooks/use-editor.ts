@@ -128,9 +128,9 @@ export function useEditor(initialNodes: EditorNode[]) {
     handleSelect();
   }, [editorState, handleSelect]);
 
-  // useEffect(() => {
-  //   console.log("NODES", editorState.nodes);
-  // }, [editorState.nodes]);
+  useEffect(() => {
+    console.log("NODES", editorState.nodes);
+  }, [editorState.nodes]);
 
   return {
     editorRef,
