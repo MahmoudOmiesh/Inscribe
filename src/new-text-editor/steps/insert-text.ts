@@ -1,5 +1,5 @@
-import { adjustMarks } from "../model/marks";
-import type { ActiveMarkDescriptor, EditorNode } from "../model/schema";
+import { adjustMarks, isSameMarkDescriptor, splitMarkAt } from "../model/marks";
+import type { ActiveMarkDescriptor, EditorNode, Mark } from "../model/schema";
 import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { deleteBetween, findNodeIndex, replaceNodeAtIndex } from "./shared";
@@ -45,8 +45,14 @@ function insertTextIntoNode(
   offset: number,
   text: string,
 ) {
+  const marksAfterSplit = splitMarksNotInTypingAtOffset(
+    node.marks,
+    typingMarks,
+    offset,
+  );
+
   const newText = node.text.slice(0, offset) + text + node.text.slice(offset);
-  const newMarks = adjustMarks(node.marks, {
+  const newMarks = adjustMarks(marksAfterSplit, {
     offset,
     deletedLength: 0,
     insertedLength: text.length,
@@ -62,4 +68,23 @@ function insertTextIntoNode(
     text: newText,
     marks: [...newMarks, ...newMarksFromActive],
   };
+}
+
+function splitMarksNotInTypingAtOffset(
+  marks: Mark[],
+  typing: ActiveMarkDescriptor[],
+  offset: number,
+) {
+  let result = marks;
+  for (const m of marks) {
+    const spansCaret = m.start < offset && m.end > offset;
+    if (spansCaret && !typing.some((t) => isSameMarkDescriptor(t, m))) {
+      const desc: ActiveMarkDescriptor =
+        m.type === "highlight"
+          ? { type: "highlight", color: m.color }
+          : { type: m.type };
+      result = splitMarkAt(result, desc, offset);
+    }
+  }
+  return result;
 }

@@ -1,35 +1,33 @@
 import type { EditorState } from "../state/editor-state";
 import type { ActiveMarkDescriptor, EditorNode, Mark } from "../model/schema";
 
-import { findNodeIndex, replaceNodeAtIndex } from "./shared";
+import { findNodeIndex } from "./shared";
 import type { SelectionRange } from "../model/selection";
-import { splitMarkAt } from "../model/marks";
+import { isSameMarkDescriptor } from "../model/marks";
 import type { Step } from "../state/transaction";
 
 export function toggleMarkStep(mark: ActiveMarkDescriptor): Step {
   return (state: EditorState) => {
     const { nodes, nodeIdIndex, typingMarks, selection } = state;
-    const shouldAddMark = !typingMarks.some((m) => m.type === mark.type);
+    const shouldAddMark = !typingMarks.some((m) =>
+      isSameMarkDescriptor(m, mark),
+    );
 
     if (selection.isCollapsed) {
-      const nodeIndex = findNodeIndex(nodeIdIndex, selection.start.nodeId);
-      if (nodeIndex === -1) return state;
+      let nextTypingMarks = [...typingMarks];
 
-      const node = nodes[nodeIndex]!;
-
-      if (!shouldAddMark) {
-        const newMarks = splitMarkAt(node.marks, mark, selection.start.offset);
-
-        return {
-          ...state,
-          nodes: replaceNodeAtIndex(nodes, nodeIndex, {
-            ...node,
-            marks: newMarks,
-          }),
-        };
+      if (shouldAddMark) {
+        nextTypingMarks.push(mark);
+      } else {
+        nextTypingMarks = nextTypingMarks.filter(
+          (m) => !isSameMarkDescriptor(m, mark),
+        );
       }
 
-      return state;
+      return {
+        ...state,
+        typingMarks: nextTypingMarks,
+      };
     }
 
     const updatedNodes = applyMarkOverRange(

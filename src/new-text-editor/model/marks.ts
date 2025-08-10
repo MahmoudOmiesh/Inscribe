@@ -116,16 +116,7 @@ export function splitMarkAt(
 ) {
   const newMarks = [];
   for (const mark of marks) {
-    if (mark.type !== markToSplit.type) {
-      newMarks.push(mark);
-      continue;
-    }
-
-    if (
-      mark.type === "highlight" &&
-      markToSplit.type === "highlight" &&
-      mark.color !== markToSplit.color
-    ) {
+    if (!isSameMarkDescriptor(markToSplit, mark)) {
       newMarks.push(mark);
       continue;
     }
@@ -149,6 +140,17 @@ export function splitMarkAt(
   }
 
   return newMarks;
+}
+
+export function isSameMarkDescriptor(
+  a: ActiveMarkDescriptor,
+  b: Mark | ActiveMarkDescriptor,
+) {
+  if (a.type === "highlight" && b.type === "highlight") {
+    return a.color === b.color;
+  }
+
+  return a.type === b.type;
 }
 
 export function subtractMark(mark: Mark, otherMark: Mark) {

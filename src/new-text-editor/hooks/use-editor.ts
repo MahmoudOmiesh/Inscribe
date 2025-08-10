@@ -16,6 +16,7 @@ import {
   getActiveMarksOverRange,
   getActiveBlockType,
   getActiveBlockAlignment,
+  isSameRange,
 } from "../model/selection";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
@@ -91,12 +92,30 @@ export function useEditor(initialNodes: EditorNode[]) {
       editorState.nodeIdIndex,
       currentSelectionRange,
     );
+
+    const selectionChanged = !isSameRange(
+      editorState.selection,
+      currentSelectionRange,
+    );
+
+    if (selectionChanged) {
+      setEditorState((prev) => ({
+        ...prev,
+        typingMarks: activeMarks,
+      }));
+    }
+
+    const typingMarks =
+      !selectionChanged && currentSelectionRange.isCollapsed
+        ? editorState.typingMarks
+        : activeMarks;
+
     setActive({
-      marks: activeMarks,
+      marks: typingMarks,
       block: activeBlockType,
       align: activeBlockAlignment,
     });
-  }, [editorState.nodes, editorState.nodeIdIndex]);
+  }, [editorState]);
 
   const handleSelect = useDebouncedCallback(_handleSelect, 16);
 
@@ -106,9 +125,12 @@ export function useEditor(initialNodes: EditorNode[]) {
   }, [editorState.selection, editorState.nodes]);
 
   useEffect(() => {
-    console.log("NODES", editorState.nodes);
     handleSelect();
-  }, [editorState.nodes, handleSelect]);
+  }, [editorState, handleSelect]);
+
+  // useEffect(() => {
+  //   console.log("NODES", editorState.nodes);
+  // }, [editorState.nodes]);
 
   return {
     editorRef,

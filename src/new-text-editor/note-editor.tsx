@@ -95,12 +95,9 @@ export function NoteEditor() {
 
 // TODO
 // - fix the insertLineBreak (doesn't work at end of a node)
-// - fix if I turn off a mark in collapsed state, it splits the node even if the user didn't type
 
 // - fix if I switch a node in a middle of a list, it created 2 lists with same id
 // - might wanna treat a list as a single node when switching node types
-
-// - fix randoms bugs with lists, when merging and deleting
 
 // - make marks non overlapping and add different colors
 // - handle losing focus
