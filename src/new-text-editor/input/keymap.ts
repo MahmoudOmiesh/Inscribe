@@ -1,6 +1,4 @@
-import { listCommands } from "../commands";
-import type { EditorState } from "../state/editor-state";
-import type { Dispatch } from "../state/transaction";
+import type { useEditorActions } from "../hooks/use-editor-actions";
 
 function isMod(e: KeyboardEvent) {
   return e.metaKey || e.ctrlKey;
@@ -8,20 +6,17 @@ function isMod(e: KeyboardEvent) {
 
 export function handleKeyDown(
   e: KeyboardEvent,
-  state: EditorState,
-  dispatch: Dispatch,
+  actions: ReturnType<typeof useEditorActions>,
 ) {
   switch (true) {
     case e.key === "Tab" && !e.shiftKey: {
       e.preventDefault();
-      const tx = listCommands.indent(state);
-      if (tx) dispatch(tx);
+      actions.indent();
       return;
     }
     case e.key === "Tab" && e.shiftKey: {
       e.preventDefault();
-      const tx = listCommands.outdent(state);
-      if (tx) dispatch(tx);
+      actions.outdent();
       return;
     }
     default:

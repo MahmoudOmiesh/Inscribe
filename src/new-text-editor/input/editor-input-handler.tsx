@@ -1,66 +1,60 @@
 import { useCallback, useEffect, type ReactNode, type RefObject } from "react";
-import type { EditorState } from "../state/editor-state";
-import type { Dispatch, Transaction } from "../state/transaction";
-import { deleteCommands, formatCommands, textCommands } from "../commands";
 import { handleKeyDown } from "./keymap";
+import type { useEditorActions } from "../hooks/use-editor-actions";
 
 interface EditorInputHandlerProps {
   children: ReactNode;
   editorRef: RefObject<HTMLDivElement | null>;
-  getState: () => EditorState;
-  dispatch: Dispatch;
+  actions: ReturnType<typeof useEditorActions>;
 }
 
 export function EditorInputHandler({
   children,
+  actions,
   editorRef,
-  getState,
-  dispatch,
 }: EditorInputHandlerProps) {
   const onBeforeInput = useCallback(
     (e: InputEvent) => {
-      const state = getState();
       const { inputType, data, dataTransfer } = e;
-      let tx: Transaction | null = null;
 
       e.preventDefault();
       switch (inputType) {
         case "insertText": {
-          tx = textCommands.insertText(state, data ?? "");
+          actions.insertText(data ?? "");
           break;
         }
         case "insertReplacementText": {
           const replacementText = dataTransfer?.getData("text/plain") ?? "";
-          tx = textCommands.insertText(state, replacementText);
+          actions.insertText(replacementText);
           break;
         }
         case "insertParagraph": {
-          tx = textCommands.insertParagraph(state);
+          actions.insertParagraph();
           break;
         }
         case "insertLineBreak": {
-          tx = textCommands.insertText(state, "\n");
+          actions.insertText("\n");
           break;
         }
 
         case "deleteContentBackward": {
-          tx = deleteCommands.deleteBackward(state);
+          actions.deleteBackward();
           break;
         }
         case "deleteContentForward": {
-          tx = deleteCommands.deleteForward(state);
+          actions.deleteForward();
           break;
         }
         case "deleteWordBackward": {
-          tx = deleteCommands.deleteWordBackward(state);
+          actions.deleteWordBackward();
           break;
         }
         case "deleteWordForward": {
-          tx = deleteCommands.deleteWordForward(state);
+          actions.deleteWordForward();
           break;
         }
         case "deleteByCut": {
-          tx = deleteCommands.deleteBackward(state);
+          actions.deleteBackward();
           break;
         }
 
@@ -73,62 +67,60 @@ export function EditorInputHandler({
             contentType === "html" ? "text/html" : "text/plain",
           );
 
-          tx = textCommands.paste(state, content, contentType);
+          actions.paste(content, contentType);
           break;
         }
 
         case "formatBold": {
-          tx = formatCommands.toggleMark(state, { type: "bold" });
+          actions.toggleMark({ type: "bold" });
           break;
         }
         case "formatItalic": {
-          tx = formatCommands.toggleMark(state, { type: "italic" });
+          actions.toggleMark({ type: "italic" });
           break;
         }
         case "formatUnderline": {
-          tx = formatCommands.toggleMark(state, { type: "underline" });
+          actions.toggleMark({ type: "underline" });
           break;
         }
         case "formatStrikethrough": {
-          tx = formatCommands.toggleMark(state, { type: "strikethrough" });
+          actions.toggleMark({ type: "strikethrough" });
           break;
         }
         case "formatSuperscript": {
-          tx = formatCommands.toggleMark(state, { type: "superscript" });
+          actions.toggleMark({ type: "superscript" });
           break;
         }
         case "formatSubscript": {
-          tx = formatCommands.toggleMark(state, { type: "subscript" });
+          actions.toggleMark({ type: "subscript" });
           break;
         }
         case "formatJustifyLeft": {
-          tx = formatCommands.toggleAlignment(state, "left");
+          actions.toggleBlockAlignment("left");
           break;
         }
         case "formatJustifyCenter": {
-          tx = formatCommands.toggleAlignment(state, "center");
+          actions.toggleBlockAlignment("center");
           break;
         }
         case "formatJustifyRight": {
-          tx = formatCommands.toggleAlignment(state, "right");
+          actions.toggleBlockAlignment("right");
           break;
         }
         case "formatJustifyFull": {
-          tx = formatCommands.toggleAlignment(state, "justify");
+          actions.toggleBlockAlignment("justify");
           break;
         }
       }
-
-      if (tx) dispatch(tx);
     },
-    [getState, dispatch],
+    [actions],
   );
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      handleKeyDown(e, getState(), dispatch);
+      handleKeyDown(e, actions);
     },
-    [getState, dispatch],
+    [actions],
   );
 
   useEffect(() => {

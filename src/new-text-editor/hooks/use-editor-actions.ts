@@ -16,14 +16,19 @@ import type {
 export function useEditorActions(
   getState: () => EditorState,
   dispatch: (tx: Transaction) => void,
+  preserveTypingMarksAtCurrentPosition: () => void,
 ) {
   const doTx = useCallback(
-    (build: (s: EditorState) => Transaction | null) => {
+    (build: (s: EditorState) => Transaction | null, preserve = false) => {
       const s = getState();
       const tx = build(s);
       if (tx) dispatch(tx);
+
+      if (preserve) {
+        preserveTypingMarksAtCurrentPosition();
+      }
     },
-    [getState, dispatch],
+    [getState, dispatch, preserveTypingMarksAtCurrentPosition],
   );
 
   return {
@@ -38,7 +43,7 @@ export function useEditorActions(
     deleteWordForward: () => doTx((s) => deleteCommands.deleteWordForward(s)),
 
     toggleMark: (mark: ActiveMarkDescriptor) =>
-      doTx((s) => formatCommands.toggleMark(s, mark)),
+      doTx((s) => formatCommands.toggleMark(s, mark), true),
     toggleBlock: (blockType: BlockType) =>
       doTx((s) => formatCommands.toggleBlockType(s, blockType)),
     toggleBlockAlignment: (alignment: Alignment) =>

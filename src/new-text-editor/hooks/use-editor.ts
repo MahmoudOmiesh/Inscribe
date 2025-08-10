@@ -17,12 +17,14 @@ import {
   getActiveBlockType,
   getActiveBlockAlignment,
   isSameRange,
+  type SelectionRange,
 } from "../model/selection";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
 export function useEditor(initialNodes: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const historyRef = useRef(new History());
+  const preserveAtRef = useRef<SelectionRange | null>(null);
 
   const [editorState, setEditorState] = useState<EditorState>(() => {
     const firstId = initialNodes[0]?.id ?? "missing";
@@ -48,10 +50,15 @@ export function useEditor(initialNodes: EditorNode[]) {
     const sel = getSelectionRange();
     if (!sel) return editorState;
 
+    const preserve =
+      sel.isCollapsed &&
+      preserveAtRef.current &&
+      isSameRange(sel, preserveAtRef.current);
+
     return {
       ...editorState,
       selection: sel,
-      typingMarks: active.marks,
+      typingMarks: preserve ? editorState.typingMarks : active.marks,
     };
   }, [editorState, active.marks]);
 
@@ -93,31 +100,32 @@ export function useEditor(initialNodes: EditorNode[]) {
       currentSelectionRange,
     );
 
-    const selectionChanged = !isSameRange(
-      editorState.selection,
-      currentSelectionRange,
-    );
+    const preserve =
+      currentSelectionRange.isCollapsed &&
+      preserveAtRef.current &&
+      isSameRange(currentSelectionRange, preserveAtRef.current);
 
-    if (selectionChanged) {
-      setEditorState((prev) => ({
-        ...prev,
-        typingMarks: activeMarks,
-      }));
+    const displayMarks = preserve ? editorState.typingMarks : activeMarks;
+
+    if (!preserve) {
+      preserveAtRef.current = null;
     }
 
-    const typingMarks =
-      !selectionChanged && currentSelectionRange.isCollapsed
-        ? editorState.typingMarks
-        : activeMarks;
-
     setActive({
-      marks: typingMarks,
+      marks: displayMarks,
       block: activeBlockType,
       align: activeBlockAlignment,
     });
   }, [editorState]);
 
   const handleSelect = useDebouncedCallback(_handleSelect, 16);
+
+  const preserveTypingMarksAtCurrentPosition = useCallback(() => {
+    const sel = getSelectionRange();
+    if (sel?.isCollapsed) {
+      preserveAtRef.current = sel;
+    }
+  }, []);
 
   // Sync DOM selection after state changes
   useEffect(() => {
@@ -128,9 +136,9 @@ export function useEditor(initialNodes: EditorNode[]) {
     handleSelect();
   }, [editorState, handleSelect]);
 
-  useEffect(() => {
-    console.log("NODES", editorState.nodes);
-  }, [editorState.nodes]);
+  // useEffect(() => {
+  //   console.log("NODES", editorState.nodes);
+  // }, [editorState.nodes]);
 
   return {
     editorRef,
@@ -142,6 +150,7 @@ export function useEditor(initialNodes: EditorNode[]) {
     canUndo,
     canRedo,
     handleSelect,
+    preserveTypingMarksAtCurrentPosition,
     activeMarks: active.marks,
     activeBlockType: active.block,
     activeAlignment: active.align,

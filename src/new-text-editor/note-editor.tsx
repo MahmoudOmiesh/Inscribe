@@ -62,7 +62,11 @@ const DEFAULT_NODES: EditorNode[] = [
 
 export function NoteEditor() {
   const editor = useEditor(DEFAULT_NODES);
-  const actions = useEditorActions(editor.getState, editor.dispatch);
+  const actions = useEditorActions(
+    editor.getState,
+    editor.dispatch,
+    editor.preserveTypingMarksAtCurrentPosition,
+  );
 
   return (
     <Card className="md:w-3xl">
@@ -70,11 +74,7 @@ export function NoteEditor() {
         <EditorToolbar editor={editor} actions={actions} />
       </CardHeader>
       <CardContent>
-        <EditorInputHandler
-          editorRef={editor.editorRef}
-          getState={editor.getState}
-          dispatch={editor.dispatch}
-        >
+        <EditorInputHandler editorRef={editor.editorRef} actions={actions}>
           <div
             ref={editor.editorRef}
             onSelect={editor.handleSelect}
@@ -96,18 +96,18 @@ export function NoteEditor() {
 // TODO
 // - fix the insertLineBreak (doesn't work at end of a node)
 
-// - fix if I switch a node in a middle of a list, it created 2 lists with same id
-// - might wanna treat a list as a single node when switching node types
-
 // - make marks non overlapping and add different colors
+// - group operations together in undo/redo
 // - handle losing focus
 // - support for lists (unordered, ordered, task)
 // - imrpove the ui
 
+// idk
 // - performance
 // - general clean up for the code
 // - support for images
 // - support for links
 // - support for code blocks and blockquotes
+// - support for separators and emojis
 // - support for arabic?
 // - support for vim?
