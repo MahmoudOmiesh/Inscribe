@@ -176,6 +176,7 @@ export const CheckListItem = memo(
             ) : (
               <br />
             )}
+            {node.text.endsWith("\n") && <br />}
           </p>
 
           {children}
@@ -211,6 +212,7 @@ export const ListItem = memo(
           ) : (
             <br />
           )}
+          {node.text.endsWith("\n") && <br />}
         </p>
 
         {children}

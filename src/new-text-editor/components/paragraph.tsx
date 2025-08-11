@@ -19,6 +19,7 @@ export const Paragraph = memo(({ node }: { node: ParagraphNodeType }) => {
       ) : (
         <br />
       )}
+      {node.text.endsWith("\n") && <br />}
     </p>
   );
 });

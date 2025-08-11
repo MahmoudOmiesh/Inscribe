@@ -107,11 +107,9 @@ export function NoteEditor() {
 }
 
 // TODO
-// - fix the insertLineBreak (doesn't work at end of a node)
-
 // - group operations together in undo/redo
 // - handle losing focus
-// - improve the ui
+// - imrpove the ui
 
 // idk
 // - performance

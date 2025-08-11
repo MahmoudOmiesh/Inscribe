@@ -20,6 +20,7 @@ export const Heading = memo(({ node }: { node: HeadingNode }) => {
           ) : (
             <br />
           )}
+          {node.text.endsWith("\n") && <br />}
         </h1>
       );
     case "heading-2":
@@ -30,6 +31,7 @@ export const Heading = memo(({ node }: { node: HeadingNode }) => {
           ) : (
             <br />
           )}
+          {node.text.endsWith("\n") && <br />}
         </h2>
       );
     case "heading-3":
@@ -40,6 +42,7 @@ export const Heading = memo(({ node }: { node: HeadingNode }) => {
           ) : (
             <br />
           )}
+          {node.text.endsWith("\n") && <br />}
         </h3>
       );
     case "heading-4":
@@ -50,6 +53,7 @@ export const Heading = memo(({ node }: { node: HeadingNode }) => {
           ) : (
             <br />
           )}
+          {node.text.endsWith("\n") && <br />}
         </h4>
       );
   }
