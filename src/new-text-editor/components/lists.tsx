@@ -117,7 +117,7 @@ function CheckListNested({
   toggleCheckbox: (nodeId: string) => void;
 }) {
   return (
-    <ul data-type="tasklist">
+    <ul className="pl-1">
       {items.map((item) => (
         <CheckListItem
           key={item.item.id}
@@ -155,12 +155,14 @@ export const CheckListItem = memo(
           node.alignment === "justify" && "text-justify",
         )}
       >
-        <Checkbox
-          checked={node.checked}
-          onCheckedChange={() => toggleCheckbox(node.id)}
-          className="mt-1.5 cursor-pointer select-none"
-        />
-        <div>
+        <label contentEditable={false}>
+          <Checkbox
+            checked={node.checked}
+            onCheckedChange={() => toggleCheckbox(node.id)}
+            className="mt-1 cursor-pointer select-none"
+          />
+        </label>
+        <div className="min-w-0 flex-1">
           <p
             data-node-id={node.id}
             className={cn(
@@ -175,6 +177,7 @@ export const CheckListItem = memo(
               <br />
             )}
           </p>
+
           {children}
         </div>
       </li>
@@ -190,7 +193,6 @@ export const ListItem = memo(
       <li
         className={cn(
           "whitespace-pre-wrap",
-          node.type === "check-list-item" && "flex items-center gap-2",
           node.alignment === "center" && "text-center",
           node.alignment === "right" && "text-right",
           node.alignment === "justify" && "text-justify",

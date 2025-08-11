@@ -108,6 +108,7 @@ export function NoteEditor() {
 
 // TODO
 // - fix the insertLineBreak (doesn't work at end of a node)
+// - fix when a list item switches to a paragraph (when pressing enter) entire list is switched to a paragraph
 
 // - group operations together in undo/redo
 // - handle losing focus

@@ -33,6 +33,11 @@ export function handleKeyDown(
       actions.toggleBlock("unordered-list-item");
       return;
     }
+    case e.code === "Digit9" && isModAndShift(e): {
+      e.preventDefault();
+      actions.toggleBlock("check-list-item");
+      return;
+    }
     default:
       return;
   }
