@@ -19,7 +19,9 @@ export function insertParagraph(state: EditorState) {
   }
 
   if (shouldSwitchListItemToParagraph(nodes, nodeIdIndex, selection)) {
-    return new Transaction(state).add(toggleBlockTypeStep("paragraph"));
+    return new Transaction(state).add(
+      toggleBlockTypeStep("paragraph", { treatListAsSingleNode: false }),
+    );
   }
 
   return new Transaction(state).add(insertParagraphStep());

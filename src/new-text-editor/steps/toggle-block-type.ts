@@ -6,7 +6,12 @@ import { findNodeIndex } from "./shared";
 import { getListBoundaries } from "../model/lists";
 import { createListItem } from "../model/nodes";
 
-export function toggleBlockTypeStep(blockType: BlockType): Step {
+export function toggleBlockTypeStep(
+  blockType: BlockType,
+  // we should always treat lists as a single node,
+  // except if it is the last item in the list, we can do both
+  { treatListAsSingleNode = true }: { treatListAsSingleNode?: boolean } = {},
+): Step {
   return (state: EditorState) => {
     const { nodes, nodeIdIndex, selection } = state;
 
@@ -23,7 +28,9 @@ export function toggleBlockTypeStep(blockType: BlockType): Step {
     const listId = isList ? nanoid() : undefined;
 
     for (let i = startNodeIndex; i <= endNodeIndex; i++) {
-      const listBoundaries = getListBoundaries(updatedNodes, i);
+      const listBoundaries = treatListAsSingleNode
+        ? getListBoundaries(updatedNodes, i)
+        : null;
 
       const start = listBoundaries?.start ?? i;
       const end = listBoundaries?.end ?? i;
