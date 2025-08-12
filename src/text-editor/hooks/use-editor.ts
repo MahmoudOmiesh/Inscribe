@@ -151,8 +151,6 @@ export function useEditor(initialNodes: EditorNode[]) {
     canRedo,
     handleSelect,
     preserveTypingMarksAtCurrentPosition,
-    activeMarks: active.marks,
-    activeBlockType: active.block,
-    activeAlignment: active.align,
+    active,
   };
 }

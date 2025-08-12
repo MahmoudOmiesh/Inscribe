@@ -15,9 +15,19 @@ export function toggleCheckboxStep(nodeId: string): Step {
     const updatedNodes = [...nodes];
     updatedNodes[nodeIndex] = { ...node, checked: !node.checked };
 
+    const caret = {
+      nodeId,
+      offset: 0,
+    };
+
     return {
       ...state,
       nodes: updatedNodes,
+      selection: {
+        start: caret,
+        end: caret,
+        isCollapsed: true,
+      },
     };
   };
 }

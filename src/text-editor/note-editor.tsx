@@ -1,12 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { NoteContent } from "./components/note-content";
-import type { EditorNode } from "./utils/types";
+import type { EditorNode } from "./model/schema";
 import { useEditor } from "./hooks/use-editor";
-import { useEditorOperations } from "./hooks/use-editor-operations";
-import { EditorInputHandler } from "./components/editor-input-handler";
-import { EditorToolbar } from "./components/editor-toolbar";
+import { useEditorActions } from "./hooks/use-editor-actions";
+import { EditorInputHandler } from "./input/editor-input-handler";
+import { EditorFloatingToolbar } from "./components/editor-floating-toolbar";
 
 const DEFAULT_NODES: EditorNode[] = [
   {
@@ -37,6 +37,16 @@ const DEFAULT_NODES: EditorNode[] = [
     indentLevel: 0,
     marks: [],
   },
+  {
+    id: "20ce649b-df96-447c-b90a-5715989b02c7",
+    type: "check-list-item",
+    text: "Check list item 1",
+    checked: true,
+    alignment: "left",
+    listId: "456",
+    indentLevel: 0,
+    marks: [],
+  },
 
   // {
   //   id: "cb7929b8-77a4-4fa0-8b4a-c3d190e5dfb8",
@@ -62,17 +72,23 @@ const DEFAULT_NODES: EditorNode[] = [
 
 export function NoteEditor() {
   const editor = useEditor(DEFAULT_NODES);
-  const operations = useEditorOperations(editor);
+  const actions = useEditorActions(
+    editor.getState,
+    editor.dispatch,
+    editor.preserveTypingMarksAtCurrentPosition,
+  );
 
   return (
     <Card className="md:w-3xl">
-      <CardHeader>
-        <EditorToolbar editor={editor} operations={operations} />
-      </CardHeader>
       <CardContent>
-        <EditorInputHandler operations={operations} editorRef={editor.ref}>
+        <EditorInputHandler editorRef={editor.editorRef} actions={actions}>
+          <EditorFloatingToolbar
+            editorRef={editor.editorRef}
+            actions={actions}
+            active={editor.active}
+          />
           <div
-            ref={editor.ref}
+            ref={editor.editorRef}
             onSelect={editor.handleSelect}
             onDragStart={(e) => {
               e.preventDefault();
@@ -81,7 +97,10 @@ export function NoteEditor() {
             suppressContentEditableWarning
             className="space-y-2 p-0.5 whitespace-pre outline-none"
           >
-            <NoteContent nodes={editor.nodes} />
+            <NoteContent
+              nodes={editor.state.nodes}
+              toggleCheckbox={actions.toggleCheckbox}
+            />
           </div>
         </EditorInputHandler>
       </CardContent>
@@ -90,20 +109,16 @@ export function NoteEditor() {
 }
 
 // TODO
-// - fix the insertLineBreak (doesn't work at end of a node)
-
-// - fix if I switch a node in a middle of a list, it created 2 lists with same id
-// - might wanna treat a list as a single node when switching node types
-
-// - make marks non overlapping and add different colors
+// - group operations together in undo/redo
 // - handle losing focus
-// - support for lists (unordered, ordered, task)
 // - imrpove the ui
 
+// idk
 // - performance
 // - general clean up for the code
 // - support for images
 // - support for links
 // - support for code blocks and blockquotes
+// - support for separators and emojis
 // - support for arabic?
 // - support for vim?

@@ -1,12 +1,14 @@
-export type BlockType =
-  | "heading-1"
-  | "heading-2"
-  | "heading-3"
-  | "heading-4"
-  | "paragraph"
-  | "unordered-list-item"
-  | "ordered-list-item"
-  | "check-list-item";
+export const BLOCK_TYPES = [
+  "paragraph",
+  "heading-1",
+  "heading-2",
+  "heading-3",
+  "heading-4",
+  "unordered-list-item",
+  "ordered-list-item",
+  "check-list-item",
+] as const;
+export type BlockType = (typeof BLOCK_TYPES)[number];
 
 export type MarkType =
   | "bold"
@@ -18,9 +20,19 @@ export type MarkType =
   | "highlight"
   | "code";
 
-export type Alignment = "left" | "center" | "right" | "justify";
+export const ALIGNMENT_TYPES = ["left", "center", "right", "justify"] as const;
+export type Alignment = (typeof ALIGNMENT_TYPES)[number];
 
-export type HighlightColor = "yellow" | "red" | "green" | "blue";
+export const HIGHLIGHT_COLORS_CSS = {
+  red: "rgb(244 67 54 / 0.28)",
+  yellow: "rgb(255 193 7 / 0.28)",
+  green: "rgb(76 175 80 / 0.28)",
+  blue: "rgb(33 150 243 / 0.28)",
+} as const;
+export const HIGHLIGHT_COLORS = Object.keys(
+  HIGHLIGHT_COLORS_CSS,
+) as (keyof typeof HIGHLIGHT_COLORS_CSS)[];
+export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
 
 export type Mark =
   | {

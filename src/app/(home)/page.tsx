@@ -1,4 +1,4 @@
-import { NoteEditor } from "@/new-text-editor/note-editor";
+import { NoteEditor } from "@/text-editor/note-editor";
 
 export default function Home() {
   return (

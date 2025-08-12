@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from "react";
-import type { Mark } from "../model/schema";
+import { HIGHLIGHT_COLORS_CSS, type Mark } from "../model/schema";
 
 const MARK_PRIORITY: Record<Mark["type"], number> = {
   bold: 1,
@@ -124,7 +124,7 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
       return (
         <mark
           style={{
-            backgroundColor: HighlighColors[mark.color],
+            backgroundColor: HIGHLIGHT_COLORS_CSS[mark.color],
             color: "inherit",
           }}
         >
@@ -142,10 +142,3 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
       return _exhaustiveCheck;
   }
 }
-
-const HighlighColors = {
-  red: "rgb(244 67 54 / 0.28)",
-  yellow: "rgb(255 193 7 / 0.28)",
-  green: "rgb(76 175 80 / 0.28)",
-  blue: "rgb(33 150 243 / 0.28)",
-};
