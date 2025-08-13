@@ -18,6 +18,7 @@ import {
   type ExtendedRefs,
 } from "@floating-ui/react";
 import { EditorNodeModifier } from "./editor-node-modifier";
+import type { useEditorActions } from "../hooks/use-editor-actions";
 
 type HeadingProps = Omit<
   ComponentProps<typeof Heading>,
@@ -43,39 +44,47 @@ type CheckListProps = Omit<
 export type GetReferenceProps = UseInteractionsReturn["getReferenceProps"];
 export type SetReference = ExtendedRefs<HTMLElement>["setReference"];
 
-type GeneralNodeProps =
+type GeneralNodeProps = (
   | {
       type: "heading";
-      props: HeadingProps;
+      nodeProps: HeadingProps;
     }
   | {
       type: "paragraph";
-      props: ParagraphProps;
+      nodeProps: ParagraphProps;
     }
   | {
       type: "unordered-list";
-      props: UnorderedListProps;
+      nodeProps: UnorderedListProps;
     }
   | {
       type: "ordered-list";
-      props: OrderedListProps;
+      nodeProps: OrderedListProps;
     }
   | {
       type: "check-list";
-      props: CheckListProps;
-    };
+      nodeProps: CheckListProps;
+    }
+) & {
+  actions: ReturnType<typeof useEditorActions>;
+};
 
 export function GeneralNode(props: GeneralNodeProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: (next) => {
+      if (!isInteracting) {
+        setIsOpen(next);
+      }
+    },
     placement: "left-start",
     // Make sure the tooltip stays on the screen
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(5),
+      offset(8),
       flip({
         fallbackAxisSideDirection: "start",
       }),
@@ -84,8 +93,13 @@ export function GeneralNode(props: GeneralNodeProps) {
   });
 
   // Event listeners to change the open state
-  const hover = useHover(context, { move: false, handleClose: safePolygon() });
-  const dismiss = useDismiss(context);
+  const hover = useHover(context, {
+    move: false,
+    handleClose: safePolygon(),
+  });
+  const dismiss = useDismiss(context, {
+    outsidePress: () => !isInteracting,
+  });
 
   // Merge all the interactions into prop getters
   const { getReferenceProps, getFloatingProps } = useInteractions([
@@ -102,7 +116,12 @@ export function GeneralNode(props: GeneralNodeProps) {
             style={floatingStyles}
             {...getFloatingProps()}
           >
-            <EditorNodeModifier />
+            <EditorNodeModifier
+              nodeId={getNodeId(props)}
+              activeBlock={getActiveBlock(props)}
+              actions={props.actions}
+              onFloatingInteraction={setIsInteracting}
+            />
           </div>
         </FloatingPortal>
       )}
@@ -111,7 +130,7 @@ export function GeneralNode(props: GeneralNodeProps) {
 }
 
 function renderNode(
-  { type, props }: GeneralNodeProps,
+  { type, nodeProps }: GeneralNodeProps,
   setReference: SetReference,
   getReferenceProps: GetReferenceProps,
 ) {
@@ -119,7 +138,7 @@ function renderNode(
     case "heading":
       return (
         <Heading
-          {...props}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
@@ -127,7 +146,7 @@ function renderNode(
     case "paragraph":
       return (
         <Paragraph
-          {...props}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
@@ -135,7 +154,7 @@ function renderNode(
     case "unordered-list":
       return (
         <UnorderedList
-          {...props}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
@@ -143,7 +162,7 @@ function renderNode(
     case "ordered-list":
       return (
         <OrderedList
-          {...props}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
@@ -151,13 +170,49 @@ function renderNode(
     case "check-list":
       return (
         <CheckList
-          {...props}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
       );
     default:
       const _: never = type;
+      return _;
+  }
+}
+
+function getNodeId(props: GeneralNodeProps) {
+  switch (props.type) {
+    case "heading":
+      return props.nodeProps.node.id;
+    case "paragraph":
+      return props.nodeProps.node.id;
+    case "unordered-list":
+      return props.nodeProps.items[0]!.id;
+    case "ordered-list":
+      return props.nodeProps.items[0]!.id;
+    case "check-list":
+      return props.nodeProps.items[0]!.id;
+    default:
+      const _: never = props;
+      return _;
+  }
+}
+
+function getActiveBlock(props: GeneralNodeProps) {
+  switch (props.type) {
+    case "heading":
+      return props.nodeProps.node.type;
+    case "paragraph":
+      return props.nodeProps.node.type;
+    case "unordered-list":
+      return props.nodeProps.items[0]!.type;
+    case "ordered-list":
+      return props.nodeProps.items[0]!.type;
+    case "check-list":
+      return props.nodeProps.items[0]!.type;
+    default:
+      const _: never = props;
       return _;
   }
 }

@@ -1,6 +1,11 @@
-import { cleanNode } from "../model/nodes";
+import { cleanNode, createParagraph } from "../model/nodes";
 import type { EditorNode } from "../model/schema";
 
 export function normalizeNodes(nodes: EditorNode[]) {
-  return nodes.map(cleanNode);
+  const normalizedNodes = nodes.map(cleanNode);
+  if (normalizedNodes.length === 0) {
+    return [createParagraph()];
+  }
+
+  return normalizedNodes;
 }

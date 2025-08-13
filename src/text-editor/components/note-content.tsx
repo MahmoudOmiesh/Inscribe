@@ -7,14 +7,15 @@ import type {
   UnorderedListItemNode,
 } from "../model/schema";
 import { GeneralNode } from "./general-node";
+import type { useEditorActions } from "../hooks/use-editor-actions";
 
 export const NoteContent = memo(
   ({
     nodes,
-    toggleCheckbox,
+    actions,
   }: {
     nodes: EditorNode[];
-    toggleCheckbox: (nodeId: string) => void;
+    actions: ReturnType<typeof useEditorActions>;
   }) => {
     const nodeComponents = useMemo(() => {
       const components: ReactNode[] = [];
@@ -28,13 +29,23 @@ export const NoteContent = memo(
           case "heading-3":
           case "heading-4":
             components.push(
-              <GeneralNode key={node.id} type="heading" props={{ node }} />,
+              <GeneralNode
+                key={node.id}
+                type="heading"
+                nodeProps={{ node }}
+                actions={actions}
+              />,
             );
             i++;
             break;
           case "paragraph":
             components.push(
-              <GeneralNode key={node.id} type="paragraph" props={{ node }} />,
+              <GeneralNode
+                key={node.id}
+                type="paragraph"
+                nodeProps={{ node }}
+                actions={actions}
+              />,
             );
             i++;
             break;
@@ -57,22 +68,25 @@ export const NoteContent = memo(
                 <GeneralNode
                   key={listId}
                   type="ordered-list"
-                  props={{ items: items as OrderedListItemNode[] }}
+                  nodeProps={{ items: items as OrderedListItemNode[] }}
+                  actions={actions}
                 />
               ) : node.type === "unordered-list-item" ? (
                 <GeneralNode
                   key={listId}
                   type="unordered-list"
-                  props={{ items: items as UnorderedListItemNode[] }}
+                  nodeProps={{ items: items as UnorderedListItemNode[] }}
+                  actions={actions}
                 />
               ) : (
                 <GeneralNode
                   key={listId}
                   type="check-list"
-                  props={{
+                  nodeProps={{
                     items: items as CheckListItemNode[],
-                    toggleCheckbox,
+                    toggleCheckbox: actions.toggleCheckbox,
                   }}
+                  actions={actions}
                 />
               ),
             );
@@ -86,7 +100,7 @@ export const NoteContent = memo(
       }
 
       return components;
-    }, [nodes, toggleCheckbox]);
+    }, [nodes, actions]);
 
     return <>{nodeComponents}</>;
   },

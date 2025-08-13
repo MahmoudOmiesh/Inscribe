@@ -97,10 +97,7 @@ export function NoteEditor() {
             suppressContentEditableWarning
             className="space-y-2 p-0.5 whitespace-pre outline-none"
           >
-            <NoteContent
-              nodes={editor.state.nodes}
-              toggleCheckbox={actions.toggleCheckbox}
-            />
+            <NoteContent nodes={editor.state.nodes} actions={actions} />
           </div>
         </EditorInputHandler>
       </CardContent>
@@ -109,6 +106,8 @@ export function NoteEditor() {
 }
 
 // TODO
+// - fix floating node modifier not closing when clicking outside
+// - fix getSelectionRange doesn't work if there is one empty node in the editor
 // - group operations together in undo/redo
 // - handle losing focus
 // - imrpove the ui

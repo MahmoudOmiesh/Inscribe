@@ -50,14 +50,14 @@ export function cleanNode(node: EditorNode): EditorNode {
 }
 
 export function createParagraph(
-  paragraph: Partial<Omit<ParagraphNode, "type">>,
+  paragraph?: Partial<Omit<ParagraphNode, "type">>,
 ): ParagraphNode {
   return {
-    id: paragraph.id ?? nanoid(),
+    id: paragraph?.id ?? nanoid(),
     type: "paragraph",
-    text: paragraph.text ?? "",
-    marks: paragraph.marks ?? [],
-    alignment: paragraph.alignment ?? "left",
+    text: paragraph?.text ?? "",
+    marks: paragraph?.marks ?? [],
+    alignment: paragraph?.alignment ?? "left",
   };
 }
 

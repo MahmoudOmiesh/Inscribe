@@ -53,5 +53,16 @@ export function useEditorActions(
     outdent: () => doTx((s) => listCommands.outdent(s)),
     toggleCheckbox: (nodeId: string) =>
       doTx((s) => listCommands.toggleCheckbox(s, nodeId)),
+
+    resetFormatting: (nodeId: string) =>
+      doTx((s) => formatCommands.resetFormatting(s, nodeId)),
+    deleteNode: (nodeId: string) =>
+      doTx((s) => deleteCommands.deleteNode(s, nodeId)),
+    duplicateNode: (nodeId: string) =>
+      doTx((s) => formatCommands.duplicateNode(s, nodeId)),
+    insertNodeAfter: (nodeId: string) =>
+      doTx((s) => formatCommands.insertNodeAfter(s, nodeId)),
+    changeNodeType: (nodeId: string, blockType: BlockType) =>
+      doTx((s) => formatCommands.changeNodeType(s, nodeId, blockType)),
   };
 }

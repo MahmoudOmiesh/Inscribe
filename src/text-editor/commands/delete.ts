@@ -1,6 +1,7 @@
 import type { EditorState } from "../state/editor-state";
 import { Transaction } from "../state/transaction";
 import { deleteCharStep } from "../steps/delete-char";
+import { deleteNodeStep } from "../steps/delete-node";
 import { deleteWordStep } from "../steps/delete-word";
 import { mergeStep } from "../steps/merge";
 import { outdentStep } from "../steps/outdent";
@@ -93,4 +94,8 @@ export function deleteWordForward(state: EditorState) {
   }
 
   return new Transaction(state).add(deleteWordStep("forward"));
+}
+
+export function deleteNode(state: EditorState, nodeId: string) {
+  return new Transaction(state).add(deleteNodeStep(nodeId));
 }
