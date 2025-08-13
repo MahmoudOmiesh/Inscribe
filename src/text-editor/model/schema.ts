@@ -28,6 +28,10 @@ export const HIGHLIGHT_COLORS_CSS = {
   yellow: "rgb(255 193 7 / 0.28)",
   green: "rgb(76 175 80 / 0.28)",
   blue: "rgb(33 150 243 / 0.28)",
+  pink: "rgb(255 205 210 / 0.28)",
+  purple: "rgb(224 195 252 / 0.28)",
+  orange: "rgb(255 213 181 / 0.28)",
+  brown: "rgb(239 235 233 / 0.28)",
 } as const;
 export const HIGHLIGHT_COLORS = Object.keys(
   HIGHLIGHT_COLORS_CSS,
