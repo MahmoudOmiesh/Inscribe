@@ -6,9 +6,7 @@ import type {
   OrderedListItemNode,
   UnorderedListItemNode,
 } from "../model/schema";
-import { Paragraph } from "./paragraph";
-import { Heading } from "./headings";
-import { CheckList, OrderedList, UnorderedList } from "./lists";
+import { GeneralNode } from "./general-node";
 
 export const NoteContent = memo(
   ({
@@ -29,11 +27,15 @@ export const NoteContent = memo(
           case "heading-2":
           case "heading-3":
           case "heading-4":
-            components.push(<Heading key={node.id} node={node} />);
+            components.push(
+              <GeneralNode key={node.id} type="heading" props={{ node }} />,
+            );
             i++;
             break;
           case "paragraph":
-            components.push(<Paragraph key={node.id} node={node} />);
+            components.push(
+              <GeneralNode key={node.id} type="paragraph" props={{ node }} />,
+            );
             i++;
             break;
           case "unordered-list-item":
@@ -52,20 +54,25 @@ export const NoteContent = memo(
             }
             components.push(
               node.type === "ordered-list-item" ? (
-                <OrderedList
+                <GeneralNode
                   key={listId}
-                  items={items as OrderedListItemNode[]}
+                  type="ordered-list"
+                  props={{ items: items as OrderedListItemNode[] }}
                 />
               ) : node.type === "unordered-list-item" ? (
-                <UnorderedList
+                <GeneralNode
                   key={listId}
-                  items={items as UnorderedListItemNode[]}
+                  type="unordered-list"
+                  props={{ items: items as UnorderedListItemNode[] }}
                 />
               ) : (
-                <CheckList
+                <GeneralNode
                   key={listId}
-                  items={items as CheckListItemNode[]}
-                  toggleCheckbox={toggleCheckbox}
+                  type="check-list"
+                  props={{
+                    items: items as CheckListItemNode[],
+                    toggleCheckbox,
+                  }}
                 />
               ),
             );

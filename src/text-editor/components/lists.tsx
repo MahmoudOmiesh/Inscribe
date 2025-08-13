@@ -8,6 +8,7 @@ import type {
 import { MarkRenderer } from "./mark-renderer";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { GetReferenceProps, SetReference } from "./general-node";
 
 type NestedListItemNode<T extends ListItemNode> = {
   item: T;
@@ -15,9 +16,24 @@ type NestedListItemNode<T extends ListItemNode> = {
 };
 
 export const UnorderedList = memo(
-  ({ items }: { items: UnorderedListItemNode[] }) => {
+  ({
+    items,
+    setReference,
+    getReferenceProps,
+  }: {
+    items: UnorderedListItemNode[];
+    setReference: SetReference;
+    getReferenceProps: GetReferenceProps;
+  }) => {
     const nestedItems = createNestedListItems(items);
-    return <UnorderedListNested items={nestedItems} level={0} />;
+    return (
+      <UnorderedListNested
+        items={nestedItems}
+        level={0}
+        setReference={setReference}
+        getReferenceProps={getReferenceProps}
+      />
+    );
   },
 );
 
@@ -26,10 +42,17 @@ UnorderedList.displayName = "UnorderedList";
 function UnorderedListNested({
   items,
   level,
+  setReference,
+  getReferenceProps,
 }: {
   items: NestedListItemNode<UnorderedListItemNode>[];
   level: number;
+  setReference: SetReference;
+  getReferenceProps: GetReferenceProps;
 }) {
+  const isRoot = level === 0;
+  const ref = isRoot ? setReference : undefined;
+  const rest = isRoot ? getReferenceProps() : {};
   return (
     <ul
       className={cn(
@@ -38,6 +61,8 @@ function UnorderedListNested({
         level === 1 && "list-[circle]",
         level >= 2 && "list-[square]",
       )}
+      ref={ref}
+      {...rest}
     >
       {items.map((item) => (
         <ListItem key={item.item.id} node={item.item}>
@@ -45,6 +70,8 @@ function UnorderedListNested({
             <UnorderedListNested
               items={item.children}
               level={item.children[0]!.item.indentLevel}
+              setReference={setReference}
+              getReferenceProps={getReferenceProps}
             />
           )}
         </ListItem>
@@ -54,9 +81,24 @@ function UnorderedListNested({
 }
 
 export const OrderedList = memo(
-  ({ items }: { items: OrderedListItemNode[] }) => {
+  ({
+    items,
+    setReference,
+    getReferenceProps,
+  }: {
+    items: OrderedListItemNode[];
+    setReference: SetReference;
+    getReferenceProps: GetReferenceProps;
+  }) => {
     const nestedItems = createNestedListItems(items);
-    return <OrderedListNested items={nestedItems} level={0} />;
+    return (
+      <OrderedListNested
+        items={nestedItems}
+        level={0}
+        setReference={setReference}
+        getReferenceProps={getReferenceProps}
+      />
+    );
   },
 );
 
@@ -65,10 +107,17 @@ OrderedList.displayName = "OrderedList";
 function OrderedListNested({
   items,
   level,
+  setReference,
+  getReferenceProps,
 }: {
   items: NestedListItemNode<OrderedListItemNode>[];
   level: number;
+  setReference: SetReference;
+  getReferenceProps: GetReferenceProps;
 }) {
+  const isRoot = level === 0;
+  const ref = isRoot ? setReference : undefined;
+  const rest = isRoot ? getReferenceProps() : {};
   return (
     <ol
       className={cn(
@@ -77,6 +126,8 @@ function OrderedListNested({
         level === 1 && "list-[lower-alpha]",
         level >= 2 && "list-[lower-roman]",
       )}
+      ref={ref}
+      {...rest}
     >
       {items.map((item) => (
         <ListItem key={item.item.id} node={item.item}>
@@ -84,6 +135,8 @@ function OrderedListNested({
             <OrderedListNested
               items={item.children}
               level={item.children[0]!.item.indentLevel}
+              setReference={setReference}
+              getReferenceProps={getReferenceProps}
             />
           )}
         </ListItem>
@@ -96,13 +149,23 @@ export const CheckList = memo(
   ({
     items,
     toggleCheckbox,
+    setReference,
+    getReferenceProps,
   }: {
     items: CheckListItemNode[];
     toggleCheckbox: (nodeId: string) => void;
+    setReference: SetReference;
+    getReferenceProps: GetReferenceProps;
   }) => {
     const nestedItems = createNestedListItems(items);
     return (
-      <CheckListNested items={nestedItems} toggleCheckbox={toggleCheckbox} />
+      <CheckListNested
+        items={nestedItems}
+        level={0}
+        toggleCheckbox={toggleCheckbox}
+        setReference={setReference}
+        getReferenceProps={getReferenceProps}
+      />
     );
   },
 );
@@ -111,13 +174,22 @@ CheckList.displayName = "CheckList";
 
 function CheckListNested({
   items,
+  level,
   toggleCheckbox,
+  setReference,
+  getReferenceProps,
 }: {
   items: NestedListItemNode<CheckListItemNode>[];
+  level: number;
   toggleCheckbox: (nodeId: string) => void;
+  setReference: SetReference;
+  getReferenceProps: GetReferenceProps;
 }) {
+  const isRoot = level === 0;
+  const ref = isRoot ? setReference : undefined;
+  const rest = isRoot ? getReferenceProps() : {};
   return (
-    <ul className="pl-1">
+    <ul className="pl-1" ref={ref} {...rest}>
       {items.map((item) => (
         <CheckListItem
           key={item.item.id}
@@ -127,7 +199,10 @@ function CheckListNested({
           {item.children.length > 0 && (
             <CheckListNested
               items={item.children}
+              level={item.children[0]!.item.indentLevel}
               toggleCheckbox={toggleCheckbox}
+              setReference={setReference}
+              getReferenceProps={getReferenceProps}
             />
           )}
         </CheckListItem>
