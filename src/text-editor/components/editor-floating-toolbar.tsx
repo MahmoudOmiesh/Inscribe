@@ -21,13 +21,6 @@ import {
   SuperscriptIcon,
   SubscriptIcon,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
   EditorToggle,
@@ -39,6 +32,14 @@ import {
   renderHighlightColor,
   renderHighlightLabel,
 } from "./utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverGroup,
+  PopoverItem,
+  PopoverLabel,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function EditorFloatingToolbar({
   editorRef,
@@ -60,27 +61,33 @@ export function EditorFloatingToolbar({
   return (
     <FloatingToolbar containerRef={editorRef}>
       <div className="bg-background flex items-center gap-2 rounded-sm border px-1 py-px">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <Popover>
+          <PopoverTrigger asChild>
             <Button variant="ghost" size="sm">
               {active.block && renderBlockLabel(active.block)}
               <ChevronDownIcon />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuLabel className="text-xs">Turn Into</DropdownMenuLabel>
-            {BLOCK_TYPES.map((block) => (
-              <DropdownMenuItem
-                key={block}
-                variant={active.block === block ? "primary" : "default"}
-                onClick={() => actions.toggleBlock(block)}
-              >
-                {renderBlockIcon(block)}
-                <span className="text-sm">{renderBlockLabel(block)}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={6}
+            className="bg-background w-fit p-1"
+          >
+            <PopoverLabel>Turn Into</PopoverLabel>
+            <PopoverGroup>
+              {BLOCK_TYPES.map((block) => (
+                <PopoverItem
+                  key={block}
+                  variant={active.block === block ? "default" : "ghost"}
+                  onClick={() => actions.toggleBlock(block)}
+                >
+                  {renderBlockIcon(block)}
+                  <span className="text-sm">{renderBlockLabel(block)}</span>
+                </PopoverItem>
+              ))}
+            </PopoverGroup>
+          </PopoverContent>
+        </Popover>
 
         <Separator
           orientation="vertical"
@@ -123,113 +130,97 @@ export function EditorFloatingToolbar({
           className="data-[orientation=vertical]:h-4"
         />
 
-        <DropdownMenu>
+        <Popover>
           <EditorTooltip tooltip="Highlight">
-            <DropdownMenuTrigger asChild>
+            <PopoverTrigger asChild>
               <Button variant="ghost" size="sm">
                 {renderHighlightColor(activeHighlightColor)}
                 <ChevronDownIcon />
               </Button>
-            </DropdownMenuTrigger>
+            </PopoverTrigger>
           </EditorTooltip>
-          <DropdownMenuContent
+          <PopoverContent
             align="center"
             sideOffset={8}
-            className="bg-background"
+            className="bg-background w-fit p-1"
           >
-            <DropdownMenuLabel className="text-xs">
-              Highlight Color
-            </DropdownMenuLabel>
-            <div className="grid grid-cols-4 gap-1">
+            <PopoverLabel>Highlight Color</PopoverLabel>
+            <PopoverGroup className="grid grid-cols-4 gap-1">
               {HIGHLIGHT_COLORS.map((color) => (
-                <DropdownMenuItem key={color} asChild>
-                  <EditorToggle
-                    operation={() =>
-                      actions.toggleMark({ type: "highlight", color })
-                    }
-                    isActive={activeHighlightColor === color}
-                    tooltip={renderHighlightLabel(color)}
-                  >
-                    {renderHighlightColor(color)}
-                  </EditorToggle>
-                </DropdownMenuItem>
+                <EditorToggle
+                  key={color}
+                  operation={() =>
+                    actions.toggleMark({ type: "highlight", color })
+                  }
+                  isActive={activeHighlightColor === color}
+                  tooltip={renderHighlightLabel(color)}
+                >
+                  {renderHighlightColor(color)}
+                </EditorToggle>
               ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </PopoverGroup>
+          </PopoverContent>
+        </Popover>
 
         <Separator
           orientation="vertical"
           className="data-[orientation=vertical]:h-4"
         />
 
-        <DropdownMenu>
-          <EditorTooltip tooltip="More">
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-          </EditorTooltip>
-          <DropdownMenuContent
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVerticalIcon />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
             align="center"
             side="top"
-            className="bg-background flex items-center gap-2 px-1 py-px"
+            className="bg-background flex w-fit items-center gap-2 px-1 py-px"
           >
-            <div className="flex items-center gap-1">
-              <DropdownMenuItem asChild>
-                <EditorToggle
-                  operation={() =>
-                    actions.toggleMark({ type: "strikethrough" })
-                  }
-                  isActive={active.marks.some(
-                    (m) => m.type === "strikethrough",
-                  )}
-                  tooltip="Strikethrough"
-                >
-                  <StrikethroughIcon />
-                </EditorToggle>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <EditorToggle
-                  operation={() => actions.toggleMark({ type: "superscript" })}
-                  isActive={active.marks.some((m) => m.type === "superscript")}
-                  tooltip="Superscript"
-                >
-                  <SuperscriptIcon />
-                </EditorToggle>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <EditorToggle
-                  operation={() => actions.toggleMark({ type: "subscript" })}
-                  isActive={active.marks.some((m) => m.type === "subscript")}
-                  tooltip="Subscript"
-                >
-                  <SubscriptIcon />
-                </EditorToggle>
-              </DropdownMenuItem>
-            </div>
+            <PopoverGroup className="flex-row items-center gap-1">
+              <EditorToggle
+                operation={() => actions.toggleMark({ type: "strikethrough" })}
+                isActive={active.marks.some((m) => m.type === "strikethrough")}
+                tooltip="Strikethrough"
+              >
+                <StrikethroughIcon />
+              </EditorToggle>
+              <EditorToggle
+                operation={() => actions.toggleMark({ type: "superscript" })}
+                isActive={active.marks.some((m) => m.type === "superscript")}
+                tooltip="Superscript"
+              >
+                <SuperscriptIcon />
+              </EditorToggle>
+              <EditorToggle
+                operation={() => actions.toggleMark({ type: "subscript" })}
+                isActive={active.marks.some((m) => m.type === "subscript")}
+                tooltip="Subscript"
+              >
+                <SubscriptIcon />
+              </EditorToggle>
+            </PopoverGroup>
 
             <Separator
               orientation="vertical"
               className="data-[orientation=vertical]:h-4"
             />
 
-            <div className="flex items-center gap-1">
+            <PopoverGroup className="flex-row items-center gap-1">
               {ALIGNMENT_TYPES.map((alignment) => (
-                <DropdownMenuItem key={alignment} asChild>
-                  <EditorToggle
-                    operation={() => actions.toggleBlockAlignment(alignment)}
-                    isActive={active.align === alignment}
-                    tooltip={renderAlignmentLabel(alignment)}
-                  >
-                    {renderAlignmentIcon(alignment)}
-                  </EditorToggle>
-                </DropdownMenuItem>
+                <EditorToggle
+                  key={alignment}
+                  operation={() => actions.toggleBlockAlignment(alignment)}
+                  isActive={active.align === alignment}
+                  tooltip={renderAlignmentLabel(alignment)}
+                >
+                  {renderAlignmentIcon(alignment)}
+                </EditorToggle>
               ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </PopoverGroup>
+          </PopoverContent>
+        </Popover>
       </div>
     </FloatingToolbar>
   );

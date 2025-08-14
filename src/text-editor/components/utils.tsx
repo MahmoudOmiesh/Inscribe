@@ -224,12 +224,13 @@ export function EditorToggle({
   isActive,
   tooltip,
   children,
+  ...props
 }: {
   operation: () => void;
   isActive: boolean;
   tooltip: string;
   children: ReactNode;
-}) {
+} & React.ComponentProps<typeof Button>) {
   return (
     <EditorTooltip tooltip={tooltip}>
       <Button
@@ -237,6 +238,7 @@ export function EditorToggle({
         size="icon"
         className="cursor-pointer rounded-sm"
         onClick={operation}
+        {...props}
       >
         {children}
       </Button>
