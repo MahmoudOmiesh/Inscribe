@@ -3,12 +3,14 @@ import type {
   Alignment,
   BlockType,
 } from "../model/schema";
+import type { CaretPosition, SelectionRange } from "../model/selection";
 import type { EditorState } from "../state/editor-state";
 import { Transaction } from "../state/transaction";
 import { changeNodeTypeStep } from "../steps/change-node-type";
 import { duplicateNodeStep } from "../steps/duplicate-node";
 import { insertNodeAfterStep } from "../steps/insert-node-after";
 import { resetFormattingStep } from "../steps/reset-formatting";
+import { setRangeStep } from "../steps/set-range";
 import { toggleAlignmentStep } from "../steps/toggle-alignment";
 import { toggleBlockTypeStep } from "../steps/toggle-block-type";
 import { toggleMarkStep } from "../steps/toggle-mark";
@@ -43,4 +45,11 @@ export function changeNodeType(
   blockType: BlockType,
 ) {
   return new Transaction(state).add(changeNodeTypeStep(nodeId, blockType));
+}
+
+export function setRange(
+  state: EditorState,
+  range: CaretPosition | SelectionRange,
+) {
+  return new Transaction(state).add(setRangeStep(range));
 }

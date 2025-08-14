@@ -12,6 +12,7 @@ import type {
   Alignment,
   BlockType,
 } from "../model/schema";
+import type { CaretPosition, SelectionRange } from "../model/selection";
 
 export function useEditorActions(
   getState: () => EditorState,
@@ -64,5 +65,7 @@ export function useEditorActions(
       doTx((s) => formatCommands.insertNodeAfter(s, nodeId)),
     changeNodeType: (nodeId: string, blockType: BlockType) =>
       doTx((s) => formatCommands.changeNodeType(s, nodeId, blockType)),
+    setRange: (range: CaretPosition | SelectionRange) =>
+      doTx((s) => formatCommands.setRange(s, range)),
   };
 }

@@ -1,6 +1,13 @@
-import { useCallback, useEffect, type ReactNode, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { handleKeyDown } from "./keymap";
 import type { useEditorActions } from "../hooks/use-editor-actions";
+import { CommandMenu } from "../components/command-menu";
 
 interface EditorInputHandlerProps {
   children: ReactNode;
@@ -13,14 +20,20 @@ export function EditorInputHandler({
   actions,
   editorRef,
 }: EditorInputHandlerProps) {
+  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+
   const onBeforeInput = useCallback(
     (e: InputEvent) => {
       const { inputType, data, dataTransfer } = e;
-
       e.preventDefault();
+
       switch (inputType) {
         case "insertText": {
           actions.insertText(data ?? "");
+
+          if (data === "/") {
+            setIsCommandMenuOpen(true);
+          }
           break;
         }
         case "insertReplacementText": {
@@ -134,5 +147,16 @@ export function EditorInputHandler({
     };
   }, [onBeforeInput, onKeyDown, editorRef]);
 
-  return children;
+  return (
+    <>
+      {children}
+      {isCommandMenuOpen && (
+        <CommandMenu
+          isOpen={isCommandMenuOpen}
+          setIsOpen={setIsCommandMenuOpen}
+          actions={actions}
+        />
+      )}
+    </>
+  );
 }
