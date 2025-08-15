@@ -1,4 +1,4 @@
-import type { FolderInsert } from "@/lib/schema/folder";
+import type { FolderInsert, FolderOrder } from "@/lib/schema/folder";
 import { db } from "./root";
 
 export const _folders = {
@@ -44,6 +44,24 @@ export const _folders = {
       });
 
       return { count, id: folderId };
+    },
+
+    reorder: async (userId: string, data: FolderOrder) => {
+      const folderUpdatePromises = data.map((item) =>
+        db.folder.update({
+          where: { id: item.id, userId },
+          data: {
+            sortOrder: item.order,
+          },
+          select: {
+            id: true,
+            sortOrder: true,
+          },
+        }),
+      );
+
+      const updatedFolders = await db.$transaction(folderUpdatePromises);
+      return updatedFolders;
     },
   },
 };

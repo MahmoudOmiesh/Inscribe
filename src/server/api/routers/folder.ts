@@ -1,4 +1,4 @@
-import { folderInsertSchema } from "@/lib/schema/folder";
+import { folderInsertSchema, folderOrderSchema } from "@/lib/schema/folder";
 import { tryCatch } from "@/lib/try-catch";
 import { createTRPCRouter, authedProcedure } from "@/server/api/trpc";
 import { DB } from "@/server/db";
@@ -30,6 +30,12 @@ const FOLDER_ERRORS = {
     notFound: {
       code: "NOT_FOUND" as const,
       message: "Folder not found",
+    },
+  },
+  reorder: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to reorder folders",
     },
   },
 };
@@ -84,5 +90,19 @@ export const folderRouter = createTRPCRouter({
       }
 
       return { id: data.id };
+    }),
+
+  reorder: authedProcedure
+    .input(folderOrderSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.folders.mutations.reorder(ctx.session.user.id, input),
+      );
+
+      if (error) {
+        throw new TRPCError(FOLDER_ERRORS.reorder.internal);
+      }
+
+      return data;
     }),
 });

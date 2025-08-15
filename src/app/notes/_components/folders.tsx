@@ -22,6 +22,7 @@ import {
   CornerUpRight,
   ExternalLink,
   FolderPenIcon,
+  GripVerticalIcon,
   Link,
   MoreHorizontal,
   Plus,
@@ -87,13 +88,17 @@ import {
   EmojiPickerFooter,
 } from "@/components/ui/emoji-picker";
 import { Input } from "@/components/ui/input";
+import * as Sortable from "@/components/ui/sortable";
 
 export function FoldersList() {
+  const [isSorting, setIsSorting] = useState(true);
   const [folders] = api.user.getFolders.useSuspenseQuery();
 
   return (
     <>
-      {folders.length === 0 && (
+      {isSorting ? (
+        <FolderSortable folders={folders} setIsSorting={setIsSorting} />
+      ) : folders.length === 0 ? (
         <div className="flex h-16 items-center justify-center p-2">
           <p className="text-muted-foreground text-center text-sm italic">
             No folders found.{" "}
@@ -106,10 +111,73 @@ export function FoldersList() {
             }
           </p>
         </div>
+      ) : (
+        folders.map((folder) => <FolderItem key={folder.id} folder={folder} />)
       )}
-      {folders.map((folder) => (
-        <FolderItem key={folder.id} folder={folder} />
-      ))}
+    </>
+  );
+}
+
+function FolderSortable({
+  folders,
+  setIsSorting,
+}: {
+  folders: Folder[];
+  setIsSorting: (isSorting: boolean) => void;
+}) {
+  const [editedFolders, setEditedFolders] = useState(folders);
+
+  const utils = api.useUtils();
+  const reorderFolders = api.folder.reorder.useMutation({
+    onSuccess: async () => {
+      await utils.user.getFolders.invalidate();
+      setIsSorting(false);
+    },
+  });
+
+  return (
+    <>
+      <Sortable.Root
+        value={editedFolders}
+        onValueChange={setEditedFolders}
+        getItemValue={(item) => item.id}
+        orientation="vertical"
+      >
+        <Sortable.Content className="flex flex-col gap-2">
+          {editedFolders.map((folder) => (
+            <Sortable.Item key={folder.id} value={folder.id} asChild asHandle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
+                <GripVerticalIcon />
+                {folder.name}
+              </Button>
+            </Sortable.Item>
+          ))}
+        </Sortable.Content>
+        <Sortable.Overlay>
+          <div className="bg-accent dark:bg-accent/50 size-full rounded-md" />
+        </Sortable.Overlay>
+      </Sortable.Root>
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full justify-start"
+        disabled={reorderFolders.isPending}
+        onClick={() =>
+          reorderFolders.mutate(
+            editedFolders.map((folder, index) => ({
+              id: folder.id,
+              order: index + 1,
+            })),
+          )
+        }
+      >
+        Save Changes
+        {reorderFolders.isPending && <Spinner />}
+      </Button>
     </>
   );
 }
