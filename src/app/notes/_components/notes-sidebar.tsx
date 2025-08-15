@@ -1,11 +1,8 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -13,19 +10,7 @@ import {
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NotesSidebarHeader } from "./notes-sidebar-header";
-import {
-  ArchiveIcon,
-  ChevronDown,
-  PlusIcon,
-  SearchIcon,
-  Trash2Icon,
-  TrashIcon,
-} from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { ArchiveIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { NotesSidebarFavorites } from "./notes-sidebar-favorites";
 import { NotesSidebarFolders } from "./notes-sidebar-folders";
 

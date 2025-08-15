@@ -1,0 +1,15 @@
+model Folder {
+  id        Int    @id @default(autoincrement())
+  emoji     String
+  name      String
+  sortOrder Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
+  @@map("folder")
+}
