@@ -12,7 +12,7 @@ import { headers } from "next/headers";
 import { NotesSidebarHeader } from "./notes-sidebar-header";
 import { ArchiveIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { NotesSidebarFavorites } from "./notes-sidebar-favorites";
-import { NotesSidebarFolders } from "./notes-sidebar-folders";
+import { NotesSidebarFolders } from "./folders/notes-sidebar-folders";
 
 export async function NotesSidebar() {
   const session = await auth.api.getSession({

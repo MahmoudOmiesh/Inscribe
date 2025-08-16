@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Keep",
@@ -40,6 +41,8 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </TRPCReactProvider>
+
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   );
