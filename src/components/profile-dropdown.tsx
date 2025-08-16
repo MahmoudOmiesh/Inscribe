@@ -16,15 +16,17 @@ export function ProfileDropdown({
   name,
   email,
   photoUrl,
+  className,
 }: {
   name: string;
   email: string;
   photoUrl: string;
+  className?: string;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <AvatarWithFallback src={photoUrl} />
+        <AvatarWithFallback src={photoUrl} className={className} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup className="p-1">

@@ -1,9 +1,6 @@
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { NotesSidebar } from "./_components/notes-sidebar";
+import { NotesHeader } from "./_components/notes-header";
 
 export default async function Layout({
   children,
@@ -11,14 +8,14 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex-1">
+    <main className="flex-1">
       <SidebarProvider>
         <NotesSidebar />
-        <SidebarInset>
-          <SidebarTrigger />
+        <div className="flex flex-1 flex-col">
+          <NotesHeader />
           {children}
-        </SidebarInset>
+        </div>
       </SidebarProvider>
-    </div>
+    </main>
   );
 }
