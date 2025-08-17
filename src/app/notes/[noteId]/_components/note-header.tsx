@@ -28,7 +28,7 @@ export function NoteHeader({ noteId }: { noteId: number }) {
       <div className="flex flex-row items-center gap-2">
         <div className="flex flex-row items-center gap-1">
           <FileIcon size={16} />
-          <span>{note.title}</span>
+          <span className="max-w-[15em] truncate">{note.title}</span>
         </div>
         <MutationStatusIndicator />
       </div>

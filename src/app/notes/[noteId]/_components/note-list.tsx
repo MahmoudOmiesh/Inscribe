@@ -51,7 +51,7 @@ export function NoteList({ folderId }: { folderId: number }) {
           <SidebarMenuSubButton
             asChild
             tabIndex={0}
-            className="flex w-full items-center justify-between gap-2"
+            className="flex w-full items-center justify-between gap-2 truncate"
           >
             <Link href={`/notes/${note.id}`}>{note.title}</Link>
           </SidebarMenuSubButton>

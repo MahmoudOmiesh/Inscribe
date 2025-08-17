@@ -2,7 +2,7 @@
 
 import { MaxWidthWrapper } from "@/components/max-width-wrapper";
 import { authClient } from "@/lib/auth-client";
-import Spinner from "./ui/spinner";
+import { Spinner } from "./spinner";
 import Link from "next/link";
 import { Logo } from "./logo";
 import { ProfileDropdown } from "./profile-dropdown";

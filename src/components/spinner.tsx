@@ -23,9 +23,13 @@ const spinnerVariants = cva("animate-spin", {
   },
 });
 
-export function Spinner({ size, color }: VariantProps<typeof spinnerVariants>) {
+export function Spinner({
+  size,
+  color,
+  className,
+}: VariantProps<typeof spinnerVariants> & { className?: string }) {
   return (
-    <div className="flex items-center justify-center">
+    <div className={cn("flex items-center justify-center", className)}>
       <Loader2 className={cn(spinnerVariants({ size, color }))} />
     </div>
   );

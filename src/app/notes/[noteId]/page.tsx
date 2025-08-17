@@ -5,6 +5,28 @@ import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
 import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { tryCatch } from "@/lib/try-catch";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ noteId: string }>;
+}) {
+  const { noteId } = await params;
+  const { data: note, error } = await tryCatch(
+    api.note.get({ noteId: Number(noteId) }),
+  );
+
+  if (error) {
+    return {
+      title: "Inscribe",
+    };
+  }
+
+  return {
+    title: note.title,
+  };
+}
 
 export default async function NotePage({
   params,

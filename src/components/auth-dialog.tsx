@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Badge } from "./ui/badge";
-import Spinner from "./ui/spinner";
+import { Spinner } from "./spinner";
 import { GithubIcon, GoogleIcon } from "./brand-icons";
 
 const dialogTexts = {
