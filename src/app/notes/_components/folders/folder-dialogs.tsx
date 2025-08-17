@@ -108,7 +108,7 @@ export function FolderRenameDialog({
 
   function handleSubmit(data: FolderInsert) {
     updateFolder.mutate({
-      id: folder.id,
+      folderId: folder.id,
       ...data,
     });
   }
@@ -165,7 +165,7 @@ export function FolderDeleteDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
-            onClick={() => deleteFolder.mutate({ id: folderId })}
+            onClick={() => deleteFolder.mutate({ folderId: folderId })}
             disabled={deleteFolder.isPending}
           >
             Delete

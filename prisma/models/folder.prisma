@@ -7,9 +7,11 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  notes Note[]
+
   User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  @@index([userId])
+  @@index([userId, sortOrder])
   @@map("folder")
 }

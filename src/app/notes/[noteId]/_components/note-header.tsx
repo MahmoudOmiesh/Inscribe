@@ -12,13 +12,15 @@ import {
   FileIcon,
   MoreVerticalIcon,
   Redo2Icon,
-  RefreshCcwIcon,
   StarIcon,
   Undo2Icon,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { api } from "@/trpc/react";
+import { MutationStatusIndicator } from "@/components/mutation-status-indicator";
 
-export function NotesHeader() {
+export function NoteHeader({ noteId }: { noteId: number }) {
+  const [note] = api.note.get.useSuspenseQuery({ noteId: noteId });
   const { data: session } = authClient.useSession();
 
   return (
@@ -26,11 +28,9 @@ export function NotesHeader() {
       <div className="flex flex-row items-center gap-2">
         <div className="flex flex-row items-center gap-1">
           <FileIcon size={16} />
-          <span>Note Name</span>
+          <span>{note.title}</span>
         </div>
-        <Button variant="ghost" size="icon">
-          <RefreshCcwIcon className="text-muted-foreground" />
-        </Button>
+        <MutationStatusIndicator />
       </div>
       <div className="flex flex-row items-center gap-2">
         <div>

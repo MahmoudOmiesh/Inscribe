@@ -2,6 +2,23 @@ import type { FolderInsert, FolderOrder } from "@/lib/schema/folder";
 import { db } from "./root";
 
 export const _folders = {
+  queries: {
+    getNotes: (folderId: number, userId: string) => {
+      return db.note.findMany({
+        where: { folderId, userId, isTrashed: false, isArchived: false },
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          title: true,
+          sortOrder: true,
+          isFavorite: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    },
+  },
+
   mutations: {
     create: async (userId: string, data: FolderInsert) => {
       const last = await db.folder.findFirst({

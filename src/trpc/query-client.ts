@@ -1,3 +1,4 @@
+import { mutationStatusStore } from "@/lib/mutation-status-store";
 import {
   defaultShouldDehydrateQuery,
   MutationCache,
@@ -12,6 +13,7 @@ declare module "@tanstack/react-query" {
       invalidateQueries?: (() => Promise<void>) | (() => Promise<void>)[];
       toastOnError?: boolean;
       onSuccessMessage?: string;
+      subscribeToMutationStatus?: boolean;
     };
   }
 }
@@ -19,7 +21,13 @@ declare module "@tanstack/react-query" {
 export const createQueryClient = () =>
   new QueryClient({
     mutationCache: new MutationCache({
-      onSuccess: async (_data, _variables, _context, mutation) => {
+      onMutate: (_v, mutation) => {
+        if (mutation.meta?.subscribeToMutationStatus) {
+          mutationStatusStore.start();
+        }
+      },
+
+      onSuccess: async (_d, _v, _c, mutation) => {
         const invalidate = mutation.meta?.invalidateQueries;
 
         if (invalidate) {
@@ -33,11 +41,20 @@ export const createQueryClient = () =>
         if (mutation.meta?.onSuccessMessage) {
           toast.success(mutation.meta.onSuccessMessage);
         }
+
+        if (mutation.meta?.subscribeToMutationStatus) {
+          mutationStatusStore.success();
+        }
       },
-      onError: (_error, _variables, _context, mutation) => {
+
+      onError: (error, _v, _c, mutation) => {
         const toastOnError = mutation.meta?.toastOnError;
         if (toastOnError === undefined || toastOnError) {
-          toast.error(_error.message);
+          toast.error(error.message);
+        }
+
+        if (mutation.meta?.subscribeToMutationStatus) {
+          mutationStatusStore.error(error.message);
         }
       },
     }),

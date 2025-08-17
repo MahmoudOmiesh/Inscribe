@@ -11,12 +11,11 @@ import {
   SidebarMenu,
 } from "@/components/ui/sidebar";
 import { api, HydrateClient } from "@/trpc/server";
-import { Suspense } from "react";
-import { Spinner } from "@/components/spinner";
 import { PlusIcon } from "lucide-react";
 import { FolderSortingButton, FolderSortingProvider } from "./folder-sorting";
 import { FolderCreateDialog } from "./folder-dialogs";
 import { FoldersList } from "./folder-list";
+import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
 
 export function NotesSidebarFolders() {
   void api.user.getFolders.prefetch();
@@ -42,15 +41,9 @@ export function NotesSidebarFolders() {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <Suspense
-                    fallback={
-                      <div className="flex h-16 items-center justify-center p-2">
-                        <Spinner />
-                      </div>
-                    }
-                  >
+                  <ErrorSuspenseBoundary>
                     <FoldersList />
-                  </Suspense>
+                  </ErrorSuspenseBoundary>
                 </SidebarMenu>
               </SidebarGroupContent>
             </CollapsibleContent>

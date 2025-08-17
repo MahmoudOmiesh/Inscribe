@@ -10,6 +10,7 @@ model User {
   accounts      Account[]
 
   folders Folder[]
+  notes   Note[]
 
   @@unique([email])
   @@map("user")

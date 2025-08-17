@@ -6,6 +6,12 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 const FOLDER_ERRORS = {
+  getNotes: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to get notes",
+    },
+  },
   create: {
     internal: {
       code: "INTERNAL_SERVER_ERROR" as const,
@@ -41,6 +47,20 @@ const FOLDER_ERRORS = {
 };
 
 export const folderRouter = createTRPCRouter({
+  getNotes: authedProcedure
+    .input(z.object({ folderId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.folders.queries.getNotes(input.folderId, ctx.session.user.id),
+      );
+
+      if (error) {
+        throw new TRPCError(FOLDER_ERRORS.getNotes.internal);
+      }
+
+      return data;
+    }),
+
   create: authedProcedure
     .input(folderInsertSchema)
     .mutation(async ({ ctx, input }) => {
@@ -56,9 +76,9 @@ export const folderRouter = createTRPCRouter({
     }),
 
   update: authedProcedure
-    .input(folderInsertSchema.extend({ id: z.number() }))
+    .input(folderInsertSchema.extend({ folderId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const { id: inputId, ...rest } = input;
+      const { folderId: inputId, ...rest } = input;
       const { data, error } = await tryCatch(
         DB.folders.mutations.update(inputId, ctx.session.user.id, rest),
       );
@@ -75,10 +95,10 @@ export const folderRouter = createTRPCRouter({
     }),
 
   delete: authedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ folderId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const { data, error } = await tryCatch(
-        DB.folders.mutations.delete(input.id, ctx.session.user.id),
+        DB.folders.mutations.delete(input.folderId, ctx.session.user.id),
       );
 
       if (error) {

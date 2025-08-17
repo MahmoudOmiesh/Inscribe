@@ -1,0 +1,24 @@
+model Note {
+  id Int @id @default(autoincrement())
+
+  title   String
+  content Json
+
+  sortOrder Int
+
+  isArchived Boolean @default(false)
+  isTrashed  Boolean @default(false)
+  isFavorite Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId Int
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId, folderId, sortOrder])
+  @@map("note")
+}

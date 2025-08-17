@@ -10,25 +10,15 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/spinner";
 import * as Sortable from "@/components/ui/sortable";
 import {
-  AlertTriangle,
-  Archive,
   ChevronRight,
-  Copy,
-  CornerUpRight,
-  ExternalLink,
   FolderPenIcon,
   GripVerticalIcon,
-  Link,
   MoreHorizontal,
   Plus,
-  StarIcon,
   Trash2,
 } from "lucide-react";
 import {
@@ -40,14 +30,6 @@ import {
   PopoverSeparator,
 } from "@/components/ui/popover";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
   FolderCreateDialog,
   FolderDeleteDialog,
   FolderRenameDialog,
@@ -56,6 +38,8 @@ import { type Folder } from "@/lib/schema/folder";
 import { useFolderSorting } from "./folder-sorting";
 import { api } from "@/trpc/react";
 import { useState } from "react";
+import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
+import { NoteList } from "../../[noteId]/_components/note-list";
 
 export function FoldersList() {
   const { isSorting, setIsSorting } = useFolderSorting();
@@ -156,11 +140,21 @@ function FolderSortable({
 }
 
 function FolderItem({ folder }: { folder: Folder }) {
+  const utils = api.useUtils();
+
+  function prefetchNotes() {
+    void utils.folder.getNotes.prefetch({ folderId: folder.id });
+  }
+
   return (
     <Collapsible>
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton className="group/collapsible">
+          <SidebarMenuButton
+            className="group/collapsible"
+            onMouseEnter={prefetchNotes}
+            onFocus={prefetchNotes}
+          >
             <span>
               {folder.emoji} {folder.name}
             </span>
@@ -195,64 +189,9 @@ function FolderItem({ folder }: { folder: Folder }) {
           </PopoverContent>
         </Popover>
         <CollapsibleContent>
-          <SidebarMenuSub className="mr-0 pr-[0.3rem]">
-            <SidebarMenuSubItem className="flex w-full items-center justify-between gap-2">
-              <SidebarMenuSubButton
-                tabIndex={0}
-                className="flex w-full items-center justify-between gap-2"
-              >
-                Push Day
-              </SidebarMenuSubButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    title="More"
-                    variant="ghost"
-                    size="icon"
-                    className="size-5"
-                  >
-                    <MoreHorizontal className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <StarIcon /> Add to Favorites
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Archive /> Archive Note
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <Link /> Copy Link
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Copy /> Duplicate
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CornerUpRight /> Move To
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Trash2 /> Move to Trash
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <ExternalLink />
-                      Open in New Tab
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <AlertTriangle className="text-destructive" />
-                      Delete Permanently
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuSubItem>
-          </SidebarMenuSub>
+          <ErrorSuspenseBoundary>
+            <NoteList folderId={folder.id} />
+          </ErrorSuspenseBoundary>
         </CollapsibleContent>
       </SidebarMenuItem>
     </Collapsible>

@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NotesSidebar } from "./_components/notes-sidebar";
-import { NotesHeader } from "./_components/notes-header";
 
 export default async function Layout({
   children,
@@ -11,10 +10,7 @@ export default async function Layout({
     <main className="flex-1">
       <SidebarProvider>
         <NotesSidebar />
-        <div className="flex flex-1 flex-col">
-          <NotesHeader />
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col">{children}</div>
       </SidebarProvider>
     </main>
   );
