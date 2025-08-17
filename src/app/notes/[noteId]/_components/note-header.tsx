@@ -8,16 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import {
-  FileIcon,
-  MoreVerticalIcon,
-  Redo2Icon,
-  StarIcon,
-  Undo2Icon,
-} from "lucide-react";
+import { FileIcon, MoreVerticalIcon, Redo2Icon, Undo2Icon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { api } from "@/trpc/react";
 import { MutationStatusIndicator } from "@/components/mutation-status-indicator";
+import { NoteFavorite } from "./note-favorite";
 
 export function NoteHeader({ noteId }: { noteId: number }) {
   const [note] = api.note.get.useSuspenseQuery({ noteId: noteId });
@@ -48,9 +43,7 @@ export function NoteHeader({ noteId }: { noteId: number }) {
         />
 
         <div className="flex flex-row items-center">
-          <Button variant="ghost" size="icon">
-            <StarIcon className="text-muted-foreground" />
-          </Button>
+          <NoteFavorite note={note} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

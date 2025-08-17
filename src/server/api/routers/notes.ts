@@ -22,6 +22,12 @@ const NOTE_ERRORS = {
       message: "Failed to update note title",
     },
   },
+  toggleFavorite: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to toggle favorite",
+    },
+  },
 };
 
 export const noteRouter = createTRPCRouter({
@@ -56,6 +62,20 @@ export const noteRouter = createTRPCRouter({
 
       if (error) {
         throw new TRPCError(NOTE_ERRORS.updateTitle.internal);
+      }
+
+      return data;
+    }),
+
+  toggleFavorite: authedProcedure
+    .input(z.object({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.toggleFavorite(input.noteId, ctx.session.user.id),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.toggleFavorite.internal);
       }
 
       return data;

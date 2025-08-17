@@ -35,5 +35,25 @@ export const _notes = {
         },
       });
     },
+
+    toggleFavorite: async (noteId: number, userId: string) => {
+      const note = await db.note.findUnique({
+        where: { id: noteId, userId },
+        select: { isFavorite: true },
+      });
+
+      if (note === null) {
+        throw new Error("Note not found");
+      }
+
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { isFavorite: !note.isFavorite },
+        select: {
+          id: true,
+          isFavorite: true,
+        },
+      });
+    },
   },
 };
