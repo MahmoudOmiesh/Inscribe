@@ -1,14 +1,39 @@
 "use client";
 
-import { api } from "@/trpc/react";
 import { NoteTitle } from "./note-title";
+import { NoteEditor } from "@/text-editor/note-editor";
+import { useNoteEditor } from "./note-editor-context";
+import { api } from "@/trpc/react";
+import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
-export function NoteContent({ noteId }: { noteId: number }) {
-  const [note] = api.note.get.useSuspenseQuery({ noteId: noteId });
+export function NoteContent() {
+  const { editor, actions, note } = useNoteEditor();
+
+  const updateContent = api.note.updateContent.useMutation({
+    meta: {
+      subscribeToMutationStatus: true,
+    },
+  });
+
+  const debouncedUpdateContentMutate = useDebouncedCallback(
+    updateContent.mutate,
+    1000,
+  );
 
   return (
-    <div className="grid flex-1 grid-cols-[1fr_2fr_1fr] grid-rows-[auto_1fr] pt-26">
-      <NoteTitle note={note} />
+    <div className="grid flex-1 grid-cols-[1fr_2fr_1fr] grid-rows-[auto_1fr] gap-y-6 pt-26">
+      <div className="col-start-2">
+        <NoteTitle />
+      </div>
+      <div className="col-start-2">
+        <NoteEditor
+          editor={editor}
+          actions={actions}
+          onContentChange={(content) => {
+            debouncedUpdateContentMutate({ noteId: note.id, content });
+          }}
+        />
+      </div>
     </div>
   );
 }

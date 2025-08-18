@@ -3,7 +3,10 @@ import { createTRPCRouter, authedProcedure } from "../trpc";
 import { tryCatch } from "@/lib/try-catch";
 import z from "zod";
 import { TRPCError } from "@trpc/server";
-import { noteTitleUpdateSchema } from "@/lib/schema/note";
+import {
+  noteContentUpdateSchema,
+  noteTitleUpdateSchema,
+} from "@/lib/schema/note";
 
 const NOTE_ERRORS = {
   get: {
@@ -32,6 +35,12 @@ const NOTE_ERRORS = {
     internal: {
       code: "INTERNAL_SERVER_ERROR" as const,
       message: "Failed to update note title",
+    },
+  },
+  updateContent: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note content",
     },
   },
   toggleFavorite: {
@@ -102,6 +111,24 @@ export const noteRouter = createTRPCRouter({
 
       if (error) {
         throw new TRPCError(NOTE_ERRORS.updateTitle.internal);
+      }
+
+      return data;
+    }),
+
+  updateContent: authedProcedure
+    .input(noteContentUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateContent(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateContent.internal);
       }
 
       return data;

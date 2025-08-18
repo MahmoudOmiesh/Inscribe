@@ -10,16 +10,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FileIcon, MoreVerticalIcon, Redo2Icon, Undo2Icon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { api } from "@/trpc/react";
 import { MutationStatusIndicator } from "@/components/mutation-status-indicator";
 import { NoteFavorite } from "./note-favorite";
+import { useNoteEditor } from "./note-editor-context";
 
-export function NoteHeader({ noteId }: { noteId: number }) {
-  const [note] = api.note.get.useSuspenseQuery({ noteId: noteId });
+export function NoteHeader() {
   const { data: session } = authClient.useSession();
+  const { note } = useNoteEditor();
 
   return (
-    <header className="sticky top-0 flex flex-row items-center justify-between px-4 py-2 text-sm">
+    <header className="bg-background sticky top-0 flex flex-row items-center justify-between px-4 py-2 text-sm">
       <div className="flex flex-row items-center gap-2">
         <div className="flex flex-row items-center gap-1">
           <FileIcon size={16} />
@@ -43,7 +43,7 @@ export function NoteHeader({ noteId }: { noteId: number }) {
         />
 
         <div className="flex flex-row items-center">
-          <NoteFavorite note={note} />
+          <NoteFavorite />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

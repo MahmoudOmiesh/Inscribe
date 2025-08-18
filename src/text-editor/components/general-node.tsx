@@ -80,11 +80,11 @@ export function GeneralNode(props: GeneralNodeProps) {
         setIsOpen(next);
       }
     },
-    placement: "left-start",
+    placement: "left",
     // Make sure the tooltip stays on the screen
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(8),
+      offset(20),
       flip({
         fallbackAxisSideDirection: "start",
       }),

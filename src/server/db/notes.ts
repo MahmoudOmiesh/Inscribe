@@ -1,6 +1,18 @@
-import type { NoteTitleUpdate } from "@/lib/schema/note";
+import type { NoteContentUpdate, NoteTitleUpdate } from "@/lib/schema/note";
 import { db } from "./root";
 import type { Prisma } from "@prisma/client";
+import type { EditorNode } from "@/text-editor/model/schema";
+import { nanoid } from "nanoid";
+
+const newNoteContent: EditorNode[] = [
+  {
+    id: nanoid(),
+    type: "paragraph",
+    text: "Hello, world!",
+    alignment: "left",
+    marks: [],
+  },
+];
 
 export const _notes = {
   queries: {
@@ -39,7 +51,7 @@ export const _notes = {
           userId,
           sortOrder,
           title: "New Note",
-          content: "",
+          content: newNoteContent as unknown as Prisma.InputJsonValue,
         },
         select: { id: true },
       });
@@ -85,6 +97,18 @@ export const _notes = {
           id: true,
           title: true,
         },
+      });
+    },
+
+    updateContent: (
+      noteId: number,
+      userId: string,
+      data: NoteContentUpdate,
+    ) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { content: data.content as Prisma.InputJsonValue },
+        select: { id: true },
       });
     },
 

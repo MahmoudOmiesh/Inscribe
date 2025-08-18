@@ -2,11 +2,12 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import type { Note } from "@/lib/schema/note";
 import { api } from "@/trpc/react";
 import { useEffect } from "react";
+import { useNoteEditor } from "./note-editor-context";
 
-export function NoteTitle({ note }: { note: Note }) {
+export function NoteTitle() {
+  const { note } = useNoteEditor();
   const utils = api.useUtils();
 
   const updateTitle = api.note.updateTitle.useMutation({
@@ -51,15 +52,13 @@ export function NoteTitle({ note }: { note: Note }) {
   }, [note.title, updateDocumentTitle]);
 
   return (
-    <div className="col-start-2">
-      <Textarea
-        defaultValue={note.title}
-        onInput={handleTitleChange}
-        placeholder="New Note"
-        className="resize-none rounded-none border-0 bg-transparent font-bold whitespace-pre-wrap shadow-none outline-0 focus-visible:ring-0 md:text-4xl dark:bg-transparent"
-        rows={1}
-        wrap="soft"
-      />
-    </div>
+    <Textarea
+      defaultValue={note.title}
+      onInput={handleTitleChange}
+      placeholder="New Note"
+      className="resize-none rounded-none border-0 bg-transparent font-bold whitespace-pre-wrap shadow-none outline-0 focus-visible:ring-0 md:text-4xl dark:bg-transparent"
+      rows={1}
+      wrap="soft"
+    />
   );
 }

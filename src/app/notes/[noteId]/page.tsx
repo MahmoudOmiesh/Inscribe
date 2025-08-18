@@ -1,11 +1,10 @@
 import { api, HydrateClient } from "@/trpc/server";
-import { NoteHeader } from "./_components/note-header";
-import { NoteContent } from "./_components/note-content";
 import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
 import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { tryCatch } from "@/lib/try-catch";
+import { NoteWrapper } from "./_components/note-wrapper";
 
 export async function generateMetadata({
   params,
@@ -34,7 +33,6 @@ export default async function NotePage({
   params: Promise<{ noteId: string }>;
 }) {
   const { noteId } = await params;
-
   void api.note.get.prefetch({ noteId: Number(noteId) });
 
   return (
@@ -43,8 +41,7 @@ export default async function NotePage({
         suspenseFallback={<SuspenseFallback />}
         errorFallback={<ErrorFallback />}
       >
-        <NoteHeader noteId={Number(noteId)} />
-        <NoteContent noteId={Number(noteId)} />
+        <NoteWrapper noteId={Number(noteId)} />
       </ErrorSuspenseBoundary>
     </HydrateClient>
   );

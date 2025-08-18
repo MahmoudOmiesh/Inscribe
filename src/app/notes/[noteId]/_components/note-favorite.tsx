@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { StarIcon } from "lucide-react";
-import type { Note } from "@/lib/schema/note";
 import { cn } from "@/lib/utils";
 import { NOTE_MUTATIONS } from "../mutations";
+import { useNoteEditor } from "./note-editor-context";
 
-export function NoteFavorite({ note }: { note: Note }) {
+export function NoteFavorite() {
+  const { note } = useNoteEditor();
   const toggleFavorite = NOTE_MUTATIONS.toggleFavorite(note.id);
 
   return (

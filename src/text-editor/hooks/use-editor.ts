@@ -21,14 +21,14 @@ import {
 } from "../model/selection";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
-export function useEditor(initialNodes: EditorNode[]) {
+export function useEditor(initialNodes?: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const historyRef = useRef(new History());
   const preserveAtRef = useRef<SelectionRange | null>(null);
 
   const [editorState, setEditorState] = useState<EditorState>(() => {
-    const firstId = initialNodes[0]?.id ?? "missing";
-    return createInitialEditorState(initialNodes, {
+    const firstId = initialNodes?.[0]?.id ?? "missing";
+    return createInitialEditorState(initialNodes ?? [], {
       start: { nodeId: firstId, offset: 0 },
       end: { nodeId: firstId, offset: 0 },
       isCollapsed: true,
@@ -135,10 +135,6 @@ export function useEditor(initialNodes: EditorNode[]) {
   useEffect(() => {
     handleSelect();
   }, [editorState, handleSelect]);
-
-  // useEffect(() => {
-  //   console.log("NODES", editorState.nodes);
-  // }, [editorState.nodes]);
 
   return {
     editorRef,
