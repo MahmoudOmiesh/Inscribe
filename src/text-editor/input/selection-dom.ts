@@ -31,11 +31,27 @@ export function getSelectionRange(): SelectionRange | null {
 }
 
 function domToCaretPosition(node: Node, offset: number) {
-  const element =
+  let element =
     node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element);
-  const editorNode = element?.closest("[data-node-id]");
 
-  if (!editorNode) return null;
+  if (element && element.tagName === "BR") {
+    element = element.parentElement;
+  }
+
+  let editorNode = element?.closest("[data-node-id]");
+
+  if (!editorNode) {
+    if (
+      element &&
+      element.tagName === "DIV" &&
+      (element as HTMLElement).dataset.textEditorRoot
+    ) {
+      editorNode = element.querySelector("[data-node-id]");
+    }
+    if (!editorNode) {
+      return null;
+    }
+  }
 
   const nodeId = editorNode.getAttribute("data-node-id")!;
   const walker = document.createTreeWalker(

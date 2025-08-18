@@ -21,7 +21,8 @@ export function NoteEditorProvider({
   children: React.ReactNode;
   note: Note;
 }) {
-  const editor = useEditor(note.content as unknown as EditorNode[]);
+  // const editor = useEditor(note.content as unknown as EditorNode[]);
+  const editor = useEditor([]);
   const actions = useEditorActions(
     editor.getState,
     editor.dispatch,

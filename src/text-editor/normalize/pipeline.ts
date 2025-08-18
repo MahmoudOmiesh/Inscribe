@@ -5,15 +5,11 @@ import { normalizeMarks } from "./marks";
 import { normalizeNodes } from "./nodes";
 
 export function normalizePipeline(editorState: EditorState): EditorState {
-  let nodes = editorState.nodes;
+  editorState.nodes = normalizeNodes(editorState.nodes);
+  editorState.nodes = normalizeMarks(editorState.nodes);
+  editorState.nodes = normalizeLists(editorState.nodes);
 
-  nodes = normalizeNodes(nodes);
-  nodes = normalizeMarks(nodes);
-  nodes = normalizeLists(nodes);
+  editorState.nodeIdIndex = buildNodeIdxMap(editorState.nodes);
 
-  return {
-    ...editorState,
-    nodes,
-    nodeIdIndex: buildNodeIdxMap(nodes),
-  };
+  return editorState;
 }

@@ -30,6 +30,7 @@ export function NoteEditor({
         active={editor.active}
       />
       <div
+        data-text-editor-root
         ref={editor.editorRef}
         onSelect={editor.handleSelect}
         onDragStart={(e) => {
@@ -47,7 +48,6 @@ export function NoteEditor({
 
 // TODO
 // - fix floating node modifier not closing when clicking outside
-// - fix getSelectionRange doesn't work if there is one empty node in the editor
 // - fix remove / after executing command
 // - group operations together in undo/redo
 // - handle losing focus

@@ -11,7 +11,11 @@ export function insertTextStep(text: string): Step {
       ? nodes
       : deleteBetween(nodes, nodeIdIndex, selection);
     const nodeIndex = findNodeIndex(nodeIdIndex, selection.start.nodeId);
-    if (nodeIndex === -1) return state;
+
+    if (nodeIndex === -1) {
+      console.log("NOT FOUND", selection);
+      return state;
+    }
 
     const node = base[nodeIndex]!;
     const newNode = insertTextIntoNode(
