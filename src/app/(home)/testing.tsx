@@ -24,9 +24,9 @@ export default function Testing() {
     <NoteEditor
       editor={editor}
       actions={actions}
-      onContentChange={(content) => {
-        console.log("content", content);
-      }}
+      // onContentChange={(content) => {
+      //   console.log("content", content);
+      // }}
     />
   );
 }

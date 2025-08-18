@@ -16,6 +16,8 @@ import { getSelectionRange } from "../input/selection-dom";
 import { BLOCK_TYPES } from "../model/schema";
 import type { SelectionRange } from "../model/selection";
 import { renderBlockIcon, renderBlockLabel } from "./utils";
+import { changeNodeTypeStep } from "../steps/change-node-type";
+import { deleteCharStep } from "../steps/delete-char";
 
 export function CommandMenu({
   isOpen,
@@ -81,16 +83,18 @@ export function CommandMenu({
 
   function executeCommand() {
     if (rangeRef.current && filteredCommands[activeCommandIndex]) {
-      actions.changeNodeType(
-        rangeRef.current.start.nodeId,
-        filteredCommands[activeCommandIndex],
-      );
+      actions.customCommand([
+        changeNodeTypeStep(
+          rangeRef.current.start.nodeId,
+          filteredCommands[activeCommandIndex],
+        ),
+        deleteCharStep("backward"),
+      ]);
       setIsOpen(false);
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    console.log(e.key);
     switch (e.key) {
       case "Escape": {
         e.preventDefault();
@@ -101,6 +105,13 @@ export function CommandMenu({
             offset: rangeRef.current.start.offset + 1,
           });
         }
+        break;
+      }
+      case "Backspace": {
+        if (query.length > 0) break;
+        e.preventDefault();
+        setIsOpen(false);
+        actions.deleteBackward();
         break;
       }
       case "ArrowDown": {

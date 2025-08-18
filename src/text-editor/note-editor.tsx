@@ -48,7 +48,6 @@ export function NoteEditor({
 
 // TODO
 // - fix floating node modifier not closing when clicking outside
-// - fix remove / after executing command
 // - group operations together in undo/redo
 // - handle losing focus
 // - imrpove the ui

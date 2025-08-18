@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import type { EditorState } from "../state/editor-state";
-import type { Transaction } from "../state/transaction";
+import type { Step, Transaction } from "../state/transaction";
 import {
   textCommands,
   deleteCommands,
   formatCommands,
   listCommands,
+  customCommand,
 } from "../commands";
 import type {
   ActiveMarkDescriptor,
@@ -22,6 +23,7 @@ export function useEditorActions(
   const doTx = useCallback(
     (build: (s: EditorState) => Transaction | null, preserve = false) => {
       const s = getState();
+      console.log("doTx", s);
       const tx = build(s);
       if (tx) dispatch(tx);
 
@@ -67,5 +69,7 @@ export function useEditorActions(
       doTx((s) => formatCommands.changeNodeType(s, nodeId, blockType)),
     setRange: (range: CaretPosition | SelectionRange) =>
       doTx((s) => formatCommands.setRange(s, range)),
+
+    customCommand: (steps: Step[]) => doTx((s) => customCommand(s, steps)),
   };
 }
