@@ -28,11 +28,16 @@ import {
 import { api } from "@/trpc/react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { NOTE_MUTATIONS } from "../mutations";
 
 export function NoteList({ folderId }: { folderId: number }) {
-  const [notes] = api.folder.getNotes.useSuspenseQuery({ folderId: folderId });
+  const pathname = usePathname();
 
+  const [notes] = api.folder.getNotes.useSuspenseQuery({ folderId: folderId });
   const isEmpty = notes.length === 0;
+
+  const duplicate = NOTE_MUTATIONS.duplicate(folderId);
 
   return (
     <SidebarMenuSub
@@ -50,6 +55,7 @@ export function NoteList({ folderId }: { folderId: number }) {
         >
           <SidebarMenuSubButton
             asChild
+            isActive={pathname === `/notes/${note.id}`}
             tabIndex={0}
             className="flex w-full items-center justify-between gap-2 truncate"
           >
@@ -80,7 +86,11 @@ export function NoteList({ folderId }: { folderId: number }) {
                 <DropdownMenuItem>
                   <LinkIcon /> Copy Link
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    duplicate.mutate({ noteId: note.id });
+                  }}
+                >
                   <CopyIcon /> Duplicate
                 </DropdownMenuItem>
                 <DropdownMenuItem>

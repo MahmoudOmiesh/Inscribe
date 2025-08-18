@@ -25,17 +25,17 @@ export function NoteTitle({ note }: { note: Note }) {
     const title = (e.target as HTMLTextAreaElement).value;
 
     // Update the note in the cache
-    utils.note.get.setData({ noteId: note.id }, (old) => {
-      if (!old) return old;
-      return { ...old, title };
+    utils.note.get.setData({ noteId: note.id }, (prevNote) => {
+      if (!prevNote) return prevNote;
+      return { ...prevNote, title };
     });
 
     // Update the note in the folder
-    utils.folder.getNotes.setData({ folderId: note.folderId }, (old) => {
-      if (!old) return old;
-      return old.map((note) => {
-        if (note.id === note.id) return { ...note, title };
-        return note;
+    utils.folder.getNotes.setData({ folderId: note.folderId }, (prevNotes) => {
+      if (!prevNotes) return prevNotes;
+      return prevNotes.map((prevNote) => {
+        if (prevNote.id === note.id) return { ...prevNote, title };
+        return prevNote;
       });
     });
 

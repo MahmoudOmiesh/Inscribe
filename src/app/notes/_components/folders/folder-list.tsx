@@ -40,6 +40,7 @@ import { api } from "@/trpc/react";
 import { useState } from "react";
 import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
 import { NoteList } from "../../[noteId]/_components/note-list";
+import { useRouter } from "next/navigation";
 
 export function FoldersList() {
   const { isSorting, setIsSorting } = useFolderSorting();
@@ -140,11 +141,26 @@ function FolderSortable({
 }
 
 function FolderItem({ folder }: { folder: Folder }) {
+  const router = useRouter();
   const utils = api.useUtils();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   function prefetchNotes() {
     void utils.folder.getNotes.prefetch({ folderId: folder.id });
   }
+
+  const createNote = api.note.create.useMutation({
+    onMutate: () => {
+      setIsPopoverOpen(false);
+    },
+    onSuccess: (data) => {
+      router.push(`/notes/${data.id}`);
+    },
+    meta: {
+      invalidateQueries: () =>
+        utils.folder.getNotes.invalidate({ folderId: folder.id }),
+    },
+  });
 
   return (
     <Collapsible>
@@ -161,7 +177,7 @@ function FolderItem({ folder }: { folder: Folder }) {
             <ChevronRight className="ml-auto hidden transition-transform group-hover/collapsible:block group-data-[state=open]/collapsible:rotate-90" />
           </SidebarMenuButton>
         </CollapsibleTrigger>
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
             <SidebarMenuAction showOnHover>
               <MoreHorizontal />
@@ -169,7 +185,9 @@ function FolderItem({ folder }: { folder: Folder }) {
           </PopoverTrigger>
           <PopoverContent align="center" side="right" className="w-fit">
             <PopoverGroup>
-              <PopoverItem>
+              <PopoverItem
+                onClick={() => createNote.mutate({ folderId: folder.id })}
+              >
                 <Plus /> Add Note
               </PopoverItem>
               <FolderRenameDialog folder={folder}>

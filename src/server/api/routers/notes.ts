@@ -16,6 +16,18 @@ const NOTE_ERRORS = {
       message: "Note not found",
     },
   },
+  create: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to create note",
+    },
+  },
+  duplicate: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to duplicate note",
+    },
+  },
   updateTitle: {
     internal: {
       code: "INTERNAL_SERVER_ERROR" as const,
@@ -44,6 +56,34 @@ export const noteRouter = createTRPCRouter({
 
       if (!data) {
         throw new TRPCError(NOTE_ERRORS.get.notFound);
+      }
+
+      return data;
+    }),
+
+  create: authedProcedure
+    .input(z.object({ folderId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.create(input.folderId, ctx.session.user.id),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.create.internal);
+      }
+
+      return data;
+    }),
+
+  duplicate: authedProcedure
+    .input(z.object({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.duplicate(input.noteId, ctx.session.user.id),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.duplicate.internal);
       }
 
       return data;
