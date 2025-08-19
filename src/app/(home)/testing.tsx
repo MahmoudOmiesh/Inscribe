@@ -20,6 +20,13 @@ export default function Testing() {
     editor.preserveTypingMarksAtCurrentPosition,
   );
 
+  const testString = "😬";
+
+  console.log(testString.length);
+  console.log(testString[0]);
+  console.log(testString[1]);
+  console.log(testString[2]);
+
   return (
     <TextEditor
       editor={editor}

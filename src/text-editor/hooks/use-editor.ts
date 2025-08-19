@@ -129,7 +129,7 @@ export function useEditor(initialNodes?: EditorNode[]) {
 
   // Sync DOM selection after state changes
   useEffect(() => {
-    console.log("editorState.nodes", editorState.nodes);
+    // console.log("editorState.nodes", editorState.nodes);
     setSelectionRange(editorState.selection);
   }, [editorState.selection, editorState.nodes]);
 
