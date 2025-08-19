@@ -18,8 +18,9 @@ export class Transaction {
     let state = this.editorState;
     for (const step of this.steps) {
       state = step(state);
-      state = normalizePipeline(state);
     }
+
+    state = normalizePipeline(state);
     return state;
   }
 }

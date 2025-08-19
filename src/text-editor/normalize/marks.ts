@@ -1,28 +1,47 @@
-import { mergeSameTypeMarks, subtractMark } from "../model/marks";
+import { markEqual, mergeSameTypeMarks, subtractMark } from "../model/marks";
 import type { EditorNode, Mark } from "../model/schema";
 
 export function normalizeMarks(nodes: EditorNode[]) {
-  return nodes.map((node) => {
-    let marks = [...node.marks];
+  let changed = false;
+  const normalizedNodes = nodes.map((node) => {
+    const originalMarks = node.marks;
 
-    marks = clampMarks(marks, node.text.length);
-    marks = enforceCodeExclusivity(marks);
-    marks = enforceHighlightExclusivity(marks);
-    marks = mergeSameTypeMarks(marks);
+    const clamped = clampMarks(originalMarks, node.text.length);
+    const codeExclusive = enforceCodeExclusivity(clamped);
+    const highlightExclusive = enforceHighlightExclusivity(codeExclusive);
+    const merged = mergeSameTypeMarks(highlightExclusive);
 
+    if (marksEqual(originalMarks, merged)) {
+      return node;
+    }
+
+    changed = true;
     return {
       ...node,
-      marks,
+      marks: merged,
     };
   });
+
+  return changed ? normalizedNodes : nodes;
 }
 
 function clampMarks(marks: Mark[], maxLength: number) {
-  return marks.map((mark) => ({
-    ...mark,
-    start: Math.max(0, mark.start),
-    end: Math.min(mark.end, maxLength),
-  }));
+  let changed = false;
+  const clampedMarks = marks.map((mark) => {
+    const start = Math.max(0, mark.start);
+    const end = Math.min(mark.end, maxLength);
+    if (start !== mark.start || end !== mark.end) {
+      changed = true;
+      return {
+        ...mark,
+        start,
+        end,
+      };
+    }
+    return mark;
+  });
+
+  return changed ? clampedMarks : marks;
 }
 
 function enforceCodeExclusivity(marks: Mark[]) {
@@ -68,4 +87,15 @@ function enforceHighlightExclusivity(marks: Mark[]) {
   result.push(lastHighlight);
 
   return result;
+}
+
+function marksEqual(marksOne: Mark[], marksTwo: Mark[]) {
+  if (marksOne === marksTwo) return true;
+  if (marksOne.length !== marksTwo.length) return false;
+
+  for (let i = 0; i < marksOne.length; i++) {
+    if (!markEqual(marksOne[i]!, marksTwo[i]!)) return false;
+  }
+
+  return true;
 }

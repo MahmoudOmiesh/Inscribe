@@ -131,7 +131,7 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
       )}
     </>
   );
-});
+}, propsEqual);
 
 GeneralNode.displayName = "GeneralNode";
 
@@ -184,6 +184,27 @@ function renderNode(
     default:
       const _: never = type;
       return _;
+  }
+}
+
+function propsEqual(prev: GeneralNodeProps, next: GeneralNodeProps) {
+  if (prev.type !== next.type) return false;
+  if (prev.actions !== next.actions) return false;
+
+  switch (prev.type) {
+    case "heading":
+    case "paragraph":
+      return prev.nodeProps.node === (next as typeof prev).nodeProps.node;
+    case "unordered-list":
+    case "ordered-list":
+    case "check-list":
+      const a = prev.nodeProps.items;
+      const b = (next as typeof prev).nodeProps.items;
+      return (
+        a.length === b.length && a.every((item, index) => item === b[index])
+      );
+    default:
+      return false;
   }
 }
 

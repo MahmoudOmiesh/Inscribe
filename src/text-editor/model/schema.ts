@@ -33,9 +33,16 @@ export const HIGHLIGHT_COLORS_CSS = {
   orange: "rgb(255 213 181 / 0.28)",
   brown: "rgb(239 235 233 / 0.28)",
 } as const;
-export const HIGHLIGHT_COLORS = Object.keys(
-  HIGHLIGHT_COLORS_CSS,
-) as (keyof typeof HIGHLIGHT_COLORS_CSS)[];
+export const HIGHLIGHT_COLORS = [
+  "red",
+  "yellow",
+  "green",
+  "blue",
+  "pink",
+  "purple",
+  "orange",
+  "brown",
+] as const;
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
 
 export type Mark =

@@ -75,6 +75,17 @@ function attrsKey(m: Mark): string {
   }
 }
 
+export function markEqual(markOne: Mark, markTwo: Mark) {
+  const markOneAttrs = attrsKey(markOne);
+  const markTwoAttrs = attrsKey(markTwo);
+
+  if (markOneAttrs !== markTwoAttrs) return false;
+  if (markOne.start !== markTwo.start || markOne.end !== markTwo.end)
+    return false;
+
+  return true;
+}
+
 export function mergeSameTypeMarks(marks: Mark[]) {
   const marksByType = new Map<string, Mark[]>();
   for (const mark of marks) {

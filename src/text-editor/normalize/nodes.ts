@@ -1,11 +1,37 @@
-import { cleanNode, createParagraph } from "../model/nodes";
+import { isListItem } from "../model/lists";
+import { createParagraph } from "../model/nodes";
 import type { EditorNode } from "../model/schema";
 
 export function normalizeNodes(nodes: EditorNode[]) {
-  const normalizedNodes = nodes.map(cleanNode);
-  if (normalizedNodes.length === 0) {
+  if (nodes.length === 0) {
     return [createParagraph()];
   }
 
-  return normalizedNodes;
+  let changed = false;
+  const normalizedNodes = nodes.map((node) => {
+    const cleaned = cleanNodePreserveReference(node);
+    if (cleaned !== node) {
+      changed = true;
+    }
+    return cleaned;
+  });
+
+  return changed ? normalizedNodes : nodes;
+}
+
+function cleanNodePreserveReference(node: EditorNode) {
+  const hasListProps =
+    "listId" in node || "indentLevel" in node || "checked" in node;
+
+  if (!isListItem(node) && hasListProps) {
+    return {
+      id: node.id,
+      type: node.type,
+      text: node.text,
+      marks: node.marks,
+      alignment: node.alignment,
+    } as EditorNode;
+  }
+
+  return node;
 }

@@ -7,6 +7,7 @@ import type {
 } from "./schema";
 
 import { nanoid } from "nanoid";
+import { EditorNodeSchema } from "./zod";
 
 export function buildNodeIdxMap(nodes: EditorNode[]) {
   const map = new Map<string, number>();
@@ -17,36 +18,7 @@ export function buildNodeIdxMap(nodes: EditorNode[]) {
 }
 
 export function cleanNode(node: EditorNode): EditorNode {
-  const base = {
-    id: node.id,
-    text: node.text,
-    alignment: node.alignment ?? "left",
-    marks: node.marks ?? [],
-  };
-
-  if (isListItem(node)) {
-    const listItem = {
-      ...base,
-      type: node.type,
-      listId: node.listId,
-      indentLevel: node.indentLevel,
-    };
-
-    if (node.type === "check-list-item") {
-      return {
-        ...listItem,
-        checked: node.checked,
-      };
-    }
-
-    return listItem as ListItemNode;
-  }
-
-  // Non-list blocks: strip list-specific props
-  return {
-    ...base,
-    type: node.type,
-  };
+  return EditorNodeSchema.parse(node);
 }
 
 export function createParagraph(
