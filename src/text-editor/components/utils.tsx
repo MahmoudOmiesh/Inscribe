@@ -73,6 +73,22 @@ export function renderBlockIcon(block: BlockType) {
   }
 }
 
+export function alignmentToCss(alignment: Alignment) {
+  switch (alignment) {
+    case "left":
+      return "text-left";
+    case "center":
+      return "text-center";
+    case "right":
+      return "text-right";
+    case "justify":
+      return "text-justify";
+    default:
+      const _: never = alignment;
+      return _;
+  }
+}
+
 export function renderAlignmentLabel(alignment: Alignment) {
   switch (alignment) {
     case "left":
@@ -118,66 +134,14 @@ const HIGHLIGHT_COLORS_CSS_LOCAL = {
 } as const;
 
 export function renderHighlightColor(color: HighlightColor | null) {
-  switch (color) {
-    case "red":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "yellow":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "green":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "blue":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "pink":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "purple":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "orange":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    case "brown":
-      return (
-        <div
-          className="size-4 rounded-full"
-          style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
-        />
-      );
-    default:
-      return <div className="size-4 rounded-full border" />;
-  }
+  if (!color) return <div className="size-4 rounded-full border" />;
+
+  return (
+    <div
+      className="size-4 rounded-full"
+      style={{ backgroundColor: HIGHLIGHT_COLORS_CSS_LOCAL[color] }}
+    />
+  );
 }
 
 export function renderHighlightLabel(color: HighlightColor) {

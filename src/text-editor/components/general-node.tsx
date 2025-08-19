@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from "react";
+import { memo, useState, type ComponentProps } from "react";
 import { CheckList, OrderedList, UnorderedList } from "./lists";
 import { Paragraph } from "./paragraph";
 import { Heading } from "./headings";
@@ -69,7 +69,7 @@ type GeneralNodeProps = (
   actions: ReturnType<typeof useEditorActions>;
 };
 
-export function GeneralNode(props: GeneralNodeProps) {
+export const GeneralNode = memo((props: GeneralNodeProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
 
@@ -96,6 +96,10 @@ export function GeneralNode(props: GeneralNodeProps) {
   const hover = useHover(context, {
     move: false,
     handleClose: safePolygon(),
+    delay: {
+      open: 200,
+      close: 0,
+    },
   });
   const dismiss = useDismiss(context, {
     outsidePress: () => !isInteracting,
@@ -127,7 +131,9 @@ export function GeneralNode(props: GeneralNodeProps) {
       )}
     </>
   );
-}
+});
+
+GeneralNode.displayName = "GeneralNode";
 
 function renderNode(
   { type, nodeProps }: GeneralNodeProps,

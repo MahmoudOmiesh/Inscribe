@@ -7,6 +7,7 @@ import {
   type Alignment,
   type BlockType,
   HIGHLIGHT_COLORS,
+  type HighlightColor,
 } from "../model/schema";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -54,8 +55,16 @@ export function EditorFloatingToolbar({
     align: Alignment | null;
   };
 }) {
-  const activeHighlightColor = useMemo(() => {
-    return active.marks.find((m) => m.type === "highlight")?.color ?? null;
+  const { markTypesSet, activeHighlightColor } = useMemo(() => {
+    const types = new Set<ActiveMarkDescriptor["type"]>();
+    let highlightColor: HighlightColor | null = null;
+
+    for (const mark of active.marks) {
+      types.add(mark.type);
+      if (mark.type === "highlight") highlightColor = mark.color;
+    }
+
+    return { markTypesSet: types, activeHighlightColor: highlightColor };
   }, [active.marks]);
 
   return (
@@ -64,7 +73,7 @@ export function EditorFloatingToolbar({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm">
-              {active.block && renderBlockLabel(active.block)}
+              {active.block ? renderBlockLabel(active.block) : "Text"}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
@@ -97,28 +106,28 @@ export function EditorFloatingToolbar({
         <div className="flex items-center gap-1">
           <EditorToggle
             operation={() => actions.toggleMark({ type: "bold" })}
-            isActive={active.marks.some((m) => m.type === "bold")}
+            isActive={markTypesSet.has("bold")}
             tooltip="Bold"
           >
             <BoldIcon />
           </EditorToggle>
           <EditorToggle
             operation={() => actions.toggleMark({ type: "italic" })}
-            isActive={active.marks.some((m) => m.type === "italic")}
+            isActive={markTypesSet.has("italic")}
             tooltip="Italic"
           >
             <ItalicIcon />
           </EditorToggle>
           <EditorToggle
             operation={() => actions.toggleMark({ type: "underline" })}
-            isActive={active.marks.some((m) => m.type === "underline")}
+            isActive={markTypesSet.has("underline")}
             tooltip="Underline"
           >
             <UnderlineIcon />
           </EditorToggle>
           <EditorToggle
             operation={() => actions.toggleMark({ type: "code" })}
-            isActive={active.marks.some((m) => m.type === "code")}
+            isActive={markTypesSet.has("code")}
             tooltip="Code"
           >
             <CodeIcon />
@@ -181,21 +190,21 @@ export function EditorFloatingToolbar({
             <PopoverGroup className="flex-row items-center gap-1">
               <EditorToggle
                 operation={() => actions.toggleMark({ type: "strikethrough" })}
-                isActive={active.marks.some((m) => m.type === "strikethrough")}
+                isActive={markTypesSet.has("strikethrough")}
                 tooltip="Strikethrough"
               >
                 <StrikethroughIcon />
               </EditorToggle>
               <EditorToggle
                 operation={() => actions.toggleMark({ type: "superscript" })}
-                isActive={active.marks.some((m) => m.type === "superscript")}
+                isActive={markTypesSet.has("superscript")}
                 tooltip="Superscript"
               >
                 <SuperscriptIcon />
               </EditorToggle>
               <EditorToggle
                 operation={() => actions.toggleMark({ type: "subscript" })}
-                isActive={active.marks.some((m) => m.type === "subscript")}
+                isActive={markTypesSet.has("subscript")}
                 tooltip="Subscript"
               >
                 <SubscriptIcon />

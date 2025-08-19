@@ -3,6 +3,32 @@ import { cn } from "@/lib/utils";
 import type { HeadingNode } from "../model/schema";
 import { MarkRenderer } from "./mark-renderer";
 import type { GetReferenceProps, SetReference } from "./general-node";
+import { alignmentToCss } from "./utils";
+
+const headingData: Record<
+  HeadingNode["type"],
+  {
+    Tag: "h1" | "h2" | "h3" | "h4";
+    className: string;
+  }
+> = {
+  "heading-1": {
+    Tag: "h1",
+    className: "text-4xl",
+  },
+  "heading-2": {
+    Tag: "h2",
+    className: "text-3xl",
+  },
+  "heading-3": {
+    Tag: "h3",
+    className: "text-2xl",
+  },
+  "heading-4": {
+    Tag: "h4",
+    className: "text-xl",
+  },
+};
 
 export const Heading = memo(
   ({
@@ -14,79 +40,27 @@ export const Heading = memo(
     setReference: SetReference;
     getReferenceProps: GetReferenceProps;
   }) => {
-    const commonClassNames = cn(
-      "whitespace-pre-wrap",
-      node.alignment === "center" && "text-center",
-      node.alignment === "right" && "text-right",
-      node.alignment === "justify" && "text-justify",
-    );
+    const { Tag, className } = headingData[node.type];
 
-    switch (node.type) {
-      case "heading-1":
-        return (
-          <h1
-            className={cn("text-4xl", commonClassNames)}
-            data-node-id={node.id}
-            ref={setReference}
-            {...getReferenceProps()}
-          >
-            {node.text.length > 0 ? (
-              <MarkRenderer text={node.text} marks={node.marks} />
-            ) : (
-              <br />
-            )}
-            {node.text.endsWith("\n") && <br />}
-          </h1>
-        );
-      case "heading-2":
-        return (
-          <h2
-            className={cn("text-3xl", commonClassNames)}
-            data-node-id={node.id}
-            ref={setReference}
-            {...getReferenceProps()}
-          >
-            {node.text.length > 0 ? (
-              <MarkRenderer text={node.text} marks={node.marks} />
-            ) : (
-              <br />
-            )}
-            {node.text.endsWith("\n") && <br />}
-          </h2>
-        );
-      case "heading-3":
-        return (
-          <h3
-            className={cn("text-2xl", commonClassNames)}
-            data-node-id={node.id}
-            ref={setReference}
-            {...getReferenceProps()}
-          >
-            {node.text.length > 0 ? (
-              <MarkRenderer text={node.text} marks={node.marks} />
-            ) : (
-              <br />
-            )}
-            {node.text.endsWith("\n") && <br />}
-          </h3>
-        );
-      case "heading-4":
-        return (
-          <h4
-            className={cn("text-xl", commonClassNames)}
-            data-node-id={node.id}
-            ref={setReference}
-            {...getReferenceProps()}
-          >
-            {node.text.length > 0 ? (
-              <MarkRenderer text={node.text} marks={node.marks} />
-            ) : (
-              <br />
-            )}
-            {node.text.endsWith("\n") && <br />}
-          </h4>
-        );
-    }
+    return (
+      <Tag
+        {...getReferenceProps()}
+        ref={setReference}
+        data-node-id={node.id}
+        className={cn(
+          "font-bold whitespace-pre-wrap",
+          className,
+          alignmentToCss(node.alignment),
+        )}
+      >
+        {node.text.length > 0 ? (
+          <MarkRenderer text={node.text} marks={node.marks} />
+        ) : (
+          <br />
+        )}
+        {node.text.endsWith("\n") && <br />}
+      </Tag>
+    );
   },
 );
 

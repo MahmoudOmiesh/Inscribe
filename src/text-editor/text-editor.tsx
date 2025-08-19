@@ -1,6 +1,6 @@
 "use client";
 
-import { NoteContent } from "./components/note-content";
+import { EditorContent } from "./components/editor-content";
 import type { useEditor } from "./hooks/use-editor";
 import type { useEditorActions } from "./hooks/use-editor-actions";
 import { EditorInputHandler } from "./input/editor-input-handler";
@@ -8,7 +8,7 @@ import { EditorFloatingToolbar } from "./components/editor-floating-toolbar";
 import { useEffect } from "react";
 import type { EditorNode } from "./model/schema";
 
-export function NoteEditor({
+export function TextEditor({
   editor,
   actions,
   onContentChange,
@@ -40,7 +40,7 @@ export function NoteEditor({
         suppressContentEditableWarning
         className="space-y-2 px-3 py-2 whitespace-pre outline-none"
       >
-        <NoteContent nodes={editor.state.nodes} actions={actions} />
+        <EditorContent nodes={editor.state.nodes} actions={actions} />
       </div>
     </EditorInputHandler>
   );

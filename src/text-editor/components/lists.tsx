@@ -9,6 +9,7 @@ import { MarkRenderer } from "./mark-renderer";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { GetReferenceProps, SetReference } from "./general-node";
+import { alignmentToCss } from "./utils";
 
 type NestedListItemNode<T extends ListItemNode> = {
   item: T;
@@ -53,6 +54,7 @@ function UnorderedListNested({
   const isRoot = level === 0;
   const ref = isRoot ? setReference : undefined;
   const rest = isRoot ? getReferenceProps() : {};
+
   return (
     <ul
       className={cn(
@@ -225,9 +227,7 @@ export const CheckListItem = memo(
       <li
         className={cn(
           "flex items-start gap-2 whitespace-pre-wrap",
-          node.alignment === "center" && "text-center",
-          node.alignment === "right" && "text-right",
-          node.alignment === "justify" && "text-justify",
+          alignmentToCss(node.alignment),
         )}
       >
         <label contentEditable={false}>
@@ -266,14 +266,7 @@ CheckListItem.displayName = "CheckListItem";
 export const ListItem = memo(
   ({ node, children }: { node: ListItemNode; children?: React.ReactNode }) => {
     return (
-      <li
-        className={cn(
-          "whitespace-pre-wrap",
-          node.alignment === "center" && "text-center",
-          node.alignment === "right" && "text-right",
-          node.alignment === "justify" && "text-justify",
-        )}
-      >
+      <li className={cn("whitespace-pre-wrap", alignmentToCss(node.alignment))}>
         <p
           data-node-id={node.id}
           className={cn(
@@ -301,36 +294,31 @@ ListItem.displayName = "ListItem";
 export function createNestedListItems<T extends ListItemNode>(
   items: T[],
 ): NestedListItemNode<T>[] {
-  const nestedItems: NestedListItemNode<T>[] = items.map((item) => ({
-    item,
-    children: [],
-  }));
+  const roots: NestedListItemNode<T>[] = [];
+  const stack: NestedListItemNode<T>[] = [];
 
-  const indentIdxMap = new Map<number, number[]>();
+  for (const item of items) {
+    const node: NestedListItemNode<T> = {
+      item,
+      children: [],
+    };
+    const level = item.indentLevel;
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]!;
-    const indentLevel = item.indentLevel;
-    const indentIdx = indentIdxMap.get(indentLevel) ?? [];
-    indentIdxMap.set(indentLevel, [...indentIdx, i]);
-  }
-
-  const marked = new Set<number>();
-  for (let i = nestedItems.length - 1; i >= 0; --i) {
-    const nestedItem = nestedItems[i]!;
-    const indentLevel = nestedItem.item.indentLevel;
-
-    const childrenIndices = indentIdxMap.get(indentLevel + 1) ?? [];
-    for (const idx of childrenIndices) {
-      if (idx < i || marked.has(idx)) continue;
-      marked.add(idx);
-      nestedItem.children.push(nestedItems[idx]!);
+    while (
+      stack.length > 0 &&
+      stack[stack.length - 1]!.item.indentLevel >= level
+    ) {
+      stack.pop();
     }
+
+    if (stack.length === 0) {
+      roots.push(node);
+    } else {
+      stack[stack.length - 1]!.children.push(node);
+    }
+
+    stack.push(node);
   }
 
-  const rootLevelIndices = indentIdxMap.get(0) ?? [];
-  const rootLevelItems: NestedListItemNode<T>[] = [];
-  rootLevelIndices.forEach((idx) => rootLevelItems.push(nestedItems[idx]!));
-
-  return rootLevelItems;
+  return roots;
 }

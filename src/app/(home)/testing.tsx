@@ -2,7 +2,7 @@
 
 import { useEditor } from "@/text-editor/hooks/use-editor";
 import { useEditorActions } from "@/text-editor/hooks/use-editor-actions";
-import { NoteEditor } from "@/text-editor/note-editor";
+import { TextEditor } from "@/text-editor/text-editor";
 
 export default function Testing() {
   const editor = useEditor([
@@ -21,7 +21,7 @@ export default function Testing() {
   );
 
   return (
-    <NoteEditor
+    <TextEditor
       editor={editor}
       actions={actions}
       // onContentChange={(content) => {

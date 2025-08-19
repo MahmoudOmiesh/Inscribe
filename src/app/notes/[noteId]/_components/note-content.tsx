@@ -1,7 +1,7 @@
 "use client";
 
 import { NoteTitle } from "./note-title";
-import { NoteEditor } from "@/text-editor/note-editor";
+import { TextEditor } from "@/text-editor/text-editor";
 import { useNoteEditor } from "./note-editor-context";
 import { api } from "@/trpc/react";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
@@ -26,7 +26,7 @@ export function NoteContent() {
         <NoteTitle />
       </div>
       <div className="col-start-2">
-        <NoteEditor
+        <TextEditor
           editor={editor}
           actions={actions}
           onContentChange={(content) => {

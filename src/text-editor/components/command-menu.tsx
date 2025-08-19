@@ -81,13 +81,13 @@ export function CommandMenu({
     inputRef.current?.focus();
   }, [refs, setIsOpen]);
 
-  function executeCommand() {
-    if (rangeRef.current && filteredCommands[activeCommandIndex]) {
+  function executeCommand(index?: number) {
+    const commandIndex = index ?? activeCommandIndex;
+    const chosen = filteredCommands[commandIndex];
+
+    if (rangeRef.current && chosen) {
       actions.customCommand([
-        changeNodeTypeStep(
-          rangeRef.current.start.nodeId,
-          filteredCommands[activeCommandIndex],
-        ),
+        changeNodeTypeStep(rangeRef.current.start.nodeId, chosen),
         deleteCharStep("backward"),
       ]);
       setIsOpen(false);
@@ -163,7 +163,7 @@ export function CommandMenu({
                     variant={activeCommandIndex === index ? "default" : "ghost"}
                     size="sm"
                     className="w-full justify-start transition-none"
-                    onClick={executeCommand}
+                    onClick={() => executeCommand(index)}
                   >
                     {renderBlockIcon(type)}
                     <span className="text-xs">{renderBlockLabel(type)}</span>
