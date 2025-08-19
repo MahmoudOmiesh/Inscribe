@@ -8,6 +8,7 @@ import {
 import { handleKeyDown } from "./keymap";
 import type { useEditorActions } from "../hooks/use-editor-actions";
 import { CommandMenu } from "../components/command-menu";
+import { EmojiMenu } from "../components/emoji-menu";
 
 interface EditorInputHandlerProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export function EditorInputHandler({
   editorRef,
 }: EditorInputHandlerProps) {
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+  const [isEmojiMenuOpen, setIsEmojiMenuOpen] = useState(false);
 
   const onBeforeInput = useCallback(
     (e: InputEvent) => {
@@ -34,6 +36,10 @@ export function EditorInputHandler({
           if (data === "/") {
             setIsCommandMenuOpen(true);
           }
+          if (data === ":") {
+            setIsEmojiMenuOpen(true);
+          }
+
           break;
         }
         case "insertReplacementText": {
@@ -154,6 +160,13 @@ export function EditorInputHandler({
         <CommandMenu
           isOpen={isCommandMenuOpen}
           setIsOpen={setIsCommandMenuOpen}
+          actions={actions}
+        />
+      )}
+      {isEmojiMenuOpen && (
+        <EmojiMenu
+          isOpen={isEmojiMenuOpen}
+          setIsOpen={setIsEmojiMenuOpen}
           actions={actions}
         />
       )}

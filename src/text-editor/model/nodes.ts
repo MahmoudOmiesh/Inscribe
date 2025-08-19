@@ -1,4 +1,3 @@
-import { isListItem } from "./lists";
 import type {
   EditorNode,
   HeadingNode,
