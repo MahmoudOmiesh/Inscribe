@@ -58,6 +58,6 @@ export function TextEditor({
 // - general clean up for the code
 // - support for images
 // - support for links
-// - support for code blocks and blockquotes
+// - support for code blocks
 // - support for arabic?
 // - support for vim?

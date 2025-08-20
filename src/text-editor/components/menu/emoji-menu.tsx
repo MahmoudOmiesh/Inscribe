@@ -18,6 +18,7 @@ import {
   ListEmojiPickerContent,
 } from "@/components/ui/list-emoji-picker";
 import { insertTextStep } from "../../steps/insert-text";
+import { setRangeStep } from "@/text-editor/steps/set-range";
 
 export function EmojiMenu({
   isOpen,
@@ -67,7 +68,13 @@ export function EmojiMenu({
   }, [refs, setIsOpen]);
 
   function executeCommand(emoji: string) {
+    if (!rangeRef.current) return;
+
     actions.customCommand([
+      setRangeStep({
+        ...rangeRef.current.start,
+        offset: rangeRef.current.start.offset + 1,
+      }),
       deleteCharStep("backward"),
       insertTextStep(`${emoji} `),
     ]);

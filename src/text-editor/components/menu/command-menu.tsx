@@ -109,26 +109,19 @@ export function CommandMenu({
   function executeCommand(index?: number) {
     const commandIndex = index ?? activeCommandIndex;
     const chosen = filteredCommands[commandIndex];
+    if (!rangeRef.current || !chosen) return;
 
-    if (rangeRef.current && chosen) {
-      if (chosen === "separator") {
-        actions.customCommand([
-          insertNodeAfterStep(rangeRef.current.start.nodeId, "separator"),
-          setRangeStep({
-            ...rangeRef.current.start,
-            offset: rangeRef.current.start.offset + 1,
-          }),
-          deleteCharStep("backward"),
-        ]);
-        setIsOpen(false);
-        return;
-      }
-      actions.customCommand([
-        changeNodeTypeStep(rangeRef.current.start.nodeId, chosen),
-        deleteCharStep("backward"),
-      ]);
-      setIsOpen(false);
-    }
+    actions.customCommand([
+      chosen === "separator"
+        ? insertNodeAfterStep(rangeRef.current.start.nodeId, "separator")
+        : changeNodeTypeStep(rangeRef.current.start.nodeId, chosen),
+      setRangeStep({
+        ...rangeRef.current.start,
+        offset: rangeRef.current.start.offset + 1,
+      }),
+      deleteCharStep("backward"),
+    ]);
+    setIsOpen(false);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
