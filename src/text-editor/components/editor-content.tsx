@@ -47,6 +47,16 @@ export const EditorContent = memo(
               />,
             );
             break;
+          case "blockquote":
+            components.push(
+              <GeneralNode
+                key={node.id}
+                type="blockquote"
+                nodeProps={{ node }}
+                actions={actions}
+              />,
+            );
+            break;
           case "separator":
             components.push(
               <GeneralNode

@@ -10,6 +10,7 @@ import {
   Heading4Icon,
   ListIcon,
   ListOrderedIcon,
+  QuoteIcon,
   SeparatorHorizontalIcon,
   TypeIcon,
 } from "lucide-react";
@@ -46,6 +47,8 @@ export function renderBlockLabel(block: BlockType) {
       return "To-do List";
     case "separator":
       return "Separator";
+    case "blockquote":
+      return "Blockquote";
     default:
       const _: never = block;
       return _;
@@ -72,6 +75,8 @@ export function renderBlockIcon(block: BlockType) {
       return <CheckIcon />;
     case "separator":
       return <SeparatorHorizontalIcon />;
+    case "blockquote":
+      return <QuoteIcon />;
     default:
       const _: never = block;
       return _;

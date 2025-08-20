@@ -1,24 +1,25 @@
 import { memo, useState, type ComponentProps } from "react";
+import { Heading } from "./headings";
 import { CheckList, OrderedList, UnorderedList } from "./lists";
 import { Paragraph } from "./paragraph";
-import { Heading } from "./headings";
 
 import {
-  useFloating,
   autoUpdate,
-  offset,
   flip,
-  shift,
-  useHover,
-  useDismiss,
-  useInteractions,
   FloatingPortal,
+  offset,
   safePolygon,
-  type UseInteractionsReturn,
+  shift,
+  useDismiss,
+  useFloating,
+  useHover,
+  useInteractions,
   type ExtendedRefs,
+  type UseInteractionsReturn,
 } from "@floating-ui/react";
-import { EditorNodeModifier } from "../floating/editor-node-modifier";
 import type { useEditorActions } from "../../hooks/use-editor-actions";
+import { EditorNodeModifier } from "../floating/editor-node-modifier";
+import { Blockquote } from "./block-quote";
 import { Separator } from "./separator";
 
 type HeadingProps = Omit<
@@ -27,6 +28,10 @@ type HeadingProps = Omit<
 >;
 type ParagraphProps = Omit<
   ComponentProps<typeof Paragraph>,
+  "setReference" | "getReferenceProps"
+>;
+type BlockquoteProps = Omit<
+  ComponentProps<typeof Blockquote>,
   "setReference" | "getReferenceProps"
 >;
 type UnorderedListProps = Omit<
@@ -57,6 +62,10 @@ type GeneralNodeProps = (
   | {
       type: "paragraph";
       nodeProps: ParagraphProps;
+    }
+  | {
+      type: "blockquote";
+      nodeProps: BlockquoteProps;
     }
   | {
       type: "unordered-list";
@@ -198,6 +207,14 @@ function renderNode(
           getReferenceProps={getReferenceProps}
         />
       );
+    case "blockquote":
+      return (
+        <Blockquote
+          {...nodeProps}
+          setReference={setReference}
+          getReferenceProps={getReferenceProps}
+        />
+      );
     default:
       const _: never = type;
       return _;
@@ -229,6 +246,7 @@ function getNodeId(props: GeneralNodeProps) {
   switch (props.type) {
     case "heading":
     case "paragraph":
+    case "blockquote":
     case "separator":
       return props.nodeProps.node.id;
     case "unordered-list":
@@ -245,6 +263,7 @@ function getActiveBlock(props: GeneralNodeProps) {
   switch (props.type) {
     case "heading":
     case "paragraph":
+    case "blockquote":
     case "separator":
       return props.nodeProps.node.type;
     case "unordered-list":

@@ -38,7 +38,7 @@ export function TextEditor({
         }}
         contentEditable
         suppressContentEditableWarning
-        className="space-y-2 px-3 py-2 whitespace-pre outline-none"
+        className="isolate space-y-2 px-3 py-2 whitespace-pre outline-none"
       >
         <EditorContent nodes={editor.state.nodes} actions={actions} />
       </div>

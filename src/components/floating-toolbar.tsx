@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import {
   useFloating,
   useDismiss,
@@ -104,10 +103,7 @@ export function FloatingToolbar({
       <div
         ref={refs.setFloating}
         style={floatingStyles}
-        className={cn(
-          "scale-90 opacity-0 transition-opacity duration-100",
-          isOpen && "scale-100 opacity-100",
-        )}
+        className="z-[1000]"
         {...getFloatingProps()}
       >
         {children}

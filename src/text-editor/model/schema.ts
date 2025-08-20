@@ -4,6 +4,7 @@ export const TEXT_BLOCK_TYPES = [
   "heading-2",
   "heading-3",
   "heading-4",
+  "blockquote",
   "unordered-list-item",
   "ordered-list-item",
   "check-list-item",
@@ -88,6 +89,10 @@ export type ParagraphNode = BaseNode & {
   type: "paragraph";
 };
 
+export type BlockquoteNode = BaseNode & {
+  type: "blockquote";
+};
+
 export type SeparatorNode = BaseNode & {
   type: "separator";
 };
@@ -116,5 +121,9 @@ export type ListItemNode =
   | OrderedListItemNode
   | CheckListItemNode;
 
-export type TextNode = HeadingNode | ParagraphNode | ListItemNode;
+export type TextNode =
+  | HeadingNode
+  | ParagraphNode
+  | ListItemNode
+  | BlockquoteNode;
 export type EditorNode = TextNode | SeparatorNode;
