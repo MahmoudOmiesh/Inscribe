@@ -4,7 +4,7 @@ import { EditorContent } from "./components/editor-content";
 import type { useEditor } from "./hooks/use-editor";
 import type { useEditorActions } from "./hooks/use-editor-actions";
 import { EditorInputHandler } from "./input/editor-input-handler";
-import { EditorFloatingToolbar } from "./components/editor-floating-toolbar";
+import { EditorFloatingToolbar } from "./components/floating/editor-floating-toolbar";
 import { useEffect } from "react";
 import type { EditorNode } from "./model/schema";
 
@@ -51,6 +51,7 @@ export function TextEditor({
 // - group operations together in undo/redo
 // - handle losing focus
 // - imrpove the ui
+// - add ai to editor
 
 // idk
 // - performance
@@ -58,6 +59,5 @@ export function TextEditor({
 // - support for images
 // - support for links
 // - support for code blocks and blockquotes
-// - support for separators and emojis
 // - support for arabic?
 // - support for vim?

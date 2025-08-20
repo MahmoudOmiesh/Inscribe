@@ -5,7 +5,7 @@ import type {
   OrderedListItemNode,
   UnorderedListItemNode,
 } from "../model/schema";
-import { GeneralNode } from "./general-node";
+import { GeneralNode } from "./base/general-node";
 import type { useEditorActions } from "../hooks/use-editor-actions";
 import { getListBoundaries } from "../model/lists";
 
@@ -42,6 +42,16 @@ export const EditorContent = memo(
               <GeneralNode
                 key={node.id}
                 type="paragraph"
+                nodeProps={{ node }}
+                actions={actions}
+              />,
+            );
+            break;
+          case "separator":
+            components.push(
+              <GeneralNode
+                key={node.id}
+                type="separator"
                 nodeProps={{ node }}
                 actions={actions}
               />,

@@ -1,14 +1,14 @@
 import { FloatingToolbar } from "@/components/floating-toolbar";
-import type { useEditorActions } from "../hooks/use-editor-actions";
+import type { useEditorActions } from "../../hooks/use-editor-actions";
 import {
   ALIGNMENT_TYPES,
-  BLOCK_TYPES,
+  TEXT_BLOCK_TYPES,
   type ActiveMarkDescriptor,
   type Alignment,
-  type BlockType,
   HIGHLIGHT_COLORS,
   type HighlightColor,
-} from "../model/schema";
+  type BlockType,
+} from "../../model/schema";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +32,7 @@ import {
   renderBlockLabel,
   renderHighlightColor,
   renderHighlightLabel,
-} from "./utils";
+} from "../utils";
 import {
   Popover,
   PopoverContent,
@@ -84,7 +84,7 @@ export function EditorFloatingToolbar({
           >
             <PopoverLabel>Turn Into</PopoverLabel>
             <PopoverGroup>
-              {BLOCK_TYPES.map((block) => (
+              {TEXT_BLOCK_TYPES.map((block) => (
                 <PopoverItem
                   key={block}
                   variant={active.block === block ? "default" : "ghost"}

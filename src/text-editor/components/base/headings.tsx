@@ -1,9 +1,9 @@
 import { memo } from "react";
 import { cn } from "@/lib/utils";
-import type { HeadingNode } from "../model/schema";
-import { MarkRenderer } from "./mark-renderer";
+import type { HeadingNode } from "../../model/schema";
+import { MarkRenderer } from "../mark-renderer";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "./utils";
+import { alignmentToCss } from "../utils";
 
 const headingData: Record<
   HeadingNode["type"],

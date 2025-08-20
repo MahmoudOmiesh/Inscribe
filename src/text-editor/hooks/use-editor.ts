@@ -8,8 +8,8 @@ import type { Transaction } from "../state/transaction";
 import type {
   ActiveMarkDescriptor,
   Alignment,
-  BlockType,
   EditorNode,
+  BlockType,
 } from "../model/schema";
 import { getSelectionRange, setSelectionRange } from "../input/selection-dom";
 import {

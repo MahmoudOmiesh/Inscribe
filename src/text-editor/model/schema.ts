@@ -1,4 +1,4 @@
-export const BLOCK_TYPES = [
+export const TEXT_BLOCK_TYPES = [
   "paragraph",
   "heading-1",
   "heading-2",
@@ -8,6 +8,10 @@ export const BLOCK_TYPES = [
   "ordered-list-item",
   "check-list-item",
 ] as const;
+
+export type TextBlockType = (typeof TEXT_BLOCK_TYPES)[number];
+
+export const BLOCK_TYPES = [...TEXT_BLOCK_TYPES, "separator"] as const;
 export type BlockType = (typeof BLOCK_TYPES)[number];
 
 export type MarkType =
@@ -84,6 +88,10 @@ export type ParagraphNode = BaseNode & {
   type: "paragraph";
 };
 
+export type SeparatorNode = BaseNode & {
+  type: "separator";
+};
+
 export type UnorderedListItemNode = BaseNode & {
   type: "unordered-list-item";
   listId: string;
@@ -108,4 +116,5 @@ export type ListItemNode =
   | OrderedListItemNode
   | CheckListItemNode;
 
-export type EditorNode = HeadingNode | ParagraphNode | ListItemNode;
+export type TextNode = HeadingNode | ParagraphNode | ListItemNode;
+export type EditorNode = TextNode | SeparatorNode;

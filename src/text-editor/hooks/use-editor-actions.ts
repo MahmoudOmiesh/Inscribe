@@ -11,7 +11,7 @@ import {
 import type {
   ActiveMarkDescriptor,
   Alignment,
-  BlockType,
+  TextBlockType,
 } from "../model/schema";
 import type { CaretPosition, SelectionRange } from "../model/selection";
 
@@ -55,7 +55,7 @@ export function useEditorActions(
 
       toggleMark: (mark: ActiveMarkDescriptor) =>
         doTx((s) => formatCommands.toggleMark(s, mark), true),
-      toggleBlock: (blockType: BlockType) =>
+      toggleBlock: (blockType: TextBlockType) =>
         doTx((s) => formatCommands.toggleBlockType(s, blockType)),
       toggleBlockAlignment: (alignment: Alignment) =>
         doTx((s) => formatCommands.toggleAlignment(s, alignment)),
@@ -73,7 +73,7 @@ export function useEditorActions(
         doTx((s) => formatCommands.duplicateNode(s, nodeId)),
       insertNodeAfter: (nodeId: string) =>
         doTx((s) => formatCommands.insertNodeAfter(s, nodeId)),
-      changeNodeType: (nodeId: string, blockType: BlockType) =>
+      changeNodeType: (nodeId: string, blockType: TextBlockType) =>
         doTx((s) => formatCommands.changeNodeType(s, nodeId, blockType)),
       setRange: (range: CaretPosition | SelectionRange) =>
         doTx((s) => formatCommands.setRange(s, range)),

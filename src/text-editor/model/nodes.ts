@@ -3,6 +3,7 @@ import type {
   HeadingNode,
   ListItemNode,
   ParagraphNode,
+  SeparatorNode,
 } from "./schema";
 
 import { nanoid } from "nanoid";
@@ -70,4 +71,14 @@ export function createListItem(
   }
 
   return base as ListItemNode;
+}
+
+export function createSeparator(): SeparatorNode {
+  return {
+    id: nanoid(),
+    type: "separator",
+    text: "",
+    marks: [],
+    alignment: "left",
+  };
 }

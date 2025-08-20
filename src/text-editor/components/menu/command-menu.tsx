@@ -11,13 +11,20 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { useEditorActions } from "../hooks/use-editor-actions";
-import { getSelectionRange } from "../input/selection-dom";
-import { BLOCK_TYPES } from "../model/schema";
-import type { SelectionRange } from "../model/selection";
-import { renderBlockIcon, renderBlockLabel } from "./utils";
-import { changeNodeTypeStep } from "../steps/change-node-type";
-import { deleteCharStep } from "../steps/delete-char";
+import type { useEditorActions } from "../../hooks/use-editor-actions";
+import { getSelectionRange } from "../../input/selection-dom";
+import {
+  BLOCK_TYPES,
+  TEXT_BLOCK_TYPES,
+  type BlockType,
+  type TextBlockType,
+} from "../../model/schema";
+import type { SelectionRange } from "../../model/selection";
+import { renderBlockIcon, renderBlockLabel } from "../utils";
+import { changeNodeTypeStep } from "../../steps/change-node-type";
+import { deleteCharStep } from "../../steps/delete-char";
+import { insertNodeAfterStep } from "@/text-editor/steps/insert-node-after";
+import { setRangeStep } from "@/text-editor/steps/set-range";
 
 export function CommandMenu({
   isOpen,
@@ -34,13 +41,31 @@ export function CommandMenu({
 
   const rangeRef = useRef<SelectionRange | null>(getSelectionRange());
 
-  const filteredCommands = useMemo(
-    () =>
-      BLOCK_TYPES.filter((type) =>
-        renderBlockLabel(type).toLowerCase().includes(query.toLowerCase()),
-      ),
-    [query],
-  );
+  const { filteredCommands, styleCommands, insertCommands } = useMemo(() => {
+    const filteredCommands: BlockType[] = [];
+    const styleCommands: TextBlockType[] = [];
+    const insertCommands: BlockType[] = [];
+
+    for (const type of BLOCK_TYPES) {
+      const label = renderBlockLabel(type);
+      if (!label.toLowerCase().includes(query.toLowerCase())) {
+        continue;
+      }
+
+      filteredCommands.push(type);
+      if (TEXT_BLOCK_TYPES.includes(type as TextBlockType)) {
+        styleCommands.push(type as TextBlockType);
+      } else {
+        insertCommands.push(type);
+      }
+    }
+
+    return {
+      filteredCommands,
+      styleCommands,
+      insertCommands,
+    };
+  }, [query]);
 
   const { refs, floatingStyles, context } = useFloating({
     placement: "bottom-start",
@@ -86,6 +111,18 @@ export function CommandMenu({
     const chosen = filteredCommands[commandIndex];
 
     if (rangeRef.current && chosen) {
+      if (chosen === "separator") {
+        actions.customCommand([
+          insertNodeAfterStep(rangeRef.current.start.nodeId, "separator"),
+          setRangeStep({
+            ...rangeRef.current.start,
+            offset: rangeRef.current.start.offset + 1,
+          }),
+          deleteCharStep("backward"),
+        ]);
+        setIsOpen(false);
+        return;
+      }
       actions.customCommand([
         changeNodeTypeStep(rangeRef.current.start.nodeId, chosen),
         deleteCharStep("backward"),
@@ -153,11 +190,11 @@ export function CommandMenu({
         />
 
         <Separator className="my-1" />
-        {filteredCommands.length > 0 ? (
+        {styleCommands.length > 0 && (
           <>
             <div className="px-2 py-1.5 text-xs font-medium">Style</div>
             <ul className="flex flex-col gap-1">
-              {filteredCommands.map((type, index) => (
+              {styleCommands.map((type, index) => (
                 <li key={type}>
                   <Button
                     variant={activeCommandIndex === index ? "default" : "ghost"}
@@ -172,7 +209,32 @@ export function CommandMenu({
               ))}
             </ul>
           </>
-        ) : (
+        )}
+        {insertCommands.length > 0 && (
+          <>
+            <div className="px-2 py-1.5 text-xs font-medium">Insert</div>
+            <ul className="flex flex-col gap-1">
+              {insertCommands.map((type, index) => (
+                <li key={type}>
+                  <Button
+                    variant={
+                      activeCommandIndex === styleCommands.length + index
+                        ? "default"
+                        : "ghost"
+                    }
+                    size="sm"
+                    className="w-full justify-start transition-none"
+                    onClick={() => executeCommand(index)}
+                  >
+                    {renderBlockIcon(type)}
+                    <span className="text-xs">{renderBlockLabel(type)}</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {filteredCommands.length === 0 && (
           <div className="px-2 py-1.5 text-center text-xs font-medium italic">
             No commands found
           </div>

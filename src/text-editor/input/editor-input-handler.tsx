@@ -7,8 +7,8 @@ import {
 } from "react";
 import { handleKeyDown } from "./keymap";
 import type { useEditorActions } from "../hooks/use-editor-actions";
-import { CommandMenu } from "../components/command-menu";
-import { EmojiMenu } from "../components/emoji-menu";
+import { CommandMenu } from "../components/menu/command-menu";
+import { EmojiMenu } from "../components/menu/emoji-menu";
 
 interface EditorInputHandlerProps {
   children: ReactNode;

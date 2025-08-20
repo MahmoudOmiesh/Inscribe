@@ -1,10 +1,13 @@
 import { getListBoundaries } from "../model/lists";
-import { createParagraph } from "../model/nodes";
+import { createParagraph, createSeparator } from "../model/nodes";
 import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { findNodeIndex } from "./shared";
 
-export function insertNodeAfterStep(nodeId: string): Step {
+export function insertNodeAfterStep(
+  nodeId: string,
+  type: "paragraph" | "separator" = "paragraph",
+): Step {
   return (state: EditorState) => {
     const { nodes, nodeIdIndex } = state;
 
@@ -15,7 +18,7 @@ export function insertNodeAfterStep(nodeId: string): Step {
 
     const updatedNodes = [
       ...nodes.slice(0, end + 1),
-      createParagraph(),
+      type === "paragraph" ? createParagraph() : createSeparator(),
       ...nodes.slice(end + 1),
     ];
 

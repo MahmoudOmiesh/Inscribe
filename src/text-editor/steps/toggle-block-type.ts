@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import type { BlockType } from "../model/schema";
+import type { TextBlockType } from "../model/schema";
 import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { findNodeIndex } from "./shared";
@@ -7,7 +7,7 @@ import { getListBoundaries } from "../model/lists";
 import { createListItem } from "../model/nodes";
 
 export function toggleBlockTypeStep(
-  blockType: BlockType,
+  blockType: TextBlockType,
   // we should always treat lists as a single node,
   // except if it is the last item in the list, we can do both
   { treatListAsSingleNode = true }: { treatListAsSingleNode?: boolean } = {},

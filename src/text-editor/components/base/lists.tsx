@@ -4,12 +4,12 @@ import type {
   ListItemNode,
   OrderedListItemNode,
   UnorderedListItemNode,
-} from "../model/schema";
-import { MarkRenderer } from "./mark-renderer";
+} from "../../model/schema";
+import { MarkRenderer } from "../mark-renderer";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "./utils";
+import { alignmentToCss } from "../utils";
 
 type NestedListItemNode<T extends ListItemNode> = {
   item: T;

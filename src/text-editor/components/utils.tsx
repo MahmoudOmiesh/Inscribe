@@ -10,12 +10,13 @@ import {
   Heading4Icon,
   ListIcon,
   ListOrderedIcon,
+  SeparatorHorizontalIcon,
   TypeIcon,
 } from "lucide-react";
 import {
   type Alignment,
-  type BlockType,
   type HighlightColor,
+  type BlockType,
 } from "../model/schema";
 import {
   Tooltip,
@@ -43,6 +44,8 @@ export function renderBlockLabel(block: BlockType) {
       return "Numbered List";
     case "check-list-item":
       return "To-do List";
+    case "separator":
+      return "Separator";
     default:
       const _: never = block;
       return _;
@@ -67,6 +70,8 @@ export function renderBlockIcon(block: BlockType) {
       return <ListOrderedIcon />;
     case "check-list-item":
       return <CheckIcon />;
+    case "separator":
+      return <SeparatorHorizontalIcon />;
     default:
       const _: never = block;
       return _;

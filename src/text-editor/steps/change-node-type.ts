@@ -1,12 +1,15 @@
 import { nanoid } from "nanoid";
 import { getListBoundaries } from "../model/lists";
 import { createListItem } from "../model/nodes";
-import type { BlockType } from "../model/schema";
+import type { TextBlockType } from "../model/schema";
 import type { EditorState } from "../state/editor-state";
 import type { Step } from "../state/transaction";
 import { findNodeIndex } from "./shared";
 
-export function changeNodeTypeStep(nodeId: string, blockType: BlockType): Step {
+export function changeNodeTypeStep(
+  nodeId: string,
+  blockType: TextBlockType,
+): Step {
   return (state: EditorState) => {
     const { nodes, nodeIdIndex } = state;
 

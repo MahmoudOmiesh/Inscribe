@@ -33,6 +33,8 @@ export function replaceNodesInRange<T extends EditorNode>(
 }
 
 export function mergeTwoNodes(firstNode: EditorNode, secondNode: EditorNode) {
+  if (firstNode.type === "separator") return secondNode;
+
   const secondNodeMarks = adjustMarks(secondNode.marks, {
     offset: 0,
     deletedLength: 0,

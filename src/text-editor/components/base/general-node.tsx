@@ -17,8 +17,9 @@ import {
   type UseInteractionsReturn,
   type ExtendedRefs,
 } from "@floating-ui/react";
-import { EditorNodeModifier } from "./editor-node-modifier";
-import type { useEditorActions } from "../hooks/use-editor-actions";
+import { EditorNodeModifier } from "../floating/editor-node-modifier";
+import type { useEditorActions } from "../../hooks/use-editor-actions";
+import { Separator } from "./separator";
 
 type HeadingProps = Omit<
   ComponentProps<typeof Heading>,
@@ -38,6 +39,10 @@ type OrderedListProps = Omit<
 >;
 type CheckListProps = Omit<
   ComponentProps<typeof CheckList>,
+  "setReference" | "getReferenceProps"
+>;
+type SeparatorProps = Omit<
+  ComponentProps<typeof Separator>,
   "setReference" | "getReferenceProps"
 >;
 
@@ -64,6 +69,10 @@ type GeneralNodeProps = (
   | {
       type: "check-list";
       nodeProps: CheckListProps;
+    }
+  | {
+      type: "separator";
+      nodeProps: SeparatorProps;
     }
 ) & {
   actions: ReturnType<typeof useEditorActions>;
@@ -149,6 +158,14 @@ function renderNode(
           getReferenceProps={getReferenceProps}
         />
       );
+    case "separator":
+      return (
+        <Separator
+          node={nodeProps.node}
+          setReference={setReference}
+          getReferenceProps={getReferenceProps}
+        />
+      );
     case "paragraph":
       return (
         <Paragraph
@@ -211,13 +228,11 @@ function propsEqual(prev: GeneralNodeProps, next: GeneralNodeProps) {
 function getNodeId(props: GeneralNodeProps) {
   switch (props.type) {
     case "heading":
-      return props.nodeProps.node.id;
     case "paragraph":
+    case "separator":
       return props.nodeProps.node.id;
     case "unordered-list":
-      return props.nodeProps.items[0]!.id;
     case "ordered-list":
-      return props.nodeProps.items[0]!.id;
     case "check-list":
       return props.nodeProps.items[0]!.id;
     default:
@@ -229,13 +244,11 @@ function getNodeId(props: GeneralNodeProps) {
 function getActiveBlock(props: GeneralNodeProps) {
   switch (props.type) {
     case "heading":
-      return props.nodeProps.node.type;
     case "paragraph":
+    case "separator":
       return props.nodeProps.node.type;
     case "unordered-list":
-      return props.nodeProps.items[0]!.type;
     case "ordered-list":
-      return props.nodeProps.items[0]!.type;
     case "check-list":
       return props.nodeProps.items[0]!.type;
     default:

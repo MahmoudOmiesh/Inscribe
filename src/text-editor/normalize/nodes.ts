@@ -23,6 +23,12 @@ function cleanNodePreserveReference(node: EditorNode) {
   const hasListProps =
     "listId" in node || "indentLevel" in node || "checked" in node;
 
+  if (node.type === "separator") {
+    node.text = "";
+    node.marks = [];
+    node.alignment = "left";
+  }
+
   if (!isListItem(node) && hasListProps) {
     return {
       id: node.id,

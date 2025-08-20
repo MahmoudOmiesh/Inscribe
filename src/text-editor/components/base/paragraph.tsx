@@ -1,9 +1,9 @@
 import { memo } from "react";
-import type { ParagraphNode as ParagraphNodeType } from "../model/schema";
-import { MarkRenderer } from "./mark-renderer";
+import type { ParagraphNode as ParagraphNodeType } from "../../model/schema";
+import { MarkRenderer } from "../mark-renderer";
 import { cn } from "@/lib/utils";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "./utils";
+import { alignmentToCss } from "../utils";
 
 export const Paragraph = memo(
   ({

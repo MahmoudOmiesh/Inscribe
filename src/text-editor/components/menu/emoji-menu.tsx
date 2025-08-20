@@ -8,16 +8,16 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { useEffect, useRef, useState } from "react";
-import type { useEditorActions } from "../hooks/use-editor-actions";
-import { getSelectionRange } from "../input/selection-dom";
-import type { SelectionRange } from "../model/selection";
-import { deleteCharStep } from "../steps/delete-char";
+import type { useEditorActions } from "../../hooks/use-editor-actions";
+import { getSelectionRange } from "../../input/selection-dom";
+import type { SelectionRange } from "../../model/selection";
+import { deleteCharStep } from "../../steps/delete-char";
 import {
   ListEmojiPicker,
   ListEmojiPickerSearch,
   ListEmojiPickerContent,
 } from "@/components/ui/list-emoji-picker";
-import { insertTextStep } from "../steps/insert-text";
+import { insertTextStep } from "../../steps/insert-text";
 
 export function EmojiMenu({
   isOpen,

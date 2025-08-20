@@ -1,7 +1,7 @@
 import type {
   ActiveMarkDescriptor,
   Alignment,
-  BlockType,
+  TextBlockType,
 } from "../model/schema";
 import type { CaretPosition, SelectionRange } from "../model/selection";
 import type { EditorState } from "../state/editor-state";
@@ -19,7 +19,7 @@ export function toggleMark(state: EditorState, mark: ActiveMarkDescriptor) {
   return new Transaction(state).add(toggleMarkStep(mark));
 }
 
-export function toggleBlockType(state: EditorState, blockType: BlockType) {
+export function toggleBlockType(state: EditorState, blockType: TextBlockType) {
   return new Transaction(state).add(toggleBlockTypeStep(blockType));
 }
 
@@ -42,7 +42,7 @@ export function insertNodeAfter(state: EditorState, nodeId: string) {
 export function changeNodeType(
   state: EditorState,
   nodeId: string,
-  blockType: BlockType,
+  blockType: TextBlockType,
 ) {
   return new Transaction(state).add(changeNodeTypeStep(nodeId, blockType));
 }
