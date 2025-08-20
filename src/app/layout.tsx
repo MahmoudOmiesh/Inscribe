@@ -24,12 +24,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={cn(inter.variable)} suppressHydrationWarning>
-      {/* <head>
+      <head>
         <script
           crossOrigin="anonymous"
           src="//unpkg.com/react-scan/dist/auto.global.js"
         />
-      </head> */}
+      </head>
       <body className="flex min-h-screen flex-col">
         <TRPCReactProvider>
           <ThemeProvider

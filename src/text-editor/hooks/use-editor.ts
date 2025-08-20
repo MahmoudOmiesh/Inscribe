@@ -20,6 +20,7 @@ import {
   type SelectionRange,
 } from "../model/selection";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import { useThrottleCallback } from "@/hooks/use-throttle-callback";
 
 export function useEditor(initialNodes?: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +47,6 @@ export function useEditor(initialNodes?: EditorNode[]) {
   });
 
   const getState = useCallback(() => {
-    // always refresh selection from DOM before building tx
     const sel = getSelectionRange();
     if (!sel) return editorState;
 
@@ -62,20 +62,35 @@ export function useEditor(initialNodes?: EditorNode[]) {
     };
   }, [editorState, active.marks]);
 
-  const dispatch = useCallback((tx: Transaction) => {
-    const next = tx.apply();
-    setEditorState((prev) => {
-      historyRef.current.push(prev);
-      return next;
-    });
-  }, []);
+  const throttledHistoryPush = useThrottleCallback((prev: EditorState) => {
+    historyRef.current.push(prev);
+  }, 500);
+
+  const dispatch = useCallback(
+    (tx: Transaction) => {
+      const next = tx.apply();
+      const sel = getSelectionRange();
+
+      throttledHistoryPush({
+        ...editorState,
+        selection: sel ?? editorState.selection,
+      });
+      setEditorState(next);
+    },
+    [throttledHistoryPush, editorState],
+  );
 
   const undo = useCallback(() => {
-    setEditorState((cur) => historyRef.current.popUndo(cur) ?? cur);
-  }, []);
+    const prev = historyRef.current.popUndo(editorState);
+    if (!prev) return;
+    setEditorState(prev);
+  }, [editorState]);
+
   const redo = useCallback(() => {
-    setEditorState((cur) => historyRef.current.popRedo(cur) ?? cur);
-  }, []);
+    const next = historyRef.current.popRedo(editorState);
+    if (!next) return;
+    setEditorState(next);
+  }, [editorState]);
 
   const canUndo = historyRef.current.canUndo();
   const canRedo = historyRef.current.canRedo();

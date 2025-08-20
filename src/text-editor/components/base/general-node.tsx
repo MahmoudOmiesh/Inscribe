@@ -170,7 +170,7 @@ function renderNode(
     case "separator":
       return (
         <Separator
-          node={nodeProps.node}
+          {...nodeProps}
           setReference={setReference}
           getReferenceProps={getReferenceProps}
         />
@@ -228,6 +228,8 @@ function propsEqual(prev: GeneralNodeProps, next: GeneralNodeProps) {
   switch (prev.type) {
     case "heading":
     case "paragraph":
+    case "blockquote":
+    case "separator":
       return prev.nodeProps.node === (next as typeof prev).nodeProps.node;
     case "unordered-list":
     case "ordered-list":
@@ -238,7 +240,8 @@ function propsEqual(prev: GeneralNodeProps, next: GeneralNodeProps) {
         a.length === b.length && a.every((item, index) => item === b[index])
       );
     default:
-      return false;
+      const _: never = prev;
+      return _;
   }
 }
 

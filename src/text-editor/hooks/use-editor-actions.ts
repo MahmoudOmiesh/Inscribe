@@ -20,23 +20,34 @@ export function useEditorActions(
   dispatch: (tx: Transaction) => void,
   preserveTypingMarksAtCurrentPosition: () => void,
 ) {
+  // This is to make the actions stable, for memoization to work
   const getStateRef = useRef(getState);
+  const dispatchRef = useRef(dispatch);
+  const preserveRef = useRef(preserveTypingMarksAtCurrentPosition);
 
   useEffect(() => {
     getStateRef.current = getState;
   }, [getState]);
 
+  useEffect(() => {
+    dispatchRef.current = dispatch;
+  }, [dispatch]);
+
+  useEffect(() => {
+    preserveRef.current = preserveTypingMarksAtCurrentPosition;
+  }, [preserveTypingMarksAtCurrentPosition]);
+
   const doTx = useCallback(
     (build: (s: EditorState) => Transaction | null, preserve = false) => {
       const s = getStateRef.current();
       const tx = build(s);
-      if (tx) dispatch(tx);
+      if (tx) dispatchRef.current(tx);
 
       if (preserve) {
-        preserveTypingMarksAtCurrentPosition();
+        preserveRef.current();
       }
     },
-    [dispatch, preserveTypingMarksAtCurrentPosition],
+    [],
   );
 
   return useMemo(

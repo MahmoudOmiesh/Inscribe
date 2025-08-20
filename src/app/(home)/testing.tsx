@@ -46,6 +46,12 @@ export default function Testing() {
           // }}
         />
       </div>
+      <Button onClick={() => editor.undo()} disabled={!editor.canUndo}>
+        Undo
+      </Button>
+      <Button onClick={() => editor.redo()} disabled={!editor.canRedo}>
+        Redo
+      </Button>
       <Button onClick={() => console.log(editor.state.nodes)}>Log Nodes</Button>
     </>
   );

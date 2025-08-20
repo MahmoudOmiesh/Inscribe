@@ -44,6 +44,7 @@ function insertTextIntoNode(
   offset: number,
   text: string,
 ) {
+  console.log("insertTextIntoNode", node, typingMarks, offset, text);
   const marksAfterSplit = splitMarksNotInTypingAtOffset(
     node.marks,
     typingMarks,

@@ -48,13 +48,13 @@ export function TextEditor({
 
 // TODO
 // - fix floating node modifier not closing when clicking outside
-// - group operations together in undo/redo
 // - handle losing focus
 // - imrpove the ui
 // - add ai to editor
 
 // idk
 // - performance
+// - try a branch without the memoization hacks and see if it's actually worth it
 // - general clean up for the code
 // - support for images
 // - support for links
