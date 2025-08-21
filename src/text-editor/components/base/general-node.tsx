@@ -136,6 +136,8 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
           >
             <EditorAIPrompt
               nodeId={getNodeId(props)}
+              nodeText={getNodeText(props)}
+              nodeMarks={getNodeMarks(props)}
               actions={props.actions}
               closeAiPrompt={() => setIsAIOpen(false)}
             />
@@ -268,6 +270,40 @@ function getActiveBlock(props: GeneralNodeProps) {
     case "ordered-list":
     case "check-list":
       return props.nodeProps.items[0]!.type;
+    default:
+      const _: never = props;
+      return _;
+  }
+}
+
+function getNodeText(props: GeneralNodeProps) {
+  switch (props.type) {
+    case "heading":
+    case "paragraph":
+    case "blockquote":
+    case "separator":
+      return props.nodeProps.node.text;
+    case "unordered-list":
+    case "ordered-list":
+    case "check-list":
+      return props.nodeProps.items.map((item) => item.text).join("\n");
+    default:
+      const _: never = props;
+      return _;
+  }
+}
+
+function getNodeMarks(props: GeneralNodeProps) {
+  switch (props.type) {
+    case "heading":
+    case "paragraph":
+    case "blockquote":
+    case "separator":
+      return props.nodeProps.node.marks;
+    case "unordered-list":
+    case "ordered-list":
+    case "check-list":
+      return props.nodeProps.items[0]!.marks;
     default:
       const _: never = props;
       return _;

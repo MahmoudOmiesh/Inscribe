@@ -11,6 +11,7 @@ import {
 import type {
   ActiveMarkDescriptor,
   Alignment,
+  Mark,
   TextBlockType,
 } from "../model/schema";
 import type { CaretPosition, SelectionRange } from "../model/selection";
@@ -54,6 +55,8 @@ export function useEditorActions(
     () => ({
       insertText: (text: string) =>
         doTx((s) => textCommands.insertText(s, text)),
+      streamText: (nodeId: string, text: string, marks?: Mark[]) =>
+        doTx((s) => textCommands.streamText(s, nodeId, text, marks)),
       insertParagraph: () => doTx((s) => textCommands.insertParagraph(s)),
       paste: (content: string, type: "plain" | "html") =>
         doTx((s) => textCommands.paste(s, content, type)),
