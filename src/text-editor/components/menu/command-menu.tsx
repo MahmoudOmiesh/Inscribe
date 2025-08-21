@@ -169,7 +169,7 @@ export function CommandMenu({
       <div
         ref={refs.setFloating}
         style={floatingStyles}
-        className="bg-background border-border rounded-md border p-1 shadow-md"
+        className="bg-background border-border z-50 rounded-md border p-1 shadow-md"
         {...getFloatingProps()}
       >
         <Input

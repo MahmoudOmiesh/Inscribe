@@ -112,7 +112,7 @@ export function EmojiMenu({
         {...getFloatingProps()}
       >
         <ListEmojiPicker
-          className="h-[326px] rounded-lg border shadow-md"
+          className="z-50 h-[326px] rounded-lg border shadow-md"
           onEmojiSelect={(emoji) => executeCommand(emoji.emoji)}
         >
           <ListEmojiPickerSearch

@@ -9,6 +9,7 @@ import {
   GripVerticalIcon,
   PlusIcon,
   RotateCcwIcon,
+  SparklesIcon,
   TrashIcon,
 } from "lucide-react";
 import {
@@ -26,12 +27,15 @@ export function EditorNodeModifier({
   actions,
   activeBlock,
   onFloatingInteraction,
+  openAiPrompt,
 }: {
   nodeId: string;
   activeBlock: BlockType;
   actions: ReturnType<typeof useEditorActions>;
   onFloatingInteraction: (open: boolean) => void;
+  openAiPrompt: () => void;
 }) {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [turnIntoOpen, setTurnIntoOpen] = useState(false);
 
   const isSeparator = activeBlock === "separator";
@@ -45,7 +49,13 @@ export function EditorNodeModifier({
       >
         <PlusIcon />
       </Button>
-      <Popover onOpenChange={onFloatingInteraction}>
+      <Popover
+        open={isPopoverOpen}
+        onOpenChange={(open) => {
+          onFloatingInteraction(open);
+          setIsPopoverOpen(open);
+        }}
+      >
         <PopoverTrigger asChild>
           <Button variant="ghost" size="icon">
             <GripVerticalIcon />
@@ -152,6 +162,26 @@ export function EditorNodeModifier({
               </li>
             )}
           </ul>
+          {!isSeparator && (
+            <>
+              <Separator className="my-2" />
+              <ul>
+                <li>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    size="sm"
+                    onClick={() => {
+                      openAiPrompt();
+                      setIsPopoverOpen(false);
+                    }}
+                  >
+                    <SparklesIcon /> Ask AI
+                  </Button>
+                </li>
+              </ul>
+            </>
+          )}
           <Separator className="my-2" />
           <ul>
             <li>

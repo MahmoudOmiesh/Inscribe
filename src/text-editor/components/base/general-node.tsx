@@ -1,19 +1,10 @@
-import { memo, useState, type ComponentProps } from "react";
+import { memo, type ComponentProps } from "react";
 import { Heading } from "./headings";
 import { CheckList, OrderedList, UnorderedList } from "./lists";
 import { Paragraph } from "./paragraph";
 
 import {
-  autoUpdate,
-  flip,
   FloatingPortal,
-  offset,
-  safePolygon,
-  shift,
-  useDismiss,
-  useFloating,
-  useHover,
-  useInteractions,
   type ExtendedRefs,
   type UseInteractionsReturn,
 } from "@floating-ui/react";
@@ -21,6 +12,9 @@ import type { useEditorActions } from "../../hooks/use-editor-actions";
 import { EditorNodeModifier } from "../floating/editor-node-modifier";
 import { Blockquote } from "./block-quote";
 import { Separator } from "./separator";
+import { useNodeModifier } from "@/text-editor/hooks/use-node-modifier";
+import { useAI } from "@/text-editor/hooks/use-ai";
+import { EditorAIPrompt } from "../floating/editor-ai-prompt";
 
 type HeadingProps = Omit<
   ComponentProps<typeof Heading>,
@@ -88,61 +82,62 @@ type GeneralNodeProps = (
 };
 
 export const GeneralNode = memo((props: GeneralNodeProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isInteracting, setIsInteracting] = useState(false);
+  const {
+    isOpen: isNodeModifierOpen,
+    refs: nodeModifierRefs,
+    floatingStyles: nodeModifierFloatingStyles,
+    getReferenceProps: nodeModifierGetReferenceProps,
+    getFloatingProps: nodeModifierGetFloatingProps,
+    setIsInteracting: setIsNodeModifierInteracting,
+  } = useNodeModifier();
 
-  const { refs, floatingStyles, context } = useFloating({
-    open: isOpen,
-    onOpenChange: (next) => {
-      if (!isInteracting) {
-        setIsOpen(next);
-      }
-    },
-    placement: "left",
-    // Make sure the tooltip stays on the screen
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(20),
-      flip({
-        fallbackAxisSideDirection: "start",
-      }),
-      shift(),
-    ],
-  });
+  const {
+    isOpen: isAIOpen,
+    setIsOpen: setIsAIOpen,
+    refs: aiRefs,
+    floatingStyles: aiFloatingStyles,
+    getFloatingProps: aiGetFloatingProps,
+  } = useAI();
 
-  // Event listeners to change the open state
-  const hover = useHover(context, {
-    move: false,
-    handleClose: safePolygon(),
-    delay: {
-      open: 200,
-      close: 0,
-    },
-  });
-  const dismiss = useDismiss(context, {
-    outsidePress: () => !isInteracting,
-  });
+  if (aiRefs.reference.current !== nodeModifierRefs.reference.current) {
+    aiRefs.setReference(nodeModifierRefs.reference.current);
+  }
 
-  // Merge all the interactions into prop getters
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    dismiss,
-  ]);
   return (
     <>
-      {renderNode(props, refs.setReference, getReferenceProps)}
-      {isOpen && (
+      {renderNode(
+        props,
+        nodeModifierRefs.setReference,
+        nodeModifierGetReferenceProps,
+      )}
+      {isNodeModifierOpen && (
         <FloatingPortal>
           <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
+            ref={nodeModifierRefs.setFloating}
+            style={nodeModifierFloatingStyles}
+            {...nodeModifierGetFloatingProps()}
           >
             <EditorNodeModifier
               nodeId={getNodeId(props)}
               activeBlock={getActiveBlock(props)}
               actions={props.actions}
-              onFloatingInteraction={setIsInteracting}
+              onFloatingInteraction={setIsNodeModifierInteracting}
+              openAiPrompt={() => setIsAIOpen(true)}
+            />
+          </div>
+        </FloatingPortal>
+      )}
+      {isAIOpen && (
+        <FloatingPortal>
+          <div
+            ref={aiRefs.setFloating}
+            style={aiFloatingStyles}
+            {...aiGetFloatingProps()}
+          >
+            <EditorAIPrompt
+              nodeId={getNodeId(props)}
+              actions={props.actions}
+              closeAiPrompt={() => setIsAIOpen(false)}
             />
           </div>
         </FloatingPortal>

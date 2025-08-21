@@ -15,15 +15,15 @@ export default function Testing() {
       marks: [],
     },
     {
-      type: "separator",
+      type: "paragraph",
+      text: "world",
       id: "2",
-      text: "",
       alignment: "left",
       marks: [],
     },
     {
       type: "paragraph",
-      text: "world",
+      text: "hello world",
       id: "3",
       alignment: "left",
       marks: [],
