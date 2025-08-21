@@ -4,29 +4,30 @@ import type { HeadingNode } from "../../model/schema";
 import { MarkRenderer } from "../mark-renderer";
 import type { GetReferenceProps, SetReference } from "./general-node";
 import { alignmentToCss } from "../utils";
+import type { ClassValue } from "clsx";
 
 const headingData: Record<
   HeadingNode["type"],
   {
     Tag: "h1" | "h2" | "h3" | "h4";
-    className: string;
+    className: ClassValue;
   }
 > = {
   "heading-1": {
     Tag: "h1",
-    className: "text-4xl",
+    className: "text-3xl mt-18 font-bold",
   },
   "heading-2": {
     Tag: "h2",
-    className: "text-3xl",
+    className: "text-2xl mt-13 font-bold",
   },
   "heading-3": {
     Tag: "h3",
-    className: "text-2xl",
+    className: "text-xl mt-9 font-semibold",
   },
   "heading-4": {
     Tag: "h4",
-    className: "text-xl",
+    className: "text-lg mt-7 font-medium",
   },
 };
 
@@ -48,7 +49,7 @@ export const Heading = memo(
         ref={setReference}
         data-node-id={node.id}
         className={cn(
-          "font-bold whitespace-pre-wrap",
+          "whitespace-pre-wrap",
           className,
           alignmentToCss(node.alignment),
         )}

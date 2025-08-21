@@ -2,7 +2,6 @@ import {
   autoUpdate,
   flip,
   offset,
-  shift,
   useDismiss,
   useFloating,
   useInteractions,
@@ -38,7 +37,7 @@ export function EmojiMenu({
     placement: "bottom-start",
     open: isOpen,
     onOpenChange: setIsOpen,
-    middleware: [flip(), shift(), offset(8)],
+    middleware: [flip(), offset(8)],
     whileElementsMounted: autoUpdate,
   });
 

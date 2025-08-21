@@ -58,8 +58,8 @@ function UnorderedListNested({
   return (
     <ul
       className={cn(
-        "pl-4",
-        level === 0 && "list-[disc]",
+        "pl-6 leading-[1.6]",
+        level === 0 && "my-6 list-[disc]",
         level === 1 && "list-[circle]",
         level >= 2 && "list-[square]",
       )}
@@ -123,8 +123,8 @@ function OrderedListNested({
   return (
     <ol
       className={cn(
-        "pl-4",
-        level === 0 && "list-[decimal]",
+        "pl-6 leading-[1.6]",
+        level === 0 && "my-6 list-[decimal]",
         level === 1 && "list-[lower-alpha]",
         level >= 2 && "list-[lower-roman]",
       )}
@@ -191,7 +191,11 @@ function CheckListNested({
   const ref = isRoot ? setReference : undefined;
   const rest = isRoot ? getReferenceProps() : {};
   return (
-    <ul className="pl-1" ref={ref} {...rest}>
+    <ul
+      className={cn("pl-1 leading-[1.6]", level === 0 && "my-6")}
+      ref={ref}
+      {...rest}
+    >
       {items.map((item) => (
         <CheckListItem
           key={item.item.id}
@@ -226,15 +230,15 @@ export const CheckListItem = memo(
     return (
       <li
         className={cn(
-          "flex items-start gap-2 whitespace-pre-wrap",
+          "flex gap-2.5 whitespace-pre-wrap",
           alignmentToCss(node.alignment),
         )}
       >
-        <label contentEditable={false}>
+        <label contentEditable={false} className="relative h-fit w-fit pt-0.5">
           <Checkbox
             checked={node.checked}
             onCheckedChange={() => toggleCheckbox(node.id)}
-            className="mt-1 cursor-pointer select-none"
+            className="cursor-pointer select-none"
           />
         </label>
         <div className="min-w-0 flex-1">

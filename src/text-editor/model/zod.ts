@@ -63,12 +63,22 @@ const CheckListItemSchema = ListItemBaseSchema.extend({
   checked: z.boolean(),
 });
 
+const SeparatorNodeSchema = BaseNodeSchema.extend({
+  type: z.literal("separator"),
+});
+
+const BlockquoteNodeSchema = BaseNodeSchema.extend({
+  type: z.literal("blockquote"),
+});
+
 export const EditorNodeSchema = z.discriminatedUnion("type", [
   ParagraphNodeSchema,
   ...HeadingNodeSchema.options,
   UnorderedListItemSchema,
   OrderedListItemSchema,
   CheckListItemSchema,
+  SeparatorNodeSchema,
+  BlockquoteNodeSchema,
 ]);
 
 export type ParsedEditorNode = z.infer<typeof EditorNodeSchema>;

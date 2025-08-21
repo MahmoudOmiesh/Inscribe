@@ -18,7 +18,7 @@ export const Blockquote = memo(
     return (
       <blockquote
         className={cn(
-          "relative pl-4 whitespace-pre-wrap before:absolute before:top-0 before:bottom-0 before:left-0 before:w-1 before:bg-gray-200 before:content-['']",
+          "relative my-6 py-1.5 pl-4 whitespace-pre-wrap before:absolute before:top-0 before:bottom-0 before:left-0 before:w-1 before:bg-gray-200 before:content-['']",
           alignmentToCss(node.alignment),
         )}
         ref={setReference}

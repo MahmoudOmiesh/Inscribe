@@ -3,7 +3,6 @@ import {
   autoUpdate,
   offset,
   useFloating,
-  shift,
   useInteractions,
   useDismiss,
   size,
@@ -21,10 +20,7 @@ export function useAI() {
     whileElementsMounted: autoUpdate,
     middleware: [
       offset(5),
-      flip({
-        fallbackAxisSideDirection: "start",
-      }),
-      shift(),
+      flip(),
       size({
         apply({ rects, elements }) {
           Object.assign(elements.floating.style, {

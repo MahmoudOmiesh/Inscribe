@@ -18,7 +18,10 @@ export const Paragraph = memo(
     return (
       <p
         data-node-id={node.id}
-        className={cn("whitespace-pre-wrap", alignmentToCss(node.alignment))}
+        className={cn(
+          "mt-5 whitespace-pre-wrap",
+          alignmentToCss(node.alignment),
+        )}
         ref={setReference}
         {...getReferenceProps()}
       >

@@ -1,13 +1,12 @@
 import {
-  flip,
   autoUpdate,
   offset,
   useFloating,
-  shift,
   useHover,
   safePolygon,
   useInteractions,
   useDismiss,
+  flip,
 } from "@floating-ui/react";
 import { useState } from "react";
 
@@ -25,13 +24,7 @@ export function useNodeModifier() {
     placement: "left",
     // Make sure the tooltip stays on the screen
     whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(20),
-      flip({
-        fallbackAxisSideDirection: "start",
-      }),
-      shift(),
-    ],
+    middleware: [offset(20), flip()],
   });
 
   // Event listeners to change the open state

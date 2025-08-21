@@ -3,7 +3,6 @@ import {
   useDismiss,
   useInteractions,
   flip,
-  shift,
   inline,
   autoUpdate,
   offset,
@@ -23,7 +22,7 @@ export function FloatingToolbar({
     placement: "top",
     open: isOpen,
     onOpenChange: setIsOpen,
-    middleware: [inline(), flip(), shift(), offset(8)],
+    middleware: [inline(), flip(), offset(8)],
     whileElementsMounted: autoUpdate,
   });
 

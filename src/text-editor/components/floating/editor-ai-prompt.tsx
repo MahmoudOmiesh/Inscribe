@@ -46,23 +46,23 @@ export function EditorAIPrompt({
   }
 
   function onAccept() {
+    actions.setRange({
+      nodeId,
+      offset: nodeText.length,
+    });
     closeAiPrompt();
   }
 
   function onDiscard() {
-    void stop();
-    setMessages([]);
-    console.log(originalText.current, originalMarks.current);
     actions.streamText(nodeId, originalText.current, originalMarks.current);
     closeAiPrompt();
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (prompt.length === 0) return;
 
     const text = isFinished ? prompt : prompt + "\n" + nodeText;
-
-    console.log(text);
 
     void sendMessage({
       text,
@@ -121,7 +121,13 @@ export function EditorAIPrompt({
               }
             }}
           />
-          <Button variant="outline" size="icon" className="justify-self-end">
+          <Button
+            variant="outline"
+            size="icon"
+            className="justify-self-end"
+            type="submit"
+            disabled={prompt.length === 0}
+          >
             <ArrowUpIcon />
           </Button>
         </form>

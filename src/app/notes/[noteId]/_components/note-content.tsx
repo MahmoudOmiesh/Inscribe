@@ -30,6 +30,7 @@ export function NoteContent() {
           editor={editor}
           actions={actions}
           onContentChange={(content) => {
+            // console.log(content);
             debouncedUpdateContentMutate({ noteId: note.id, content });
           }}
         />

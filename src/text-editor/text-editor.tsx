@@ -38,7 +38,7 @@ export function TextEditor({
         }}
         contentEditable
         suppressContentEditableWarning
-        className="isolate space-y-2 px-3 py-2 whitespace-pre outline-none"
+        className="isolate px-3 py-2 whitespace-pre outline-none [&>*:first-child]:mt-0"
       >
         <EditorContent nodes={editor.state.nodes} actions={actions} />
       </div>
@@ -50,7 +50,7 @@ export function TextEditor({
 // - fix floating node modifier not closing when clicking outside
 // - handle losing focus
 // - imrpove the ui
-// - add ai to editor
+// - fix paste when html
 
 // idk
 // - performance
