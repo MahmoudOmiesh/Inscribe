@@ -2,21 +2,17 @@
 
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { FileIcon, MoreVerticalIcon, Redo2Icon, Undo2Icon } from "lucide-react";
+import { FileIcon, Redo2Icon, Undo2Icon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { MutationStatusIndicator } from "@/components/mutation-status-indicator";
 import { NoteFavorite } from "./note-favorite";
 import { useNoteEditor } from "./note-editor-context";
+import { NoteHeaderDropdown } from "./note-header-dropdown";
 
 export function NoteHeader() {
   const { data: session } = authClient.useSession();
-  const { note } = useNoteEditor();
+  const { note, editor } = useNoteEditor();
 
   return (
     <header className="bg-background sticky top-0 flex flex-row items-center justify-between px-4 py-2 text-sm">
@@ -29,10 +25,20 @@ export function NoteHeader() {
       </div>
       <div className="flex flex-row items-center gap-2">
         <div>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={!editor.canUndo}
+            onClick={() => editor.undo()}
+          >
             <Undo2Icon className="text-muted-foreground" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={!editor.canRedo}
+            onClick={() => editor.redo()}
+          >
             <Redo2Icon className="text-muted-foreground" />
           </Button>
         </div>
@@ -44,14 +50,7 @@ export function NoteHeader() {
 
         <div className="flex flex-row items-center">
           <NoteFavorite />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVerticalIcon className="text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">hi</DropdownMenuContent>
-          </DropdownMenu>
+          <NoteHeaderDropdown />
         </div>
 
         <Separator

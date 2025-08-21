@@ -21,7 +21,7 @@ export function NoteContent() {
   );
 
   return (
-    <div className="grid flex-1 grid-cols-[1fr_2fr_1fr] grid-rows-[auto_1fr] gap-y-6 pt-26">
+    <div className="grid flex-1 grid-cols-[1fr_2fr_1fr] grid-rows-[auto_1fr] gap-y-6 pt-26 pb-40">
       <div className="col-start-2">
         <NoteTitle />
       </div>

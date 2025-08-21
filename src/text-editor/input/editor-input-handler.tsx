@@ -14,11 +14,15 @@ interface EditorInputHandlerProps {
   children: ReactNode;
   editorRef: RefObject<HTMLDivElement | null>;
   actions: ReturnType<typeof useEditorActions>;
+  undo: () => void;
+  redo: () => void;
 }
 
 export function EditorInputHandler({
   children,
   actions,
+  undo,
+  redo,
   editorRef,
 }: EditorInputHandlerProps) {
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
@@ -137,9 +141,9 @@ export function EditorInputHandler({
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      handleKeyDown(e, actions);
+      handleKeyDown(e, actions, undo, redo);
     },
-    [actions],
+    [actions, undo, redo],
   );
 
   useEffect(() => {

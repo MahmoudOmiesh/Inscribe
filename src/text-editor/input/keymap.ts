@@ -11,6 +11,8 @@ function isModAndShift(e: KeyboardEvent) {
 export function handleKeyDown(
   e: KeyboardEvent,
   actions: ReturnType<typeof useEditorActions>,
+  undo: () => void,
+  redo: () => void,
 ) {
   switch (true) {
     case e.key === "Tab" && !e.shiftKey: {
@@ -36,6 +38,16 @@ export function handleKeyDown(
     case e.code === "Digit9" && isModAndShift(e): {
       e.preventDefault();
       actions.toggleBlock("check-list-item");
+      return;
+    }
+    case e.key === "z" && isMod(e): {
+      e.preventDefault();
+      undo();
+      return;
+    }
+    case e.key === "y" && isMod(e): {
+      e.preventDefault();
+      redo();
       return;
     }
     default:

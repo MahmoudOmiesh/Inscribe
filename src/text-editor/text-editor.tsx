@@ -23,7 +23,12 @@ export function TextEditor({
   }, [editor.state.nodes]);
 
   return (
-    <EditorInputHandler editorRef={editor.editorRef} actions={actions}>
+    <EditorInputHandler
+      editorRef={editor.editorRef}
+      actions={actions}
+      undo={editor.undo}
+      redo={editor.redo}
+    >
       <EditorFloatingToolbar
         editorRef={editor.editorRef}
         actions={actions}
