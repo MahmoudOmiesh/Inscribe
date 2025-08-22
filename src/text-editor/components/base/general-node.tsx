@@ -15,6 +15,7 @@ import { Separator } from "./separator";
 import { useNodeModifier } from "@/text-editor/hooks/use-node-modifier";
 import { useAI } from "@/text-editor/hooks/use-ai";
 import { EditorAIPrompt } from "../floating/editor-ai-prompt";
+import { useOptionContext } from "../option-context";
 
 type HeadingProps = Omit<
   ComponentProps<typeof Heading>,
@@ -99,9 +100,14 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
     getFloatingProps: aiGetFloatingProps,
   } = useAI();
 
+  const { locked } = useOptionContext();
+
   if (aiRefs.reference.current !== nodeModifierRefs.reference.current) {
     aiRefs.setReference(nodeModifierRefs.reference.current);
   }
+
+  const showNodeModifier = !locked && isNodeModifierOpen;
+  const showAIPrompt = !locked && isAIOpen;
 
   return (
     <>
@@ -110,7 +116,7 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
         nodeModifierRefs.setReference,
         nodeModifierGetReferenceProps,
       )}
-      {isNodeModifierOpen && (
+      {showNodeModifier && (
         <FloatingPortal>
           <div
             ref={nodeModifierRefs.setFloating}
@@ -127,7 +133,7 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
           </div>
         </FloatingPortal>
       )}
-      {isAIOpen && (
+      {showAIPrompt && (
         <FloatingPortal>
           <div
             ref={aiRefs.setFloating}

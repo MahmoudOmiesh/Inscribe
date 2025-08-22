@@ -19,7 +19,7 @@ export const Paragraph = memo(
       <p
         data-node-id={node.id}
         className={cn(
-          "mt-5 whitespace-pre-wrap",
+          "mt-(--editor-paragraph-mt) text-(length:--editor-paragraph-s)",
           alignmentToCss(node.alignment),
         )}
         ref={setReference}

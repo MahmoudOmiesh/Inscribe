@@ -15,19 +15,23 @@ const headingData: Record<
 > = {
   "heading-1": {
     Tag: "h1",
-    className: "text-3xl mt-18 font-bold",
+    className:
+      "text-(length:--editor-heading-1-s) mt-(--editor-heading-1-mt) font-bold",
   },
   "heading-2": {
     Tag: "h2",
-    className: "text-2xl mt-13 font-bold",
+    className:
+      "text-(length:--editor-heading-2-s) mt-(--editor-heading-2-mt) font-bold",
   },
   "heading-3": {
     Tag: "h3",
-    className: "text-xl mt-9 font-semibold",
+    className:
+      "text-(length:--editor-heading-3-s) mt-(--editor-heading-3-mt) font-semibold",
   },
   "heading-4": {
     Tag: "h4",
-    className: "text-lg mt-7 font-medium",
+    className:
+      "text-(length:--editor-heading-4-s) mt-(--editor-heading-4-mt) font-medium",
   },
 };
 

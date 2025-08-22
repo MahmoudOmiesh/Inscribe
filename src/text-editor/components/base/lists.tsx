@@ -58,8 +58,8 @@ function UnorderedListNested({
   return (
     <ul
       className={cn(
-        "pl-6 leading-[1.6]",
-        level === 0 && "my-6 list-[disc]",
+        "pl-(--editor-ul-pl) leading-[1.6]",
+        level === 0 && "my-(--editor-ul-my) list-[disc]",
         level === 1 && "list-[circle]",
         level >= 2 && "list-[square]",
       )}
@@ -123,8 +123,8 @@ function OrderedListNested({
   return (
     <ol
       className={cn(
-        "pl-6 leading-[1.6]",
-        level === 0 && "my-6 list-[decimal]",
+        "pl-(--editor-ol-pl) text-(length:--editor-ol-s) leading-[1.6]",
+        level === 0 && "my-(--editor-ol-my) list-[decimal]",
         level === 1 && "list-[lower-alpha]",
         level >= 2 && "list-[lower-roman]",
       )}
@@ -192,7 +192,10 @@ function CheckListNested({
   const rest = isRoot ? getReferenceProps() : {};
   return (
     <ul
-      className={cn("pl-1 leading-[1.6]", level === 0 && "my-6")}
+      className={cn(
+        "pl-(--editor-cl-pl) text-(length:--editor-cl-s) leading-[1.6]",
+        level === 0 && "my-(--editor-cl-my)",
+      )}
       ref={ref}
       {...rest}
     >
