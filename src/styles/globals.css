@@ -40,7 +40,7 @@
   --font-sans: var(--font-sans), ui-sans-serif, sans-serif, system-ui;
   --font-serif: var(--font-serif), serif;
   --font-mono: var(--font-mono), monospace;
-  --radius: 1rem;
+  --radius: 0.65rem;
   --shadow-2xs: 0px 0px 5px 1.5px hsl(240 4% 60% / 0.09);
   --shadow-xs: 0px 0px 5px 1.5px hsl(240 4% 60% / 0.09);
   --shadow-sm:
@@ -99,7 +99,7 @@
   --font-sans: var(--font-sans), ui-sans-serif, sans-serif, system-ui;
   --font-serif: var(--font-serif), serif;
   --font-mono: var(--font-mono), monospace;
-  --radius: 1rem;
+  --radius: 0.65rem;
   --shadow-2xs: 0px 0px 5px 1.5px hsl(0 0% 0% / 0.09);
   --shadow-xs: 0px 0px 5px 1.5px hsl(0 0% 0% / 0.09);
   --shadow-sm:

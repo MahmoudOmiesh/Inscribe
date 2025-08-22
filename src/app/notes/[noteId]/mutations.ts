@@ -138,6 +138,20 @@ export const NOTE_MUTATIONS = {
     return updateFullWidth;
   },
 
+  updateFolder: () => {
+    const utils = api.useUtils();
+
+    const updateFolder = api.note.updateFolder.useMutation({
+      meta: {
+        subscribeToMutationStatus: true,
+        invalidateQueries: () => utils.folder.getNotes.invalidate(),
+        onSuccessMessage: "Note moved to folder",
+      },
+    });
+
+    return updateFolder;
+  },
+
   duplicate: (folderId: number) => {
     const router = useRouter();
     const utils = api.useUtils();

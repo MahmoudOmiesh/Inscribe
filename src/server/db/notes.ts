@@ -1,5 +1,6 @@
 import type {
   NoteContentUpdate,
+  NoteFolderUpdate,
   NoteFontUpdate,
   NoteFullWidthUpdate,
   NoteLockedUpdate,
@@ -183,6 +184,14 @@ export const _notes = {
         where: { id: noteId, userId },
         data: { fullWidth: data.fullWidth },
         select: { id: true, fullWidth: true },
+      });
+    },
+
+    updateFolder: (noteId: number, userId: string, data: NoteFolderUpdate) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { folderId: data.folderId },
+        select: { id: true, folderId: true },
       });
     },
   },

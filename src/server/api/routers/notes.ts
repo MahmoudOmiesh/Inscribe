@@ -5,6 +5,7 @@ import z from "zod";
 import { TRPCError } from "@trpc/server";
 import {
   noteContentUpdateSchema,
+  noteFolderUpdateSchema,
   noteFontUpdateSchema,
   noteFullWidthUpdateSchema,
   noteLockedUpdateSchema,
@@ -75,6 +76,12 @@ const NOTE_ERRORS = {
     internal: {
       code: "INTERNAL_SERVER_ERROR" as const,
       message: "Failed to update note full width",
+    },
+  },
+  updateFolder: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note folder",
     },
   },
 };
@@ -239,6 +246,24 @@ export const noteRouter = createTRPCRouter({
 
       if (error) {
         throw new TRPCError(NOTE_ERRORS.updateFullWidth.internal);
+      }
+
+      return data;
+    }),
+
+  updateFolder: authedProcedure
+    .input(noteFolderUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateFolder(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateFolder.internal);
       }
 
       return data;

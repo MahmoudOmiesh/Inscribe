@@ -27,6 +27,10 @@ export const noteFullWidthUpdateSchema = z.object({
   fullWidth: z.boolean(),
 });
 
+export const noteFolderUpdateSchema = z.object({
+  folderId: z.number(),
+});
+
 export type Note = RouterOutputs["note"]["get"];
 export type NoteTitleUpdate = z.infer<typeof noteTitleUpdateSchema>;
 export type NoteContentUpdate = z.infer<typeof noteContentUpdateSchema>;
@@ -34,3 +38,4 @@ export type NoteFontUpdate = z.infer<typeof noteFontUpdateSchema>;
 export type NoteSmallTextUpdate = z.infer<typeof noteSmallTextUpdateSchema>;
 export type NoteLockedUpdate = z.infer<typeof noteLockedUpdateSchema>;
 export type NoteFullWidthUpdate = z.infer<typeof noteFullWidthUpdateSchema>;
+export type NoteFolderUpdate = z.infer<typeof noteFolderUpdateSchema>;
