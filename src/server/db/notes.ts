@@ -1,4 +1,11 @@
-import type { NoteContentUpdate, NoteTitleUpdate } from "@/lib/schema/note";
+import type {
+  NoteContentUpdate,
+  NoteFontUpdate,
+  NoteFullWidthUpdate,
+  NoteLockedUpdate,
+  NoteSmallTextUpdate,
+  NoteTitleUpdate,
+} from "@/lib/schema/note";
 import { db } from "./root";
 import type { Prisma } from "@prisma/client";
 import type { EditorNode } from "@/text-editor/model/schema";
@@ -23,9 +30,15 @@ export const _notes = {
           id: true,
           title: true,
           content: true,
+
           isFavorite: true,
           isArchived: true,
           isTrashed: true,
+
+          font: true,
+          smallText: true,
+          fullWidth: true,
+          locked: true,
 
           folderId: true,
           createdAt: true,
@@ -112,6 +125,7 @@ export const _notes = {
       });
     },
 
+    //TODO: change this to take a boolean instead of toggling
     toggleFavorite: async (noteId: number, userId: string) => {
       const note = await db.note.findUnique({
         where: { id: noteId, userId },
@@ -129,6 +143,46 @@ export const _notes = {
           id: true,
           isFavorite: true,
         },
+      });
+    },
+
+    updateFont: (noteId: number, userId: string, data: NoteFontUpdate) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { font: data.font },
+        select: { id: true, font: true },
+      });
+    },
+
+    updateSmallText: (
+      noteId: number,
+      userId: string,
+      data: NoteSmallTextUpdate,
+    ) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { smallText: data.smallText },
+        select: { id: true, smallText: true },
+      });
+    },
+
+    updateLocked: (noteId: number, userId: string, data: NoteLockedUpdate) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { locked: data.locked },
+        select: { id: true, locked: true },
+      });
+    },
+
+    updateFullWidth: (
+      noteId: number,
+      userId: string,
+      data: NoteFullWidthUpdate,
+    ) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { fullWidth: data.fullWidth },
+        select: { id: true, fullWidth: true },
       });
     },
   },

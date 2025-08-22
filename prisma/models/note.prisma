@@ -10,6 +10,11 @@ model Note {
   isTrashed  Boolean @default(false)
   isFavorite Boolean @default(false)
 
+  font      Font    @default(default)
+  smallText Boolean @default(false)
+  locked    Boolean @default(false)
+  fullWidth Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -21,4 +26,10 @@ model Note {
 
   @@index([userId, folderId, sortOrder])
   @@map("note")
+}
+
+enum Font {
+  default
+  serif
+  mono
 }

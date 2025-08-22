@@ -28,6 +28,9 @@ export type MarkType =
 export const ALIGNMENT_TYPES = ["left", "center", "right", "justify"] as const;
 export type Alignment = (typeof ALIGNMENT_TYPES)[number];
 
+export const FONT_TYPES = ["default", "serif", "mono"] as const;
+export type FontType = (typeof FONT_TYPES)[number];
+
 export const HIGHLIGHT_COLORS_CSS = {
   red: "rgb(244 67 54 / 0.28)",
   yellow: "rgb(255 193 7 / 0.28)",

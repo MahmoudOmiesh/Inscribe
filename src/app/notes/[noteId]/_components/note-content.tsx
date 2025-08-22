@@ -5,6 +5,7 @@ import { TextEditor } from "@/text-editor/text-editor";
 import { useNoteEditor } from "./note-editor-context";
 import { api } from "@/trpc/react";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import { cn } from "@/lib/utils";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
@@ -21,7 +22,12 @@ export function NoteContent() {
   );
 
   return (
-    <div className="grid flex-1 grid-cols-[1fr_2fr_1fr] grid-rows-[auto_1fr] gap-y-6 pt-26 pb-40">
+    <div
+      className={cn(
+        "grid flex-1 grid-rows-[auto_1fr] gap-y-6 pt-26 pb-40",
+        note.fullWidth ? "grid-cols-[1fr_10fr_1fr]" : "grid-cols-[1fr_2fr_1fr]",
+      )}
+    >
       <div className="col-start-2">
         <NoteTitle />
       </div>
@@ -32,6 +38,11 @@ export function NoteContent() {
           onContentChange={(content) => {
             // console.log(content);
             debouncedUpdateContentMutate({ noteId: note.id, content });
+          }}
+          options={{
+            font: note.font,
+            smallText: note.smallText,
+            locked: note.locked,
           }}
         />
       </div>

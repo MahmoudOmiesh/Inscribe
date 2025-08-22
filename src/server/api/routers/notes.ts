@@ -5,6 +5,10 @@ import z from "zod";
 import { TRPCError } from "@trpc/server";
 import {
   noteContentUpdateSchema,
+  noteFontUpdateSchema,
+  noteFullWidthUpdateSchema,
+  noteLockedUpdateSchema,
+  noteSmallTextUpdateSchema,
   noteTitleUpdateSchema,
 } from "@/lib/schema/note";
 
@@ -47,6 +51,30 @@ const NOTE_ERRORS = {
     internal: {
       code: "INTERNAL_SERVER_ERROR" as const,
       message: "Failed to toggle favorite",
+    },
+  },
+  updateFont: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note font",
+    },
+  },
+  updateSmallText: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note small text",
+    },
+  },
+  updateLocked: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note locked",
+    },
+  },
+  updateFullWidth: {
+    internal: {
+      code: "INTERNAL_SERVER_ERROR" as const,
+      message: "Failed to update note full width",
     },
   },
 };
@@ -143,6 +171,74 @@ export const noteRouter = createTRPCRouter({
 
       if (error) {
         throw new TRPCError(NOTE_ERRORS.toggleFavorite.internal);
+      }
+
+      return data;
+    }),
+
+  updateFont: authedProcedure
+    .input(noteFontUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateFont(input.noteId, ctx.session.user.id, input),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateFont.internal);
+      }
+
+      return data;
+    }),
+
+  updateSmallText: authedProcedure
+    .input(noteSmallTextUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateSmallText(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateSmallText.internal);
+      }
+
+      return data;
+    }),
+
+  updateLocked: authedProcedure
+    .input(noteLockedUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateLocked(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateLocked.internal);
+      }
+
+      return data;
+    }),
+
+  updateFullWidth: authedProcedure
+    .input(noteFullWidthUpdateSchema.extend({ noteId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data, error } = await tryCatch(
+        DB.notes.mutations.updateFullWidth(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
+      );
+
+      if (error) {
+        throw new TRPCError(NOTE_ERRORS.updateFullWidth.internal);
       }
 
       return data;

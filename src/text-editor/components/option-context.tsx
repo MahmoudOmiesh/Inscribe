@@ -1,7 +1,8 @@
 import { createContext, use } from "react";
+import type { FontType } from "../model/schema";
 
 export interface EditorOptions {
-  font?: "default" | "serif" | "mono";
+  font?: FontType;
   locked?: boolean;
   smallText?: boolean;
 }
