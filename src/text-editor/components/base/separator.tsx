@@ -18,7 +18,7 @@ export const Separator = memo(
         ref={setReference}
         contentEditable={false}
         data-node-id={node.id}
-        className="py-4"
+        className="my-[var(--editor-separator-my)] py-[var(--editor-separator-py)]"
       >
         <hr />
       </div>

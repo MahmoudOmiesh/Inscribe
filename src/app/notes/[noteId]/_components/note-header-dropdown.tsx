@@ -28,12 +28,30 @@ import {
 } from "lucide-react";
 import { useNoteEditor } from "./note-editor-context";
 import { NOTE_MUTATIONS } from "../mutations";
-import { FONT_TYPES } from "@/text-editor/model/schema";
+import {
+  EXPORT_FORMATS,
+  FONT_TYPES,
+  type ExportFormat,
+} from "@/text-editor/model/schema";
 import { api } from "@/trpc/react";
 import { Spinner } from "@/components/spinner";
 import { Input } from "@/components/ui/input";
-import { DownloadError } from "ai";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { exportToMarkdown } from "@/text-editor/export/md";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
@@ -42,6 +60,8 @@ export function NoteHeaderDropdown() {
   const updateSmallText = NOTE_MUTATIONS.updateSmallText(note.id);
   const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
   const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
+
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   const canUndoOrRedo = editor.canUndo || editor.canRedo;
 
@@ -89,7 +109,7 @@ export function NoteHeaderDropdown() {
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent sideOffset={10}>
-                  <FolderDropdown />
+                  <MoveToDropdown />
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
@@ -164,17 +184,99 @@ export function NoteHeaderDropdown() {
           )}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
               <ArrowRightFromLineIcon className="-rotate-90" /> Export
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ExportDialog
+        isOpen={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+      />
     </>
   );
 }
 
-function FolderDropdown() {
+function ExportDialog({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { editor, note } = useNoteEditor();
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
+
+  function handleExport() {
+    switch (exportFormat) {
+      case "pdf":
+        break;
+      case "html":
+        break;
+      case "markdown":
+        const markdown = exportToMarkdown(editor.state.nodes);
+        const blob = new Blob([markdown], { type: "text/markdown" });
+        downloadFile(blob, `${note.title}-${note.id}-export.md`);
+        break;
+      default:
+        const _: never = exportFormat;
+        return _;
+    }
+
+    onOpenChange(false);
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="p-4 sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Export</DialogTitle>
+        </DialogHeader>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground flex-1 text-sm">
+            Export format
+          </span>
+          <Select
+            value={exportFormat}
+            onValueChange={(value) => setExportFormat(value as ExportFormat)}
+          >
+            <SelectTrigger size="sm">
+              <SelectValue placeholder="Select format" />
+            </SelectTrigger>
+            <SelectContent>
+              {EXPORT_FORMATS.map((format) => (
+                <SelectItem key={format} value={format}>
+                  {format}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <DialogFooter className="mt-3">
+          <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={handleExport}>
+            Export
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function downloadFile(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function MoveToDropdown() {
   const [search, setSearch] = useState("");
   const { data: folders, isPending, isError } = api.user.getFolders.useQuery();
   const { note } = useNoteEditor();

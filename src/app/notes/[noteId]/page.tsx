@@ -73,4 +73,8 @@ function SuspenseFallback() {
 
 //TODO:
 // - fix race condition when spamming a muatation with optimistic update
-// add export function
+// - add export function
+// - figure out optimistic updates / no optismistic updates situation
+// - database performance stuff
+// -- indexes
+// -- pagination + useInfiniteQuery

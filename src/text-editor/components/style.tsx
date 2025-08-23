@@ -34,6 +34,9 @@ export const editorVariables: {
     "--editor-blockquote-pl": "1rem",
     "--editor-blockquote-my": "1.5rem",
     "--editor-blockquote-py": "0.375rem",
+
+    "--editor-separator-py": "0.5rem",
+    "--editor-separator-my": "1.5rem",
   } as CSSProperties,
   small: {
     "--editor-heading-1-s": "1.5rem",
@@ -65,5 +68,8 @@ export const editorVariables: {
     "--editor-blockquote-pl": "0.75rem",
     "--editor-blockquote-my": "1.25rem",
     "--editor-blockquote-py": "0.25rem",
+
+    "--editor-separator-py": "0.25rem",
+    "--editor-separator-my": "1.25rem",
   } as CSSProperties,
 };
