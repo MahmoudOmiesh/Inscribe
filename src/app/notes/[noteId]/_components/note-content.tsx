@@ -22,16 +22,17 @@ export function NoteContent() {
   );
 
   return (
+    // <div>
     <div
       className={cn(
-        "grid flex-1 grid-rows-[auto_1fr] gap-y-6 pt-26 pb-40",
-        note.fullWidth ? "grid-cols-[1fr_10fr_1fr]" : "grid-cols-[1fr_2fr_1fr]",
+        "mx-auto w-full flex-1 px-4 py-20",
+        note.fullWidth ? "max-w-screen-xl" : "max-w-3xl",
       )}
     >
-      <div className="col-start-2">
+      <div className="mb-8 w-full">
         <NoteTitle />
       </div>
-      <div className="col-start-2">
+      <div className="w-full">
         <TextEditor
           editor={editor}
           actions={actions}
@@ -46,6 +47,7 @@ export function NoteContent() {
           }}
         />
       </div>
+      {/* </div> */}
     </div>
   );
 }

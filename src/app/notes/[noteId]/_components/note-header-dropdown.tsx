@@ -52,6 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { exportToMarkdown } from "@/text-editor/export/md";
+import { exportToHtml } from "@/text-editor/export/html";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
@@ -207,19 +208,22 @@ function ExportDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { editor, note } = useNoteEditor();
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("html");
 
   function handleExport() {
     switch (exportFormat) {
-      case "pdf":
+      case "html": {
+        const html = exportToHtml(editor.state.nodes, note);
+        const blob = new Blob([html], { type: "text/html" });
+        downloadFile(blob, `${note.title}-${note.id}-export.html`);
         break;
-      case "html":
-        break;
-      case "markdown":
+      }
+      case "markdown": {
         const markdown = exportToMarkdown(editor.state.nodes);
         const blob = new Blob([markdown], { type: "text/markdown" });
-        downloadFile(blob, `${note.title}-${note.id}-export.md`);
+        downloadFile(blob, `${note.title}-${note.id}-export.${exportFormat}`);
         break;
+      }
       default:
         const _: never = exportFormat;
         return _;

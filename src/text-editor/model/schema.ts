@@ -28,7 +28,7 @@ export type MarkType =
 export const ALIGNMENT_TYPES = ["left", "center", "right", "justify"] as const;
 export type Alignment = (typeof ALIGNMENT_TYPES)[number];
 
-export const EXPORT_FORMATS = ["pdf", "html", "markdown"] as const;
+export const EXPORT_FORMATS = ["html", "markdown"] as const;
 export type ExportFormat = (typeof EXPORT_FORMATS)[number];
 
 export const FONT_TYPES = ["default", "serif", "mono"] as const;

@@ -56,6 +56,8 @@ function generateText(text: string, marks: Mark[]) {
   for (let i = 0; i < boundaries.length - 1; i++) {
     const start = boundaries[i]!;
     const end = boundaries[i + 1]!;
+    if (start >= end) continue;
+
     const marksInRange = marks.filter(
       (mark) => mark.start <= start && mark.end >= end,
     );

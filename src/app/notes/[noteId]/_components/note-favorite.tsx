@@ -15,7 +15,7 @@ export function NoteFavorite() {
         size="icon"
         onClick={() => {
           // prevent spamming which causes race conditions
-          if (toggleFavorite.isPending) return;
+          // if (toggleFavorite.isPending) return;
           toggleFavorite.mutate({ noteId: note.id });
         }}
       >

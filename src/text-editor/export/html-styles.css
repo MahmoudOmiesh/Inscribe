@@ -1,0 +1,143 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  line-height: 1.5;
+}
+
+body {
+  line-height: inherit;
+  color: rgb(55, 53, 47);
+  max-width: 900px;
+  margin-inline: auto;
+  margin-block: 5rem;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+
+.editor > h1,
+.editor > h2,
+.editor > h3,
+.editor > h4,
+.editor > p,
+.editor li > p,
+.editor li > span,
+.editor > blockquote {
+  white-space: pre-wrap;
+}
+
+.editor > :first-child {
+  margin-top: 0;
+}
+
+.editor > h1 {
+  font-size: var(--editor-heading-1-s);
+  margin-top: var(--editor-heading-1-mt);
+  font-weight: 700;
+}
+.editor > h2 {
+  font-size: var(--editor-heading-2-s);
+  margin-top: var(--editor-heading-2-mt);
+  font-weight: 700;
+}
+.editor > h3 {
+  font-size: var(--editor-heading-3-s);
+  margin-top: var(--editor-heading-3-mt);
+  font-weight: 600;
+}
+.editor > h4 {
+  font-size: var(--editor-heading-4-s);
+  margin-top: var(--editor-heading-4-mt);
+  font-weight: 500;
+}
+
+.editor > p {
+  font-size: var(--editor-paragraph-s);
+  margin-top: var(--editor-paragraph-mt);
+}
+
+.editor > ul {
+  margin-block: var(--editor-ul-my);
+}
+
+.editor ul {
+  padding-left: var(--editor-ul-pl);
+}
+
+.editor > ol {
+  margin-block: var(--editor-ol-my);
+}
+
+.editor ol {
+  padding-left: var(--editor-ol-pl);
+}
+
+.editor ul,
+.editor ol {
+  line-height: 1.6;
+}
+
+/* nested list styles */
+.editor ul {
+  list-style: disc;
+}
+.editor ul ul {
+  list-style: circle;
+}
+.editor ul ul ul {
+  list-style: square;
+}
+
+.editor ol {
+  list-style: decimal;
+}
+.editor ol ol {
+  list-style: lower-alpha;
+}
+.editor ol ol ol {
+  list-style: lower-roman;
+}
+
+/* blockquote */
+.editor > blockquote {
+  position: relative;
+  margin-block: var(--editor-blockquote-my);
+  padding-block: var(--editor-blockquote-py);
+  padding-left: var(--editor-blockquote-pl);
+  font-size: var(--editor-blockquote-s);
+}
+
+.editor > blockquote::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0.25rem;
+  background-color: #202020;
+}
+
+/* separator */
+.editor > hr {
+  margin-block: var(--editor-separator-my);
+}
+
+.editor code {
+  background-color: rgba(135, 131, 120, 0.15);
+  color: #eb5757;
+  border-radius: 0.125rem;
+  padding-inline: 0.125rem 0.25rem;
+}
+
+.editor mark {
+  color: inherit;
+}
