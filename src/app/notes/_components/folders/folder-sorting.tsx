@@ -7,8 +7,6 @@ import { createContext, use, useState } from "react";
 const FolderSortingContext = createContext<{
   isSorting: boolean;
   setIsSorting: (isSorting: boolean) => void;
-  isMutating: boolean;
-  setIsMutating: (isMutating: boolean) => void;
 } | null>(null);
 
 export function FolderSortingProvider({
@@ -17,11 +15,8 @@ export function FolderSortingProvider({
   children: React.ReactNode;
 }) {
   const [isSorting, setIsSorting] = useState(false);
-  const [isMutating, setIsMutating] = useState(false);
   return (
-    <FolderSortingContext.Provider
-      value={{ isSorting, setIsSorting, isMutating, setIsMutating }}
-    >
+    <FolderSortingContext.Provider value={{ isSorting, setIsSorting }}>
       {children}
     </FolderSortingContext.Provider>
   );
@@ -38,9 +33,7 @@ export function useFolderSorting() {
 }
 
 export function FolderSortingButton() {
-  const { isSorting, setIsSorting, isMutating } = useFolderSorting();
-
-  if (isMutating) return null;
+  const { isSorting, setIsSorting } = useFolderSorting();
 
   return (
     <Button

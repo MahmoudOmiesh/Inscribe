@@ -5,6 +5,7 @@ import z from "zod";
 import { TRPCError } from "@trpc/server";
 import {
   noteContentUpdateSchema,
+  noteFavoriteUpdateSchema,
   noteFolderUpdateSchema,
   noteFontUpdateSchema,
   noteFullWidthUpdateSchema,
@@ -170,10 +171,16 @@ export const noteRouter = createTRPCRouter({
     }),
 
   toggleFavorite: authedProcedure
-    .input(z.object({ noteId: z.number() }))
+    .input(noteFavoriteUpdateSchema.extend({ noteId: z.number() }))
     .mutation(async ({ ctx, input }) => {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
       const { data, error } = await tryCatch(
-        DB.notes.mutations.toggleFavorite(input.noteId, ctx.session.user.id),
+        DB.notes.mutations.toggleFavorite(
+          input.noteId,
+          ctx.session.user.id,
+          input,
+        ),
       );
 
       if (error) {

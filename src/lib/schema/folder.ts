@@ -1,6 +1,21 @@
 import type { RouterOutputs } from "@/trpc/react";
 import z from "zod";
 
+export interface LocalFolder {
+  id: string;
+  userId: string;
+  serverId: string | null;
+
+  emoji: string;
+  name: string;
+  sortOrder: number;
+
+  createdAt: number;
+  updatedAt: number;
+
+  lastSyncedAt: number | null;
+}
+
 export const folderInsertSchema = z.object({
   emoji: z.string().min(1, "Emoji is required"),
   name: z.string().min(1, "Folder name is required"),
@@ -8,7 +23,7 @@ export const folderInsertSchema = z.object({
 
 export const folderOrderSchema = z.array(
   z.object({
-    id: z.number(),
+    id: z.string(),
     order: z.number().positive().int(),
   }),
 );

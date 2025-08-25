@@ -11,7 +11,7 @@ declare module "@tanstack/react-query" {
   interface Register {
     mutationMeta: {
       invalidateQueries?: (() => Promise<void>) | (() => Promise<void>)[];
-      toastOnError?: boolean;
+      toastOnError?: boolean | string;
       onSuccessMessage?: string;
       subscribeToMutationStatus?: boolean;
     };
@@ -50,7 +50,9 @@ export const createQueryClient = () =>
       onError: (error, _v, _c, mutation) => {
         const toastOnError = mutation.meta?.toastOnError;
         if (toastOnError === undefined || toastOnError) {
-          toast.error(error.message);
+          toast.error(
+            typeof toastOnError === "string" ? toastOnError : error.message,
+          );
         }
 
         if (mutation.meta?.subscribeToMutationStatus) {

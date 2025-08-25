@@ -29,10 +29,9 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/spinner";
 import {
   folderInsertSchema,
-  type Folder,
   type FolderInsert,
+  type LocalFolder,
 } from "@/lib/schema/folder";
-import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import {
@@ -49,6 +48,13 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { useForm } from "react-hook-form";
+import {
+  createLocalFolder,
+  deleteLocalFolder,
+  updateLocalFolder,
+} from "@/local/mutations/folders";
+import { useMutation } from "@tanstack/react-query";
+import { useUserId } from "../user-context";
 
 export function FolderCreateDialog({
   children,
@@ -56,19 +62,21 @@ export function FolderCreateDialog({
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const userId = useUserId();
 
-  const utils = api.useUtils();
-  const createFolder = api.folder.create.useMutation({
+  const createFolder = useMutation({
+    mutationFn: createLocalFolder,
+    onMutate: () => setIsDialogOpen(false),
     meta: {
-      invalidateQueries: () => utils.user.getFolders.invalidate(),
-    },
-    onSettled: () => {
-      setIsDialogOpen(false);
+      toastOnError: "Failed to create folder. Please try again.",
     },
   });
 
   function handleSubmit(data: FolderInsert) {
-    createFolder.mutate(data);
+    createFolder.mutate({
+      userId,
+      data,
+    });
   }
 
   return (
@@ -78,10 +86,7 @@ export function FolderCreateDialog({
         <DialogHeader>
           <DialogTitle>Create a Folder</DialogTitle>
         </DialogHeader>
-        <FolderForm
-          isPending={createFolder.isPending}
-          onSubmit={handleSubmit}
-        />
+        <FolderForm onSubmit={handleSubmit} />
       </DialogContent>
     </Dialog>
   );
@@ -91,25 +96,23 @@ export function FolderRenameDialog({
   folder,
   children,
 }: {
-  folder: Folder;
+  folder: LocalFolder;
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const utils = api.useUtils();
-  const updateFolder = api.folder.update.useMutation({
+  const updateFolder = useMutation({
+    mutationFn: updateLocalFolder,
+    onMutate: () => setIsDialogOpen(false),
     meta: {
-      invalidateQueries: () => utils.user.getFolders.invalidate(),
-    },
-    onSettled: () => {
-      setIsDialogOpen(false);
+      toastOnError: "Failed to rename folder. Please try again.",
     },
   });
 
   function handleSubmit(data: FolderInsert) {
     updateFolder.mutate({
       folderId: folder.id,
-      ...data,
+      data,
     });
   }
 
@@ -121,7 +124,6 @@ export function FolderRenameDialog({
           <DialogTitle>Rename Folder</DialogTitle>
         </DialogHeader>
         <FolderForm
-          isPending={updateFolder.isPending}
           onSubmit={handleSubmit}
           defaultValues={{ name: folder.name, emoji: folder.emoji }}
           isEdit
@@ -135,18 +137,16 @@ export function FolderDeleteDialog({
   folderId,
   children,
 }: {
-  folderId: number;
+  folderId: string;
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const utils = api.useUtils();
-  const deleteFolder = api.folder.delete.useMutation({
+  const deleteFolder = useMutation({
+    mutationFn: deleteLocalFolder,
+    onMutate: () => setIsDialogOpen(false),
     meta: {
-      invalidateQueries: () => utils.user.getFolders.invalidate(),
-    },
-    onSettled: () => {
-      setIsDialogOpen(false);
+      toastOnError: "Failed to delete folder. Please try again.",
     },
   });
 
@@ -180,11 +180,9 @@ export function FolderDeleteDialog({
 function FolderForm({
   defaultValues,
   onSubmit,
-  isPending,
   isEdit = false,
 }: {
   onSubmit: (data: FolderInsert) => void;
-  isPending: boolean;
   defaultValues?: FolderInsert;
   isEdit?: boolean;
 }) {
@@ -263,10 +261,7 @@ function FolderForm({
               <Button variant="outline">Cancel</Button>
             </DialogClose>
 
-            <Button type="submit" disabled={isPending}>
-              {isEdit ? "Update" : "Create"}
-              {isPending && <Spinner />}
-            </Button>
+            <Button type="submit">{isEdit ? "Update" : "Create"}</Button>
           </div>
         </div>
       </form>

@@ -9,9 +9,11 @@ import { cn } from "@/lib/utils";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
+  const utils = api.useUtils();
 
   const updateContent = api.note.updateContent.useMutation({
     meta: {
+      // invalidateQueries: () => utils.note.get.invalidate({ noteId: note.id }),
       subscribeToMutationStatus: true,
     },
   });
@@ -25,7 +27,7 @@ export function NoteContent() {
     // <div>
     <div
       className={cn(
-        "mx-auto w-full flex-1 px-4 py-20",
+        "mx-auto w-full flex-1 px-4 py-30",
         note.fullWidth ? "max-w-screen-xl" : "max-w-3xl",
       )}
     >
@@ -38,7 +40,7 @@ export function NoteContent() {
           actions={actions}
           onContentChange={(content) => {
             // console.log(content);
-            debouncedUpdateContentMutate({ noteId: note.id, content });
+            // debouncedUpdateContentMutate({ noteId: note.id, content });
           }}
           options={{
             font: note.font,

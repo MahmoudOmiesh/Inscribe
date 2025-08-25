@@ -1,5 +1,6 @@
 import type {
   NoteContentUpdate,
+  NoteFavoriteUpdate,
   NoteFolderUpdate,
   NoteFontUpdate,
   NoteFullWidthUpdate,
@@ -127,19 +128,14 @@ export const _notes = {
     },
 
     //TODO: change this to take a boolean instead of toggling
-    toggleFavorite: async (noteId: number, userId: string) => {
-      const note = await db.note.findUnique({
-        where: { id: noteId, userId },
-        select: { isFavorite: true },
-      });
-
-      if (note === null) {
-        throw new Error("Note not found");
-      }
-
+    toggleFavorite: async (
+      noteId: number,
+      userId: string,
+      data: NoteFavoriteUpdate,
+    ) => {
       return db.note.update({
         where: { id: noteId, userId },
-        data: { isFavorite: !note.isFavorite },
+        data: { isFavorite: data.isFavorite },
         select: {
           id: true,
           isFavorite: true,

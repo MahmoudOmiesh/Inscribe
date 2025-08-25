@@ -10,7 +10,7 @@ import {
   SidebarGroupContent,
   SidebarMenu,
 } from "@/components/ui/sidebar";
-import { api, HydrateClient } from "@/trpc/server";
+import { HydrateClient } from "@/trpc/server";
 import { PlusIcon } from "lucide-react";
 import { FolderSortingButton, FolderSortingProvider } from "./folder-sorting";
 import { FolderCreateDialog } from "./folder-dialogs";
@@ -18,8 +18,6 @@ import { FoldersList } from "./folder-list";
 import { ErrorSuspenseBoundary } from "@/components/error-suspense-boundary";
 
 export function NotesSidebarFolders() {
-  void api.user.getFolders.prefetch();
-
   return (
     <HydrateClient>
       <FolderSortingProvider>
