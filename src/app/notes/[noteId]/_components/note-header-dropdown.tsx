@@ -59,11 +59,20 @@ import {
   updateLocalNoteFullWidth,
   updateLocalNoteLocked,
   updateLocalNoteSmallText,
+  updateLocalNoteTrash,
 } from "@/local/mutations/notes";
 import { useLocalFolders } from "@/local/queries/folders";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
+
+  const updateTrash = useMutation({
+    mutationFn: (isTrashed: boolean) =>
+      updateLocalNoteTrash({ noteId: note.id, data: { isTrashed } }),
+    meta: {
+      toastOnError: "Failed to move to trash, please try again.",
+    },
+  });
 
   const updateFont = useMutation({
     mutationFn: (font: FontType) =>
@@ -88,6 +97,7 @@ export function NoteHeaderDropdown() {
       toastOnError: "Failed to update locked, please try again.",
     },
   });
+
   const updateFullWidth = useMutation({
     mutationFn: (fullWidth: boolean) =>
       updateLocalNoteFullWidth({ noteId: note.id, data: { fullWidth } }),
@@ -109,114 +119,132 @@ export function NoteHeaderDropdown() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="shadow-sm">
-          <DropdownMenuGroup className="grid grid-cols-3 gap-2">
-            {FONT_TYPES.map((font) => (
-              <DropdownMenuItem
-                key={font}
-                className="flex flex-col items-center gap-0"
-                variant={note.font === font ? "primary" : "default"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  updateFont.mutate(font);
-                }}
-              >
-                <span className="text-xl font-semibold">Aa</span>
-                <span className="text-xs">{font}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(window.location.href)
-              }
-            >
-              <LinkIcon /> Copy link
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <CopyIcon /> Duplicate
-            </DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center gap-2">
-                <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
-                Move to
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent sideOffset={10}>
-                  <MoveToDropdown />
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-            <DropdownMenuItem>
-              <Trash2Icon /> Move to Trash
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.preventDefault();
-                updateSmallText.mutate(!note.smallText);
-              }}
-            >
-              <AArrowDown /> Small text{" "}
-              <Switch
-                id="small-text"
-                className="pointer-events-none ml-auto"
-                checked={note.smallText}
-              />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.preventDefault();
-                updateFullWidth.mutate(!note.fullWidth);
-              }}
-            >
-              <Maximize2Icon className="rotate-45" /> Full width{" "}
-              <Switch
-                id="full-width"
-                className="pointer-events-none ml-auto"
-                checked={note.fullWidth}
-              />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.preventDefault();
-                updateLocked.mutate(!note.locked);
-              }}
-            >
-              <LockKeyholeOpenIcon /> Lock page{" "}
-              <Switch
-                id="lock-page"
-                className="pointer-events-none ml-auto"
-                checked={note.locked}
-              />
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          {canUndoOrRedo && (
+          {note.isTrashed ? (
             <>
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => updateTrash.mutate(false)}>
+                  <Trash2Icon /> Restore from trash
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                {editor.canUndo && (
-                  <DropdownMenuItem onClick={() => editor.undo()}>
-                    <Undo2Icon /> Undo
+                <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
+                  <ArrowRightFromLineIcon className="-rotate-90" /> Export
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </>
+          ) : (
+            <>
+              <DropdownMenuGroup className="grid grid-cols-3 gap-2">
+                {FONT_TYPES.map((font) => (
+                  <DropdownMenuItem
+                    key={font}
+                    className="flex flex-col items-center gap-0"
+                    variant={note.font === font ? "primary" : "default"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      updateFont.mutate(font);
+                    }}
+                  >
+                    <span className="text-xl font-semibold">Aa</span>
+                    <span className="text-xs">{font}</span>
                   </DropdownMenuItem>
-                )}
-                {editor.canRedo && (
-                  <DropdownMenuItem onClick={() => editor.redo()}>
-                    <Redo2Icon /> Redo
-                  </DropdownMenuItem>
-                )}
+                ))}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigator.clipboard.writeText(window.location.href)
+                  }
+                >
+                  <LinkIcon /> Copy link
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <CopyIcon /> Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="flex items-center gap-2">
+                    <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
+                    Move to
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent sideOffset={10}>
+                      <MoveToDropdown />
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuItem onClick={() => updateTrash.mutate(true)}>
+                  <Trash2Icon /> Move to Trash
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    updateSmallText.mutate(!note.smallText);
+                  }}
+                >
+                  <AArrowDown /> Small text{" "}
+                  <Switch
+                    id="small-text"
+                    className="pointer-events-none ml-auto"
+                    checked={note.smallText}
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    updateFullWidth.mutate(!note.fullWidth);
+                  }}
+                >
+                  <Maximize2Icon className="rotate-45" /> Full width{" "}
+                  <Switch
+                    id="full-width"
+                    className="pointer-events-none ml-auto"
+                    checked={note.fullWidth}
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    updateLocked.mutate(!note.locked);
+                  }}
+                >
+                  <LockKeyholeOpenIcon /> Lock page{" "}
+                  <Switch
+                    id="lock-page"
+                    className="pointer-events-none ml-auto"
+                    checked={note.locked}
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              {canUndoOrRedo && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    {editor.canUndo && (
+                      <DropdownMenuItem onClick={() => editor.undo()}>
+                        <Undo2Icon /> Undo
+                      </DropdownMenuItem>
+                    )}
+                    {editor.canRedo && (
+                      <DropdownMenuItem onClick={() => editor.redo()}>
+                        <Redo2Icon /> Redo
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuGroup>
+                </>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
+                  <ArrowRightFromLineIcon className="-rotate-90" /> Export
+                </DropdownMenuItem>
               </DropdownMenuGroup>
             </>
           )}
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
-              <ArrowRightFromLineIcon className="-rotate-90" /> Export
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 

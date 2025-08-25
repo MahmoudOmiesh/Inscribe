@@ -10,6 +10,7 @@ import type {
   NoteLockedUpdate,
   NoteSmallTextUpdate,
   NoteTitleUpdate,
+  NoteTrashUpdate,
 } from "@/lib/schema/note";
 
 export async function createLocalNote({
@@ -88,6 +89,19 @@ export async function updateLocalNoteFavorite({
   });
 }
 
+export async function updateLocalNoteTrash({
+  noteId,
+  data,
+}: {
+  noteId: string;
+  data: NoteTrashUpdate;
+}) {
+  return localDB.notes.update(noteId, {
+    isTrashed: data.isTrashed,
+    updatedAt: Date.now(),
+  });
+}
+
 export async function updateLocalNoteFont({
   noteId,
   data,
@@ -151,4 +165,8 @@ export async function updateLocalNoteFolder({
     folderId: data.folderId,
     updatedAt: Date.now(),
   });
+}
+
+export async function deleteLocalNote({ noteId }: { noteId: string }) {
+  return localDB.notes.delete(noteId);
 }

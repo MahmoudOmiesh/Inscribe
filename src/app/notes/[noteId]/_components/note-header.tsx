@@ -15,7 +15,7 @@ export function NoteHeader() {
   const { note, editor } = useNoteEditor();
 
   return (
-    <header className="bg-background sticky top-0 flex flex-row items-center justify-between px-4 py-2 text-sm">
+    <header className="bg-background flex flex-row items-center justify-between px-4 py-2 text-sm">
       <div className="flex flex-row items-center gap-2">
         <div className="flex flex-row items-center gap-1">
           <FileIcon size={16} />

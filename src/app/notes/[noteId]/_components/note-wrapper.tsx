@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { LocalNote } from "@/lib/schema/note";
 import Link from "next/link";
 import { Spinner } from "@/components/spinner";
+import { NoteBanner } from "./note-banner";
 
 export function NoteWrapper({ noteId }: { noteId: string }) {
   const note = useLocalNote(noteId);
@@ -22,7 +23,10 @@ export function NoteWrapper({ noteId }: { noteId: string }) {
 
   return (
     <NoteEditorProvider note={note as LocalNote}>
-      <NoteHeader />
+      <div className="sticky top-0 z-10">
+        <NoteHeader />
+        <NoteBanner />
+      </div>
       <NoteContent />
     </NoteEditorProvider>
   );
