@@ -59,7 +59,7 @@ export const noteFullWidthUpdateSchema = z.object({
 });
 
 export const noteFolderUpdateSchema = z.object({
-  folderId: z.number(),
+  folderId: z.string(),
 });
 
 export type Note = RouterOutputs["note"]["get"];

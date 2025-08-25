@@ -2,44 +2,26 @@ import { Button } from "@/components/ui/button";
 import { StarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNoteEditor } from "./note-editor-context";
-import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import { api } from "@/trpc/react";
+import { useMutation } from "@tanstack/react-query";
+import { updateLocalNoteFavorite } from "@/local/mutations/notes";
 
 export function NoteFavorite() {
   const { note } = useNoteEditor();
-  const utils = api.useUtils();
 
-  const toggleFavorite = api.note.toggleFavorite.useMutation({
+  const toggleFavorite = useMutation({
+    mutationFn: (isFavorite: boolean) =>
+      updateLocalNoteFavorite({ noteId: note.id, data: { isFavorite } }),
     meta: {
-      invalidateQueries: () => utils.note.get.invalidate({ noteId: note.id }),
-      subscribeToMutationStatus: true,
+      toastOnError: "Failed to toggle favorite, please try again.",
     },
   });
-
-  const debouncedToggleFavorite = useDebouncedCallback(
-    toggleFavorite.mutate,
-    1000,
-  );
-
-  function handleToggleFavorite() {
-    const isFavorite = !note.isFavorite;
-
-    // Update the note in the cache
-    utils.note.get.setData({ noteId: note.id }, (prevNote) => {
-      if (!prevNote) return prevNote;
-      return { ...prevNote, isFavorite };
-    });
-
-    debouncedToggleFavorite({ noteId: note.id, isFavorite });
-  }
 
   return (
     <div>
       <Button
         variant="ghost"
         size="icon"
-        disabled={toggleFavorite.isPending}
-        onClick={handleToggleFavorite}
+        onClick={() => toggleFavorite.mutate(!note.isFavorite)}
       >
         <StarIcon
           className={cn(note.isFavorite && "fill-yellow-500 text-yellow-500")}

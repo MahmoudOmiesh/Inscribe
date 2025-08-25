@@ -1,6 +1,6 @@
 "use client";
 
-import type { Note } from "@/lib/schema/note";
+import type { LocalNote } from "@/lib/schema/note";
 import { useEditor } from "@/text-editor/hooks/use-editor";
 import { useEditorActions } from "@/text-editor/hooks/use-editor-actions";
 import type { EditorNode } from "@/text-editor/model/schema";
@@ -9,7 +9,7 @@ import { createContext, use } from "react";
 interface NoteEditorContextType {
   editor: ReturnType<typeof useEditor>;
   actions: ReturnType<typeof useEditorActions>;
-  note: Note;
+  note: LocalNote;
 }
 
 const NoteEditorContext = createContext<NoteEditorContextType | null>(null);
@@ -19,9 +19,9 @@ export function NoteEditorProvider({
   note,
 }: {
   children: React.ReactNode;
-  note: Note;
+  note: LocalNote;
 }) {
-  const editor = useEditor(note.content as unknown as EditorNode[]);
+  const editor = useEditor(JSON.parse(note.content) as EditorNode[]);
   const actions = useEditorActions(
     editor.getState,
     editor.dispatch,

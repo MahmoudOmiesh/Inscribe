@@ -176,7 +176,7 @@ export const noteRouter = createTRPCRouter({
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
       const { data, error } = await tryCatch(
-        DB.notes.mutations.toggleFavorite(
+        DB.notes.mutations.updateFavorite(
           input.noteId,
           ctx.session.user.id,
           input,

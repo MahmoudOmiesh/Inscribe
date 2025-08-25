@@ -2,45 +2,25 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import { api } from "@/trpc/react";
 import { useEffect } from "react";
 import { useNoteEditor } from "./note-editor-context";
+import { useMutation } from "@tanstack/react-query";
+import { updateLocalNoteTitle } from "@/local/mutations/notes";
 
 export function NoteTitle() {
   const { note } = useNoteEditor();
-  const utils = api.useUtils();
 
-  const updateTitle = api.note.updateTitle.useMutation({
+  const updateTitle = useMutation({
+    mutationFn: (title: string) =>
+      updateLocalNoteTitle({ noteId: note.id, data: { title } }),
     meta: {
-      invalidateQueries: () => utils.folder.getNotes.invalidate(),
-      subscribeToMutationStatus: true,
+      toastOnError: "Failed to update title, please try again.",
     },
   });
 
-  const debouncedUpdateTitleMutate = useDebouncedCallback(
-    updateTitle.mutate,
-    1000,
-  );
-
   function handleTitleChange(e: React.FormEvent<HTMLTextAreaElement>) {
     const title = (e.target as HTMLTextAreaElement).value;
-
-    // Update the note in the cache
-    utils.note.get.setData({ noteId: note.id }, (prevNote) => {
-      if (!prevNote) return prevNote;
-      return { ...prevNote, title };
-    });
-
-    // Update the note in the folder
-    utils.folder.getNotes.setData({ folderId: note.folderId }, (prevNotes) => {
-      if (!prevNotes) return prevNotes;
-      return prevNotes.map((prevNote) => {
-        if (prevNote.id === note.id) return { ...prevNote, title };
-        return prevNote;
-      });
-    });
-
-    debouncedUpdateTitleMutate({ noteId: note.id, title });
+    updateTitle.mutate(title);
   }
 
   const updateDocumentTitle = useDebouncedCallback((title: string) => {

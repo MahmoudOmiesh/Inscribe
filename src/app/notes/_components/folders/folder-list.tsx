@@ -36,12 +36,14 @@ import {
 } from "./folder-dialogs";
 import { type LocalFolder } from "@/lib/schema/folder";
 import { useFolderSorting } from "./folder-sorting";
-import { api } from "@/trpc/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocalFolders } from "@/local/queries/folders";
 import { useMutation } from "@tanstack/react-query";
 import { reorderLocalFolders } from "@/local/mutations/folders";
+import { NoteList } from "../../[noteId]/_components/note-list";
+import { createLocalNote } from "@/local/mutations/notes";
+import { useUserId } from "../user-context";
 
 export function FoldersList() {
   const { isSorting } = useFolderSorting();
@@ -140,36 +142,28 @@ function FolderSortable({ folders }: { folders: LocalFolder[] }) {
 }
 
 function FolderItem({ folder }: { folder: LocalFolder }) {
-  const router = useRouter();
-  const utils = api.useUtils();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const router = useRouter();
+  const userId = useUserId();
 
-  // function prefetchNotes() {
-  //   void utils.folder.getNotes.prefetch({ folderId: folder.id });
-  // }
-
-  // const createNote = api.note.create.useMutation({
-  //   onMutate: () => {
-  //     setIsPopoverOpen(false);
-  //   },
-  //   onSuccess: (data) => {
-  //     router.push(`/notes/${data.id}`);
-  //   },
-  //   meta: {
-  //     invalidateQueries: () =>
-  //       utils.folder.getNotes.invalidate({ folderId: folder.id }),
-  //   },
-  // });
+  const createNote = useMutation({
+    mutationFn: createLocalNote,
+    onMutate: () => {
+      setIsPopoverOpen(false);
+    },
+    onSuccess: (id) => {
+      router.push(`/notes/${id}`);
+    },
+    meta: {
+      toastOnError: "Failed to create note. Please try again.",
+    },
+  });
 
   return (
     <Collapsible>
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton
-            className="group/collapsible"
-            // onMouseEnter={prefetchNotes}
-            // onFocus={prefetchNotes}
-          >
+          <SidebarMenuButton className="group/collapsible">
             <span>
               {folder.emoji} {folder.name}
             </span>
@@ -185,7 +179,9 @@ function FolderItem({ folder }: { folder: LocalFolder }) {
           <PopoverContent align="center" side="right" className="w-fit">
             <PopoverGroup>
               <PopoverItem
-              // onClick={() => createNote.mutate({ folderId: folder.id })}
+                onClick={() =>
+                  createNote.mutate({ userId, folderId: folder.id })
+                }
               >
                 <Plus /> Add Note
               </PopoverItem>
@@ -206,9 +202,7 @@ function FolderItem({ folder }: { folder: LocalFolder }) {
           </PopoverContent>
         </Popover>
         <CollapsibleContent>
-          {/* <ErrorSuspenseBoundary> */}
-          {/* <NoteList folderId={folder.id} /> */}
-          {/* </ErrorSuspenseBoundary> */}
+          <NoteList folderId={folder.id} />
         </CollapsibleContent>
       </SidebarMenuItem>
     </Collapsible>

@@ -3,18 +3,20 @@
 import { NoteTitle } from "./note-title";
 import { TextEditor } from "@/text-editor/text-editor";
 import { useNoteEditor } from "./note-editor-context";
-import { api } from "@/trpc/react";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { cn } from "@/lib/utils";
+import type { EditorNode } from "@/text-editor/model/schema";
+import { useMutation } from "@tanstack/react-query";
+import { updateLocalNoteContent } from "@/local/mutations/notes";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
-  const utils = api.useUtils();
 
-  const updateContent = api.note.updateContent.useMutation({
+  const updateContent = useMutation({
+    mutationFn: (content: EditorNode[]) =>
+      updateLocalNoteContent({ noteId: note.id, data: { content } }),
     meta: {
-      // invalidateQueries: () => utils.note.get.invalidate({ noteId: note.id }),
-      subscribeToMutationStatus: true,
+      toastOnError: "Failed to update content, please try again.",
     },
   });
 
@@ -24,7 +26,6 @@ export function NoteContent() {
   );
 
   return (
-    // <div>
     <div
       className={cn(
         "mx-auto w-full flex-1 px-4 py-30",
@@ -40,7 +41,7 @@ export function NoteContent() {
           actions={actions}
           onContentChange={(content) => {
             // console.log(content);
-            // debouncedUpdateContentMutate({ noteId: note.id, content });
+            debouncedUpdateContentMutate(content);
           }}
           options={{
             font: note.font,
@@ -49,7 +50,6 @@ export function NoteContent() {
           }}
         />
       </div>
-      {/* </div> */}
     </div>
   );
 }

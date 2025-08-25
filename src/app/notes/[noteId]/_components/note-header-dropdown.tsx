@@ -27,13 +27,12 @@ import {
   SearchIcon,
 } from "lucide-react";
 import { useNoteEditor } from "./note-editor-context";
-import { NOTE_MUTATIONS } from "../mutations";
 import {
   EXPORT_FORMATS,
   FONT_TYPES,
   type ExportFormat,
+  type FontType,
 } from "@/text-editor/model/schema";
-import { api } from "@/trpc/react";
 import { Spinner } from "@/components/spinner";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -53,14 +52,49 @@ import {
 } from "@/components/ui/select";
 import { exportToMarkdown } from "@/text-editor/export/md";
 import { exportToHtml } from "@/text-editor/export/html";
+import { useMutation } from "@tanstack/react-query";
+import {
+  updateLocalNoteFolder,
+  updateLocalNoteFont,
+  updateLocalNoteFullWidth,
+  updateLocalNoteLocked,
+  updateLocalNoteSmallText,
+} from "@/local/mutations/notes";
+import { useLocalFolders } from "@/local/queries/folders";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
 
-  const updateFont = NOTE_MUTATIONS.updateFont(note.id);
-  const updateSmallText = NOTE_MUTATIONS.updateSmallText(note.id);
-  const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
-  const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
+  const updateFont = useMutation({
+    mutationFn: (font: FontType) =>
+      updateLocalNoteFont({ noteId: note.id, data: { font } }),
+    meta: {
+      toastOnError: "Failed to update font, please try again.",
+    },
+  });
+
+  const updateSmallText = useMutation({
+    mutationFn: (smallText: boolean) =>
+      updateLocalNoteSmallText({ noteId: note.id, data: { smallText } }),
+    meta: {
+      toastOnError: "Failed to update small text, please try again.",
+    },
+  });
+
+  const updateLocked = useMutation({
+    mutationFn: (locked: boolean) =>
+      updateLocalNoteLocked({ noteId: note.id, data: { locked } }),
+    meta: {
+      toastOnError: "Failed to update locked, please try again.",
+    },
+  });
+  const updateFullWidth = useMutation({
+    mutationFn: (fullWidth: boolean) =>
+      updateLocalNoteFullWidth({ noteId: note.id, data: { fullWidth } }),
+    meta: {
+      toastOnError: "Failed to update full width, please try again.",
+    },
+  });
 
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
@@ -83,7 +117,7 @@ export function NoteHeaderDropdown() {
                 variant={note.font === font ? "primary" : "default"}
                 onClick={(e) => {
                   e.preventDefault();
-                  updateFont.mutate({ font, noteId: note.id });
+                  updateFont.mutate(font);
                 }}
               >
                 <span className="text-xl font-semibold">Aa</span>
@@ -123,10 +157,7 @@ export function NoteHeaderDropdown() {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                updateSmallText.mutate({
-                  smallText: !note.smallText,
-                  noteId: note.id,
-                });
+                updateSmallText.mutate(!note.smallText);
               }}
             >
               <AArrowDown /> Small text{" "}
@@ -139,10 +170,7 @@ export function NoteHeaderDropdown() {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                updateFullWidth.mutate({
-                  fullWidth: !note.fullWidth,
-                  noteId: note.id,
-                });
+                updateFullWidth.mutate(!note.fullWidth);
               }}
             >
               <Maximize2Icon className="rotate-45" /> Full width{" "}
@@ -155,7 +183,7 @@ export function NoteHeaderDropdown() {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                updateLocked.mutate({ locked: !note.locked, noteId: note.id });
+                updateLocked.mutate(!note.locked);
               }}
             >
               <LockKeyholeOpenIcon /> Lock page{" "}
@@ -213,7 +241,11 @@ function ExportDialog({
   function handleExport() {
     switch (exportFormat) {
       case "html": {
-        const html = exportToHtml(editor.state.nodes, note);
+        const html = exportToHtml(editor.state.nodes, {
+          title: note.title,
+          smallText: note.smallText,
+          font: note.font,
+        });
         const blob = new Blob([html], { type: "text/html" });
         downloadFile(blob, `${note.title}-${note.id}-export.html`);
         break;
@@ -282,25 +314,23 @@ function downloadFile(blob: Blob, filename: string) {
 
 function MoveToDropdown() {
   const [search, setSearch] = useState("");
-  const { data: folders, isPending, isError } = api.user.getFolders.useQuery();
+  const folders = useLocalFolders();
   const { note } = useNoteEditor();
 
-  const updateFolder = NOTE_MUTATIONS.updateFolder();
+  const updateFolder = useMutation({
+    mutationFn: (folderId: string) =>
+      updateLocalNoteFolder({ noteId: note.id, data: { folderId } }),
+    meta: {
+      toastOnError: "Failed to update folder, please try again.",
+    },
+  });
 
   const filteredFolders =
     folders?.filter((folder) =>
       folder.name.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
 
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center px-4 py-6">
-        <p className="text-muted-foreground text-sm italic">
-          Error loading folders
-        </p>
-      </div>
-    );
-  }
+  const isPending = folders === undefined;
 
   return (
     <div>
@@ -324,12 +354,7 @@ function MoveToDropdown() {
           filteredFolders.map((folder) => (
             <DropdownMenuItem
               key={folder.id}
-              onClick={() =>
-                updateFolder.mutate({
-                  noteId: note.id,
-                  folderId: folder.id,
-                })
-              }
+              onClick={() => updateFolder.mutate(folder.id)}
             >
               {folder.emoji} {folder.name}
             </DropdownMenuItem>

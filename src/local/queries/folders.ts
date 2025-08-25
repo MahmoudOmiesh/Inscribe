@@ -18,8 +18,5 @@ export function useLocalFolderNotes(folderId: string) {
         .and((note) => !note.isTrashed && !note.isArchived)
         .sortBy("sortOrder"),
     [folderId],
-    {
-      isPending: true as const,
-    },
   );
 }

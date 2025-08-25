@@ -6,14 +6,21 @@ import type {
   OrderedListItemNode,
   CheckListItemNode,
   Alignment,
+  FontType,
 } from "../model/schema";
 import { HIGHLIGHT_COLORS_CSS } from "../model/schema";
 import { getListBoundaries } from "../model/lists";
-import type { Note } from "@/lib/schema/note";
 import { HTML_STYLES_CSS } from "./html-styles";
 import { editorVariables } from "../components/style";
 
-export function exportToHtml(nodes: EditorNode[], note: Note) {
+export function exportToHtml(
+  nodes: EditorNode[],
+  {
+    title,
+    smallText,
+    font,
+  }: { title: string; smallText: boolean; font: FontType },
+) {
   const parts: string[] = [];
 
   for (let i = 0; i < nodes.length; i++) {
@@ -77,7 +84,7 @@ export function exportToHtml(nodes: EditorNode[], note: Note) {
     }
   }
 
-  const editorVariablesCss = editorVariables[note.smallText ? "small" : "big"];
+  const editorVariablesCss = editorVariables[smallText ? "small" : "big"];
   const editorVariablesCssString = Object.entries(editorVariablesCss)
     .map(([key, value]) => `${key}: ${value};`)
     .join("\n");
@@ -92,7 +99,7 @@ export function exportToHtml(nodes: EditorNode[], note: Note) {
       :root{${editorVariablesCssString}}
       ${HTML_STYLES_CSS}
     </style>
-    <title>${escapeHtml(note.title)}</title>
+    <title>${escapeHtml(title)}</title>
   </head>
   <body>
     <div class="editor">

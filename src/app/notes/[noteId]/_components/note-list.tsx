@@ -25,19 +25,25 @@ import {
   ExternalLinkIcon,
   AlertTriangleIcon,
 } from "lucide-react";
-import { api } from "@/trpc/react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NOTE_MUTATIONS } from "../mutations";
+import { useLocalFolderNotes } from "@/local/queries/folders";
+import { Spinner } from "@/components/spinner";
 
-export function NoteList({ folderId }: { folderId: number }) {
+export function NoteList({ folderId }: { folderId: string }) {
   const pathname = usePathname();
+  const notes = useLocalFolderNotes(folderId);
 
-  const [notes] = api.folder.getNotes.useSuspenseQuery({ folderId: folderId });
+  if (!notes) {
+    return (
+      <div className="flex h-16 items-center justify-center p-2">
+        <Spinner />
+      </div>
+    );
+  }
+
   const isEmpty = notes.length === 0;
-
-  const duplicate = NOTE_MUTATIONS.duplicate(folderId);
 
   return (
     <SidebarMenuSub
@@ -86,11 +92,7 @@ export function NoteList({ folderId }: { folderId: number }) {
                 <DropdownMenuItem>
                   <LinkIcon /> Copy Link
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    duplicate.mutate({ noteId: note.id });
-                  }}
-                >
+                <DropdownMenuItem>
                   <CopyIcon /> Duplicate
                 </DropdownMenuItem>
                 <DropdownMenuItem>
