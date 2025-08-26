@@ -46,6 +46,10 @@ export const noteTrashUpdateSchema = z.object({
   isTrashed: z.boolean(),
 });
 
+export const noteArchiveUpdateSchema = z.object({
+  isArchived: z.boolean(),
+});
+
 export const noteFontUpdateSchema = z.object({
   font: z.enum(FONT_TYPES),
 });
@@ -71,6 +75,7 @@ export type NoteTitleUpdate = z.infer<typeof noteTitleUpdateSchema>;
 export type NoteContentUpdate = z.infer<typeof noteContentUpdateSchema>;
 export type NoteFavoriteUpdate = z.infer<typeof noteFavoriteUpdateSchema>;
 export type NoteTrashUpdate = z.infer<typeof noteTrashUpdateSchema>;
+export type NoteArchiveUpdate = z.infer<typeof noteArchiveUpdateSchema>;
 export type NoteFontUpdate = z.infer<typeof noteFontUpdateSchema>;
 export type NoteSmallTextUpdate = z.infer<typeof noteSmallTextUpdateSchema>;
 export type NoteLockedUpdate = z.infer<typeof noteLockedUpdateSchema>;

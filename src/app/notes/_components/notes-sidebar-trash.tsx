@@ -8,20 +8,20 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from "@/components/ui/collapsible";
-import { NoteFavoritesList } from "../[noteId]/_components/note-favorites-list";
+import { NoteTrashList } from "../[noteId]/_components/note-trash-list";
 
-export function NotesSidebarFavorites() {
+export function NotesSidebarTrash() {
   return (
     <Collapsible defaultOpen className="group/collapsible">
       <SidebarGroup>
         <SidebarGroupLabel asChild>
           <CollapsibleTrigger className="hover:bg-accent/70 cursor-pointer">
-            Favorites
+            Trash
           </CollapsibleTrigger>
         </SidebarGroupLabel>
         <CollapsibleContent>
           <SidebarGroupContent>
-            <NoteFavoritesList />
+            <NoteTrashList />
           </SidebarGroupContent>
         </CollapsibleContent>
       </SidebarGroup>

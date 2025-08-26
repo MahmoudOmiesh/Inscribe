@@ -16,6 +16,10 @@ export function NoteFavorite() {
     },
   });
 
+  if (note.isTrashed || note.isArchived) {
+    return null;
+  }
+
   return (
     <div>
       <Button

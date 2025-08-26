@@ -7,6 +7,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+  SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -75,7 +76,11 @@ export function FoldersList() {
           </p>
         </div>
       ) : (
-        folders.map((folder) => <FolderItem key={folder.id} folder={folder} />)
+        <SidebarMenu>
+          {folders.map((folder) => (
+            <FolderItem key={folder.id} folder={folder} />
+          ))}
+        </SidebarMenu>
       )}
     </>
   );

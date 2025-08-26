@@ -25,6 +25,8 @@ import {
   Redo2Icon,
   ArrowRightFromLineIcon,
   SearchIcon,
+  ArchiveIcon,
+  CornerUpLeftIcon,
 } from "lucide-react";
 import { useNoteEditor } from "./note-editor-context";
 import {
@@ -54,6 +56,7 @@ import { exportToMarkdown } from "@/text-editor/export/md";
 import { exportToHtml } from "@/text-editor/export/html";
 import { useMutation } from "@tanstack/react-query";
 import {
+  updateLocalNoteArchive,
   updateLocalNoteFolder,
   updateLocalNoteFont,
   updateLocalNoteFullWidth,
@@ -71,6 +74,14 @@ export function NoteHeaderDropdown() {
       updateLocalNoteTrash({ noteId: note.id, data: { isTrashed } }),
     meta: {
       toastOnError: "Failed to move to trash, please try again.",
+    },
+  });
+
+  const updateArchive = useMutation({
+    mutationFn: (isArchived: boolean) =>
+      updateLocalNoteArchive({ noteId: note.id, data: { isArchived } }),
+    meta: {
+      toastOnError: "Failed to archive, please try again.",
     },
   });
 
@@ -163,20 +174,26 @@ export function NoteHeaderDropdown() {
                 <DropdownMenuItem>
                   <CopyIcon /> Duplicate
                 </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center gap-2">
-                    <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
-                    Move to
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent sideOffset={10}>
-                      <MoveToDropdown />
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-                <DropdownMenuItem onClick={() => updateTrash.mutate(true)}>
-                  <Trash2Icon /> Move to Trash
-                </DropdownMenuItem>
+                {note.isArchived ? (
+                  <DropdownMenuItem onClick={() => updateArchive.mutate(false)}>
+                    <CornerUpLeftIcon /> Unarchive
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2">
+                      <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
+                      Move to
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent sideOffset={10}>
+                        <MoveToDropdown
+                          moveToArchive={() => updateArchive.mutate(true)}
+                          moveToTrash={() => updateTrash.mutate(true)}
+                        />
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                )}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
@@ -340,7 +357,13 @@ function downloadFile(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function MoveToDropdown() {
+function MoveToDropdown({
+  moveToArchive,
+  moveToTrash,
+}: {
+  moveToArchive: () => void;
+  moveToTrash: () => void;
+}) {
   const [search, setSearch] = useState("");
   const folders = useLocalFolders();
   const { note } = useNoteEditor();
@@ -379,14 +402,23 @@ function MoveToDropdown() {
             <Spinner />
           </div>
         ) : (
-          filteredFolders.map((folder) => (
-            <DropdownMenuItem
-              key={folder.id}
-              onClick={() => updateFolder.mutate(folder.id)}
-            >
-              {folder.emoji} {folder.name}
+          <>
+            {filteredFolders.map((folder) => (
+              <DropdownMenuItem
+                key={folder.id}
+                onClick={() => updateFolder.mutate(folder.id)}
+              >
+                {folder.emoji} {folder.name}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={moveToArchive}>
+              <ArchiveIcon /> archive
             </DropdownMenuItem>
-          ))
+            <DropdownMenuItem onClick={moveToTrash}>
+              <Trash2Icon /> trash
+            </DropdownMenuItem>
+          </>
         )}
       </DropdownMenuGroup>
     </div>

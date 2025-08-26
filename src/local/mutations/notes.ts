@@ -2,6 +2,7 @@ import { createParagraph } from "@/text-editor/model/nodes";
 import { localDB } from "../db";
 import { nanoid } from "nanoid";
 import type {
+  NoteArchiveUpdate,
   NoteContentUpdate,
   NoteFavoriteUpdate,
   NoteFolderUpdate,
@@ -85,6 +86,19 @@ export async function updateLocalNoteFavorite({
 }) {
   return localDB.notes.update(noteId, {
     isFavorite: data.isFavorite,
+    updatedAt: Date.now(),
+  });
+}
+
+export async function updateLocalNoteArchive({
+  noteId,
+  data,
+}: {
+  noteId: string;
+  data: NoteArchiveUpdate;
+}) {
+  return localDB.notes.update(noteId, {
+    isArchived: data.isArchived,
     updatedAt: Date.now(),
   });
 }

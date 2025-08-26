@@ -7,10 +7,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ArchiveIcon, SearchIcon, TrashIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { NotesSidebarFavorites } from "./notes-sidebar-favorites";
 import { NotesSidebarFolders } from "./folders/notes-sidebar-folders";
 import { NotesSidebarHeader } from "./notes-sidebar-header";
+import { NotesSidebarTrash } from "./notes-sidebar-trash";
+import { NotesSidebarArchive } from "./notes-siderbar-archive";
 
 export async function NotesSidebar() {
   return (
@@ -25,16 +27,6 @@ export async function NotesSidebar() {
                   <SearchIcon /> Search
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <TrashIcon /> Trash
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <ArchiveIcon /> Archive
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -42,6 +34,10 @@ export async function NotesSidebar() {
         <NotesSidebarFavorites />
 
         <NotesSidebarFolders />
+
+        <NotesSidebarArchive />
+
+        <NotesSidebarTrash />
       </SidebarContent>
     </Sidebar>
   );
