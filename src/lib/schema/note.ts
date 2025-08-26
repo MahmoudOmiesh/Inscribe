@@ -13,9 +13,9 @@ export interface LocalNote {
 
   sortOrder: number;
 
-  isArchived: boolean;
-  isTrashed: boolean;
-  isFavorite: boolean;
+  isArchived: 0 | 1;
+  isTrashed: 0 | 1;
+  isFavorite: 0 | 1;
 
   font: FontType;
   smallText: boolean;

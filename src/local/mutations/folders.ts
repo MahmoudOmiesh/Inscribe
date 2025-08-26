@@ -1,5 +1,6 @@
 import { localDB } from "../db";
 import type { FolderInsert, FolderOrder } from "@/lib/schema/folder";
+import Dexie from "dexie";
 import { nanoid } from "nanoid";
 
 export async function createLocalFolder({
@@ -9,7 +10,11 @@ export async function createLocalFolder({
   userId: string;
   data: FolderInsert;
 }) {
-  const lastFolder = await localDB.folders.orderBy("sortOrder").last();
+  const lastFolder = await localDB.folders
+    .where("[userId+sortOrder]")
+    .between([userId, Dexie.minKey], [userId, Dexie.maxKey])
+    .last();
+
   const sortOrder = (lastFolder?.sortOrder ?? 0) + 1;
 
   const folderId = await localDB.folders.add({

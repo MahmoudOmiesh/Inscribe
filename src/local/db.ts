@@ -9,15 +9,16 @@ export class LocalDB extends Dexie {
   constructor() {
     super("local-db");
     this.version(1).stores({
-      folders: "id, serverId, userId, sortOrder",
-      notes: "id, serverId, folderId, sortOrder",
+      folders: "id, serverId, userId, [userId+sortOrder]",
+      notes:
+        "id, serverId, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
     });
   }
 
   deleteFolder(folderId: string) {
     return this.transaction("rw", this.folders, this.notes, async () => {
-      void this.folders.where({ id: folderId }).delete();
-      void this.notes.where({ folderId }).delete();
+      await this.folders.where({ id: folderId }).delete();
+      await this.notes.where({ folderId }).delete();
     });
   }
 }

@@ -14,7 +14,7 @@ import { NotesSidebarHeader } from "./notes-sidebar-header";
 import { NotesSidebarTrash } from "./notes-sidebar-trash";
 import { NotesSidebarArchive } from "./notes-siderbar-archive";
 
-export async function NotesSidebar() {
+export function NotesSidebar() {
   return (
     <Sidebar>
       <NotesSidebarHeader />

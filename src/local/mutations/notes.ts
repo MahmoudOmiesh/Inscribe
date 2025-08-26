@@ -13,6 +13,7 @@ import type {
   NoteTitleUpdate,
   NoteTrashUpdate,
 } from "@/lib/schema/note";
+import Dexie from "dexie";
 
 export async function createLocalNote({
   userId,
@@ -21,7 +22,11 @@ export async function createLocalNote({
   userId: string;
   folderId: string;
 }) {
-  const lastNote = await localDB.notes.orderBy("sortOrder").last();
+  const lastNote = await localDB.notes
+    .where("[folderId+sortOrder]")
+    .between([folderId, Dexie.minKey], [folderId, Dexie.maxKey])
+    .last();
+
   const sortOrder = (lastNote?.sortOrder ?? 0) + 1;
 
   const noteId = await localDB.notes.add({
@@ -34,9 +39,9 @@ export async function createLocalNote({
     content: JSON.stringify([createParagraph()]),
     sortOrder,
 
-    isArchived: false,
-    isTrashed: false,
-    isFavorite: false,
+    isArchived: 0,
+    isTrashed: 0,
+    isFavorite: 0,
 
     font: "default",
     smallText: false,
@@ -85,7 +90,7 @@ export async function updateLocalNoteFavorite({
   data: NoteFavoriteUpdate;
 }) {
   return localDB.notes.update(noteId, {
-    isFavorite: data.isFavorite,
+    isFavorite: data.isFavorite ? 1 : 0,
     updatedAt: Date.now(),
   });
 }
@@ -98,7 +103,7 @@ export async function updateLocalNoteArchive({
   data: NoteArchiveUpdate;
 }) {
   return localDB.notes.update(noteId, {
-    isArchived: data.isArchived,
+    isArchived: data.isArchived ? 1 : 0,
     updatedAt: Date.now(),
   });
 }
@@ -111,7 +116,7 @@ export async function updateLocalNoteTrash({
   data: NoteTrashUpdate;
 }) {
   return localDB.notes.update(noteId, {
-    isTrashed: data.isTrashed,
+    isTrashed: data.isTrashed ? 1 : 0,
     updatedAt: Date.now(),
   });
 }
