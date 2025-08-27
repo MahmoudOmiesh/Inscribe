@@ -4,13 +4,19 @@ import { cn } from "@/lib/utils";
 import { useNoteEditor } from "./note-editor-context";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteFavorite } from "@/local/mutations/notes";
+import { useUserId } from "../../_components/user-context";
 
 export function NoteFavorite() {
   const { note } = useNoteEditor();
+  const userId = useUserId();
 
   const toggleFavorite = useMutation({
     mutationFn: (isFavorite: boolean) =>
-      updateLocalNoteFavorite({ noteId: note.id, data: { isFavorite } }),
+      updateLocalNoteFavorite({
+        noteId: note.id,
+        userId,
+        data: { isFavorite },
+      }),
     meta: {
       toastOnError: "Failed to toggle favorite, please try again.",
     },

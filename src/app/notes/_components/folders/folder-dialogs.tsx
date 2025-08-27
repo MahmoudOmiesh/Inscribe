@@ -27,11 +27,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/spinner";
-import {
-  folderInsertSchema,
-  type FolderInsert,
-  type LocalFolder,
-} from "@/lib/schema/folder";
+import { FolderInsertSchema, type FolderInsert } from "@/lib/schema/folder";
+import type { LocalFolder } from "@/local/schema/folder";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import {
@@ -100,6 +97,7 @@ export function FolderRenameDialog({
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const userId = useUserId();
 
   const updateFolder = useMutation({
     mutationFn: updateLocalFolder,
@@ -112,6 +110,7 @@ export function FolderRenameDialog({
   function handleSubmit(data: FolderInsert) {
     updateFolder.mutate({
       folderId: folder.id,
+      userId,
       data,
     });
   }
@@ -141,6 +140,7 @@ export function FolderDeleteDialog({
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const userId = useUserId();
 
   const deleteFolder = useMutation({
     mutationFn: deleteLocalFolder,
@@ -165,7 +165,7 @@ export function FolderDeleteDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
-            onClick={() => deleteFolder.mutate({ folderId: folderId })}
+            onClick={() => deleteFolder.mutate({ folderId, userId })}
             disabled={deleteFolder.isPending}
           >
             Delete
@@ -189,7 +189,7 @@ function FolderForm({
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
   const form = useForm<FolderInsert>({
-    resolver: zodResolver(folderInsertSchema),
+    resolver: zodResolver(FolderInsertSchema),
     defaultValues: defaultValues ?? {
       emoji: "📄",
       name: "",

@@ -8,13 +8,15 @@ import { cn } from "@/lib/utils";
 import type { EditorNode } from "@/text-editor/model/schema";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteContent } from "@/local/mutations/notes";
+import { useUserId } from "../../_components/user-context";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
+  const userId = useUserId();
 
   const updateContent = useMutation({
     mutationFn: (content: EditorNode[]) =>
-      updateLocalNoteContent({ noteId: note.id, data: { content } }),
+      updateLocalNoteContent({ noteId: note.id, userId, data: { content } }),
     meta: {
       toastOnError: "Failed to update content, please try again.",
     },

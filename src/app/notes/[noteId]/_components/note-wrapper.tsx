@@ -5,7 +5,7 @@ import { NoteEditorProvider } from "./note-editor-context";
 import { NoteHeader } from "./note-header";
 import { useLocalNote } from "@/local/queries/notes";
 import { Button } from "@/components/ui/button";
-import type { LocalNote } from "@/lib/schema/note";
+import type { LocalNote } from "@/local/schema/note";
 import Link from "next/link";
 import { Spinner } from "@/components/spinner";
 import { NoteBanner } from "./note-banner";

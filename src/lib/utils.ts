@@ -5,26 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Creates a debounced function that delays invoking `func` until after `wait` milliseconds have elapsed
- * since the last time the debounced function was invoked.
- * @param func The function to debounce.
- * @param wait The number of milliseconds to delay.
- * @returns A new debounced function.
- */
-export function debounce<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  wait: number,
-) {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func.apply(this, args);
-    }, wait);
-  };
-}
-
 export function groupBy<T>(array: T[], key: keyof T) {
   return array.reduce(
     (acc, item) => {
@@ -35,4 +15,20 @@ export function groupBy<T>(array: T[], key: keyof T) {
     },
     {} as Record<string, T[]>,
   );
+}
+
+export function debounce<Args extends unknown[]>(
+  fn: (...args: Args) => void,
+  delayMs = 300,
+) {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Args) => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      fn(...args);
+    }, delayMs);
+  };
 }

@@ -65,13 +65,19 @@ import {
   updateLocalNoteTrash,
 } from "@/local/mutations/notes";
 import { useLocalFolders } from "@/local/queries/folders";
+import { useUserId } from "../../_components/user-context";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
+  const userId = useUserId();
 
   const updateTrash = useMutation({
     mutationFn: (isTrashed: boolean) =>
-      updateLocalNoteTrash({ noteId: note.id, data: { isTrashed } }),
+      updateLocalNoteTrash({
+        noteId: note.id,
+        userId,
+        data: { isTrashed },
+      }),
     meta: {
       toastOnError: "Failed to move to trash, please try again.",
     },
@@ -79,7 +85,11 @@ export function NoteHeaderDropdown() {
 
   const updateArchive = useMutation({
     mutationFn: (isArchived: boolean) =>
-      updateLocalNoteArchive({ noteId: note.id, data: { isArchived } }),
+      updateLocalNoteArchive({
+        noteId: note.id,
+        userId,
+        data: { isArchived },
+      }),
     meta: {
       toastOnError: "Failed to archive, please try again.",
     },
@@ -87,7 +97,7 @@ export function NoteHeaderDropdown() {
 
   const updateFont = useMutation({
     mutationFn: (font: FontType) =>
-      updateLocalNoteFont({ noteId: note.id, data: { font } }),
+      updateLocalNoteFont({ noteId: note.id, userId, data: { font } }),
     meta: {
       toastOnError: "Failed to update font, please try again.",
     },
@@ -95,7 +105,11 @@ export function NoteHeaderDropdown() {
 
   const updateSmallText = useMutation({
     mutationFn: (smallText: boolean) =>
-      updateLocalNoteSmallText({ noteId: note.id, data: { smallText } }),
+      updateLocalNoteSmallText({
+        noteId: note.id,
+        userId,
+        data: { smallText },
+      }),
     meta: {
       toastOnError: "Failed to update small text, please try again.",
     },
@@ -103,7 +117,7 @@ export function NoteHeaderDropdown() {
 
   const updateLocked = useMutation({
     mutationFn: (locked: boolean) =>
-      updateLocalNoteLocked({ noteId: note.id, data: { locked } }),
+      updateLocalNoteLocked({ noteId: note.id, userId, data: { locked } }),
     meta: {
       toastOnError: "Failed to update locked, please try again.",
     },
@@ -111,7 +125,11 @@ export function NoteHeaderDropdown() {
 
   const updateFullWidth = useMutation({
     mutationFn: (fullWidth: boolean) =>
-      updateLocalNoteFullWidth({ noteId: note.id, data: { fullWidth } }),
+      updateLocalNoteFullWidth({
+        noteId: note.id,
+        userId,
+        data: { fullWidth },
+      }),
     meta: {
       toastOnError: "Failed to update full width, please try again.",
     },
@@ -367,10 +385,15 @@ function MoveToDropdown({
   const [search, setSearch] = useState("");
   const folders = useLocalFolders();
   const { note } = useNoteEditor();
+  const userId = useUserId();
 
   const updateFolder = useMutation({
     mutationFn: (folderId: string) =>
-      updateLocalNoteFolder({ noteId: note.id, data: { folderId } }),
+      updateLocalNoteFolder({
+        noteId: note.id,
+        userId,
+        data: { folderId },
+      }),
     meta: {
       toastOnError: "Failed to update folder, please try again.",
     },

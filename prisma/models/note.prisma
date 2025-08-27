@@ -1,5 +1,5 @@
 model Note {
-  id Int @id @default(autoincrement())
+  id String @id
 
   title   String
   content Json
@@ -19,7 +19,7 @@ model Note {
   updatedAt DateTime @updatedAt
 
   folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId Int
+  folderId String
 
   User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String

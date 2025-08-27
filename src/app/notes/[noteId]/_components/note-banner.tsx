@@ -8,21 +8,27 @@ import {
 } from "@/local/mutations/notes";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useUserId } from "../../_components/user-context";
 
 export function NoteBanner() {
   const router = useRouter();
+  const userId = useUserId();
   const { note } = useNoteEditor();
 
   const restoreNote = useMutation({
     mutationFn: () =>
-      updateLocalNoteTrash({ noteId: note.id, data: { isTrashed: false } }),
+      updateLocalNoteTrash({
+        noteId: note.id,
+        userId,
+        data: { isTrashed: false },
+      }),
     meta: {
       toastOnError: "Failed to restore note, please try again.",
     },
   });
 
   const deleteNote = useMutation({
-    mutationFn: () => deleteLocalNote({ noteId: note.id }),
+    mutationFn: () => deleteLocalNote({ noteId: note.id, userId }),
     meta: {
       toastOnError: "Failed to delete note, please try again.",
     },
@@ -33,7 +39,11 @@ export function NoteBanner() {
 
   const unarchiveNote = useMutation({
     mutationFn: () =>
-      updateLocalNoteArchive({ noteId: note.id, data: { isArchived: false } }),
+      updateLocalNoteArchive({
+        noteId: note.id,
+        userId,
+        data: { isArchived: false },
+      }),
     meta: {
       toastOnError: "Failed to unarchive note, please try again.",
     },

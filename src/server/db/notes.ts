@@ -1,31 +1,23 @@
 import type {
+  NoteArchiveUpdate,
   NoteContentUpdate,
   NoteFavoriteUpdate,
   NoteFolderUpdate,
   NoteFontUpdate,
   NoteFullWidthUpdate,
+  NoteInsert,
   NoteLockedUpdate,
   NoteSmallTextUpdate,
   NoteTitleUpdate,
+  NoteTrashUpdate,
 } from "@/lib/schema/note";
 import { db } from "./root";
 import type { Prisma } from "@prisma/client";
-import type { EditorNode } from "@/text-editor/model/schema";
 import { nanoid } from "nanoid";
-
-const newNoteContent: EditorNode[] = [
-  {
-    id: nanoid(),
-    type: "paragraph",
-    text: "Hello, world!",
-    alignment: "left",
-    marks: [],
-  },
-];
 
 export const _notes = {
   queries: {
-    get: (noteId: number, userId: string) => {
+    get: (noteId: string, userId: string) => {
       return db.note.findUnique({
         where: { id: noteId, userId },
         select: {
@@ -51,28 +43,21 @@ export const _notes = {
   },
 
   mutations: {
-    create: async (folderId: number, userId: string) => {
-      const last = await db.note.findFirst({
-        where: { folderId, userId },
-        orderBy: { sortOrder: "desc" },
-        select: { sortOrder: true },
-      });
-
-      const sortOrder = (last?.sortOrder ?? 0) + 1;
-
+    create: async (noteId: string, userId: string, data: NoteInsert) => {
       return db.note.create({
         data: {
-          folderId,
+          id: noteId,
+          folderId: data.folderId,
           userId,
-          sortOrder,
+          sortOrder: data.sortOrder,
           title: "New Note",
-          content: newNoteContent as unknown as Prisma.InputJsonValue,
+          content: JSON.parse(data.content) as unknown as Prisma.InputJsonValue,
         },
         select: { id: true },
       });
     },
 
-    duplicate: async (noteId: number, userId: string) => {
+    duplicate: async (noteId: string, userId: string) => {
       const note = await db.note.findUnique({
         where: { id: noteId, userId },
         select: { title: true, content: true, folderId: true },
@@ -92,6 +77,7 @@ export const _notes = {
 
       return db.note.create({
         data: {
+          id: nanoid(),
           title: `${note.title} (Duplicate)`,
           content: note.content as Prisma.InputJsonValue,
           sortOrder,
@@ -102,7 +88,7 @@ export const _notes = {
       });
     },
 
-    updateTitle: (noteId: number, userId: string, data: NoteTitleUpdate) => {
+    updateTitle: (noteId: string, userId: string, data: NoteTitleUpdate) => {
       return db.note.update({
         where: { id: noteId, userId },
         data: {
@@ -116,7 +102,7 @@ export const _notes = {
     },
 
     updateContent: (
-      noteId: number,
+      noteId: string,
       userId: string,
       data: NoteContentUpdate,
     ) => {
@@ -127,9 +113,8 @@ export const _notes = {
       });
     },
 
-    //TODO: change this to take a boolean instead of toggling
-    toggleFavorite: async (
-      noteId: number,
+    updateFavorite: async (
+      noteId: string,
       userId: string,
       data: NoteFavoriteUpdate,
     ) => {
@@ -143,7 +128,31 @@ export const _notes = {
       });
     },
 
-    updateFont: (noteId: number, userId: string, data: NoteFontUpdate) => {
+    updateTrash: async (
+      noteId: string,
+      userId: string,
+      data: NoteTrashUpdate,
+    ) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { isTrashed: data.isTrashed },
+        select: { id: true, isTrashed: true },
+      });
+    },
+
+    updateArchive: async (
+      noteId: string,
+      userId: string,
+      data: NoteArchiveUpdate,
+    ) => {
+      return db.note.update({
+        where: { id: noteId, userId },
+        data: { isArchived: data.isArchived },
+        select: { id: true, isArchived: true },
+      });
+    },
+
+    updateFont: (noteId: string, userId: string, data: NoteFontUpdate) => {
       return db.note.update({
         where: { id: noteId, userId },
         data: { font: data.font },
@@ -152,7 +161,7 @@ export const _notes = {
     },
 
     updateSmallText: (
-      noteId: number,
+      noteId: string,
       userId: string,
       data: NoteSmallTextUpdate,
     ) => {
@@ -163,7 +172,7 @@ export const _notes = {
       });
     },
 
-    updateLocked: (noteId: number, userId: string, data: NoteLockedUpdate) => {
+    updateLocked: (noteId: string, userId: string, data: NoteLockedUpdate) => {
       return db.note.update({
         where: { id: noteId, userId },
         data: { locked: data.locked },
@@ -172,7 +181,7 @@ export const _notes = {
     },
 
     updateFullWidth: (
-      noteId: number,
+      noteId: string,
       userId: string,
       data: NoteFullWidthUpdate,
     ) => {
@@ -183,11 +192,18 @@ export const _notes = {
       });
     },
 
-    updateFolder: (noteId: number, userId: string, data: NoteFolderUpdate) => {
+    updateFolder: (noteId: string, userId: string, data: NoteFolderUpdate) => {
       return db.note.update({
         where: { id: noteId, userId },
         data: { folderId: data.folderId },
         select: { id: true, folderId: true },
+      });
+    },
+
+    delete: (noteId: string, userId: string) => {
+      return db.note.delete({
+        where: { id: noteId, userId },
+        select: { id: true },
       });
     },
   },

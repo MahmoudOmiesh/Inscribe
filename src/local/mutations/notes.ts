@@ -14,6 +14,7 @@ import type {
   NoteTrashUpdate,
 } from "@/lib/schema/note";
 import Dexie from "dexie";
+import { operationQueue } from "@/sync/operation-queue";
 
 export async function createLocalNote({
   userId,
@@ -28,15 +29,15 @@ export async function createLocalNote({
     .last();
 
   const sortOrder = (lastNote?.sortOrder ?? 0) + 1;
+  const content = JSON.stringify([createParagraph()]);
 
   const noteId = await localDB.notes.add({
     id: nanoid(),
     userId,
     folderId,
-    serverId: null,
 
     title: "New Note",
-    content: JSON.stringify([createParagraph()]),
+    content,
     sortOrder,
 
     isArchived: 0,
@@ -50,7 +51,19 @@ export async function createLocalNote({
 
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    lastSyncedAt: null,
+  });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "createNote",
+      data: {
+        folderId,
+        sortOrder,
+        content,
+      },
+    },
   });
 
   return noteId;
@@ -58,134 +71,280 @@ export async function createLocalNote({
 
 export async function updateLocalNoteTitle({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteTitleUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     title: data.title,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteTitle",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteContent({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteContentUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     content: JSON.stringify(data.content),
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteContent",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteFavorite({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteFavoriteUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     isFavorite: data.isFavorite ? 1 : 0,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteFavorite",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteArchive({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteArchiveUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     isArchived: data.isArchived ? 1 : 0,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteArchive",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteTrash({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteTrashUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     isTrashed: data.isTrashed ? 1 : 0,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteTrash",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteFont({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteFontUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     font: data.font,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteFont",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteSmallText({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteSmallTextUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     smallText: data.smallText,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteSmallText",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteLocked({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteLockedUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     locked: data.locked,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteLocked",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteFullWidth({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteFullWidthUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     fullWidth: data.fullWidth,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteFullWidth",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
 export async function updateLocalNoteFolder({
   noteId,
+  userId,
   data,
 }: {
   noteId: string;
+  userId: string;
   data: NoteFolderUpdate;
 }) {
-  return localDB.notes.update(noteId, {
+  const updatedNoteCount = await localDB.notes.update(noteId, {
     folderId: data.folderId,
     updatedAt: Date.now(),
   });
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "updateNoteFolder",
+      data,
+    },
+  });
+
+  return updatedNoteCount;
 }
 
-export async function deleteLocalNote({ noteId }: { noteId: string }) {
-  return localDB.notes.delete(noteId);
+export async function deleteLocalNote({
+  noteId,
+  userId,
+}: {
+  noteId: string;
+  userId: string;
+}) {
+  const deletedCount = await localDB.notes.delete(noteId);
+
+  await operationQueue.add({
+    userId,
+    operation: {
+      noteId,
+      type: "deleteNote",
+    },
+  });
+
+  return deletedCount;
 }

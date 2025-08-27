@@ -35,7 +35,7 @@ import {
   FolderDeleteDialog,
   FolderRenameDialog,
 } from "./folder-dialogs";
-import { type LocalFolder } from "@/lib/schema/folder";
+import type { LocalFolder } from "@/local/schema/folder";
 import { useFolderSorting } from "./folder-sorting";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -89,6 +89,7 @@ export function FoldersList() {
 function FolderSortable({ folders }: { folders: LocalFolder[] }) {
   const [editedFolders, setEditedFolders] = useState(folders);
   const { setIsSorting } = useFolderSorting();
+  const userId = useUserId();
 
   const reorderFolders = useMutation({
     mutationFn: reorderLocalFolders,
@@ -100,6 +101,7 @@ function FolderSortable({ folders }: { folders: LocalFolder[] }) {
 
   function handleSave() {
     reorderFolders.mutate({
+      userId,
       data: editedFolders.map((folder, index) => ({
         id: folder.id,
         order: index + 1,

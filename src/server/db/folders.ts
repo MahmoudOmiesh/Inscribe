@@ -3,7 +3,7 @@ import { db } from "./root";
 
 export const _folders = {
   queries: {
-    getNotes: (folderId: number, userId: string) => {
+    getNotes: (folderId: string, userId: string) => {
       return db.note.findMany({
         where: { folderId, userId, isTrashed: false, isArchived: false },
         orderBy: { sortOrder: "asc" },
@@ -20,19 +20,15 @@ export const _folders = {
   },
 
   mutations: {
-    create: async (userId: string, data: FolderInsert) => {
-      const last = await db.folder.findFirst({
-        where: { userId },
-        orderBy: { sortOrder: "desc" },
-        select: { sortOrder: true },
-      });
-
-      const sortOrder = (last?.sortOrder ?? 0) + 1;
-
+    create: async (
+      folderId: string,
+      userId: string,
+      data: FolderInsert & { sortOrder: number },
+    ) => {
       return db.folder.create({
         data: {
+          id: folderId,
           userId,
-          sortOrder,
           ...data,
         },
         select: {
@@ -44,7 +40,7 @@ export const _folders = {
       });
     },
 
-    update: async (folderId: number, userId: string, data: FolderInsert) => {
+    update: async (folderId: string, userId: string, data: FolderInsert) => {
       const { count } = await db.folder.updateMany({
         where: { id: folderId, userId },
         data: {
@@ -55,7 +51,7 @@ export const _folders = {
       return { count, id: folderId };
     },
 
-    delete: async (folderId: number, userId: string) => {
+    delete: async (folderId: string, userId: string) => {
       const { count } = await db.folder.deleteMany({
         where: { id: folderId, userId },
       });

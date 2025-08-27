@@ -1,6 +1,6 @@
 "use client";
 
-import type { LocalNote } from "@/lib/schema/note";
+import type { LocalNote } from "@/local/schema/note";
 import { useEditor } from "@/text-editor/hooks/use-editor";
 import { useEditorActions } from "@/text-editor/hooks/use-editor-actions";
 import type { EditorNode } from "@/text-editor/model/schema";

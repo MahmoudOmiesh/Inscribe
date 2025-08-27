@@ -6,13 +6,15 @@ import { useEffect } from "react";
 import { useNoteEditor } from "./note-editor-context";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteTitle } from "@/local/mutations/notes";
+import { useUserId } from "../../_components/user-context";
 
 export function NoteTitle() {
   const { note } = useNoteEditor();
+  const userId = useUserId();
 
   const updateTitle = useMutation({
     mutationFn: (title: string) =>
-      updateLocalNoteTitle({ noteId: note.id, data: { title } }),
+      updateLocalNoteTitle({ noteId: note.id, userId, data: { title } }),
     meta: {
       toastOnError: "Failed to update title, please try again.",
     },

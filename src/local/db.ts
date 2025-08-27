@@ -1,10 +1,12 @@
-import type { LocalFolder } from "@/lib/schema/folder";
-import type { LocalNote } from "@/lib/schema/note";
+import type { LocalFolder } from "@/local/schema/folder";
+import type { LocalNote } from "@/local/schema/note";
 import Dexie, { type Table } from "dexie";
+import type { SyncOperation } from "./schema/sync";
 
 export class LocalDB extends Dexie {
   folders!: Table<LocalFolder, string>;
   notes!: Table<LocalNote, string>;
+  syncOperations!: Table<SyncOperation, string>;
 
   constructor() {
     super("local-db");
@@ -12,13 +14,17 @@ export class LocalDB extends Dexie {
       folders: "id, serverId, userId, [userId+sortOrder]",
       notes:
         "id, serverId, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
+      syncOperations: "id, userId, timestamp, [userId+status+timestamp]",
     });
   }
 
   deleteFolder(folderId: string) {
     return this.transaction("rw", this.folders, this.notes, async () => {
-      await this.folders.where({ id: folderId }).delete();
-      await this.notes.where({ folderId }).delete();
+      const deletedFolderCount = await this.folders
+        .where({ id: folderId })
+        .delete();
+      const deletedNoteCount = await this.notes.where({ folderId }).delete();
+      return { deletedFolderCount, deletedNoteCount };
     });
   }
 }

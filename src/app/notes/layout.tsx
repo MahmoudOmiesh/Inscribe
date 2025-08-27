@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserProvider } from "./_components/user-context";
+import { SyncHandler } from "./_components/sync-handler";
 
 export default async function Layout({
   children,
@@ -22,8 +23,10 @@ export default async function Layout({
     <main className="flex-1">
       <UserProvider userId={session.user.id}>
         <SidebarProvider>
-          <NotesSidebar />
-          <div className="flex flex-1 flex-col">{children}</div>
+          <SyncHandler>
+            <NotesSidebar />
+            <div className="flex flex-1 flex-col">{children}</div>
+          </SyncHandler>
         </SidebarProvider>
       </UserProvider>
     </main>
