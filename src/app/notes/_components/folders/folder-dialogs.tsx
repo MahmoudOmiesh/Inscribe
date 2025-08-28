@@ -145,6 +145,9 @@ export function FolderDeleteDialog({
   const deleteFolder = useMutation({
     mutationFn: deleteLocalFolder,
     onMutate: () => setIsDialogOpen(false),
+    onError: (error) => {
+      console.log(error);
+    },
     meta: {
       toastOnError: "Failed to delete folder. Please try again.",
     },

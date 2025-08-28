@@ -1,5 +1,6 @@
 import { localDB } from "@/local/db";
 import type { SyncOperation } from "@/local/schema/sync";
+import Dexie from "dexie";
 import { nanoid } from "nanoid";
 
 export class OperationQueue {
@@ -29,7 +30,10 @@ export class OperationQueue {
   async getPendingOperations(userId: string) {
     return localDB.syncOperations
       .where("[userId+status+timestamp]")
-      .between([userId, "pending", 0], [userId, "pending", Date.now()])
+      .between(
+        [userId, "pending", Dexie.minKey],
+        [userId, "pending", Dexie.maxKey],
+      )
       .toArray();
   }
 

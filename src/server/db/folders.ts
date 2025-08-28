@@ -43,12 +43,18 @@ export const _folders = {
       return { count, id: folderId };
     },
 
-    delete: async (folderId: string, userId: string) => {
-      const { count } = await db.folder.deleteMany({
+    delete: (folderId: string, userId: string) => {
+      console.log("delete folder", folderId, userId);
+      return db.folder.update({
         where: { id: folderId, userId },
+        data: {
+          deletedAt: new Date(),
+        },
+        select: {
+          id: true,
+          deletedAt: true,
+        },
       });
-
-      return { count, id: folderId };
     },
 
     reorder: async (userId: string, data: FolderOrder) => {

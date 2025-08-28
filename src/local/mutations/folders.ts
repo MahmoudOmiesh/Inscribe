@@ -95,9 +95,9 @@ export async function deleteLocalFolder({
 }) {
   const tx = await localDB.transaction(
     "rw",
-    [localDB.folders, localDB.syncOperations],
+    [localDB.folders, localDB.notes, localDB.syncOperations],
     async () => {
-      const deletedCount = await localDB.deleteFolder(folderId);
+      const deletedCount = await localDB.deleteFolders([folderId]);
 
       await operationQueue.add({
         userId,

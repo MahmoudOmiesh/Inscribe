@@ -4,8 +4,9 @@ model Folder {
   name      String
   sortOrder Int
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   notes Note[]
 

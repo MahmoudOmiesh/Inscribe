@@ -184,9 +184,12 @@ export const _notes = {
     },
 
     delete: (noteId: string, userId: string) => {
-      return db.note.delete({
-        where: { id: noteId, userId },
-        select: { id: true },
+      return db.note.update({
+        where: { id: noteId, userId, deletedAt: null },
+        data: {
+          deletedAt: new Date(),
+        },
+        select: { id: true, deletedAt: true },
       });
     },
   },

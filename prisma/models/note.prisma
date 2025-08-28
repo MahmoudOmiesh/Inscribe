@@ -15,8 +15,9 @@ model Note {
   locked    Boolean @default(false)
   fullWidth Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId String

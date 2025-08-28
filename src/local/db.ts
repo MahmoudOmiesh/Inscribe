@@ -21,15 +21,29 @@ export class LocalDB extends Dexie {
     });
   }
 
-  deleteFolder(folderId: string) {
+  deleteFolders(folderIds: string[]) {
     return this.transaction("rw", this.folders, this.notes, async () => {
-      const deletedFolderCount = await this.folders
-        .where({ id: folderId })
-        .delete();
-      const deletedNoteCount = await this.notes.where({ folderId }).delete();
+      const deletedFolderCount = await this.folders.bulkDelete(folderIds);
+      const deleteNotePromises = folderIds.map((folderId) =>
+        this.notes.where({ folderId }).delete(),
+      );
+      const deletedNoteCount = (await Promise.all(deleteNotePromises)).reduce(
+        (acc, count) => acc + count,
+        0,
+      );
       return { deletedFolderCount, deletedNoteCount };
     });
   }
 }
 
 export const localDB = new LocalDB();
+
+export function resetLocalDB() {
+  return localDB.transaction(
+    "rw",
+    [localDB.folders, localDB.notes, localDB.syncOperations, localDB.syncMeta],
+    async () => {
+      await Promise.all(localDB.tables.map((table) => table.clear()));
+    },
+  );
+}
