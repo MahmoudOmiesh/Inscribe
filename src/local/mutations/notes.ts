@@ -31,42 +31,50 @@ export async function createLocalNote({
   const sortOrder = (lastNote?.sortOrder ?? 0) + 1;
   const content = JSON.stringify([createParagraph()]);
 
-  const noteId = await localDB.notes.add({
-    id: nanoid(),
-    userId,
-    folderId,
-
-    title: "New Note",
-    content,
-    sortOrder,
-
-    isArchived: 0,
-    isTrashed: 0,
-    isFavorite: 0,
-
-    font: "default",
-    smallText: false,
-    locked: false,
-    fullWidth: false,
-
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  });
-
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "createNote",
-      data: {
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const noteId = await localDB.notes.add({
+        id: nanoid(),
+        userId,
         folderId,
-        sortOrder,
-        content,
-      },
-    },
-  });
 
-  return noteId;
+        title: "New Note",
+        content,
+        sortOrder,
+
+        isArchived: 0,
+        isTrashed: 0,
+        isFavorite: 0,
+
+        font: "default",
+        smallText: false,
+        locked: false,
+        fullWidth: false,
+
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "createNote",
+          data: {
+            folderId,
+            sortOrder,
+            content,
+          },
+        },
+      });
+
+      return noteId;
+    },
+  );
+
+  return tx;
 }
 
 export async function updateLocalNoteTitle({
@@ -78,21 +86,29 @@ export async function updateLocalNoteTitle({
   userId: string;
   data: NoteTitleUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    title: data.title,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        title: data.title,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteTitle",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteTitle",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteContent({
@@ -104,21 +120,29 @@ export async function updateLocalNoteContent({
   userId: string;
   data: NoteContentUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    content: JSON.stringify(data.content),
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        content: JSON.stringify(data.content),
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteContent",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteContent",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteFavorite({
@@ -130,21 +154,29 @@ export async function updateLocalNoteFavorite({
   userId: string;
   data: NoteFavoriteUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    isFavorite: data.isFavorite ? 1 : 0,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        isFavorite: data.isFavorite ? 1 : 0,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteFavorite",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteFavorite",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteArchive({
@@ -156,21 +188,29 @@ export async function updateLocalNoteArchive({
   userId: string;
   data: NoteArchiveUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    isArchived: data.isArchived ? 1 : 0,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        isArchived: data.isArchived ? 1 : 0,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteArchive",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteArchive",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteTrash({
@@ -182,21 +222,29 @@ export async function updateLocalNoteTrash({
   userId: string;
   data: NoteTrashUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    isTrashed: data.isTrashed ? 1 : 0,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        isTrashed: data.isTrashed ? 1 : 0,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteTrash",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteTrash",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteFont({
@@ -208,21 +256,29 @@ export async function updateLocalNoteFont({
   userId: string;
   data: NoteFontUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    font: data.font,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        font: data.font,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteFont",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteFont",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteSmallText({
@@ -234,21 +290,29 @@ export async function updateLocalNoteSmallText({
   userId: string;
   data: NoteSmallTextUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    smallText: data.smallText,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        smallText: data.smallText,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteSmallText",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteSmallText",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteLocked({
@@ -260,21 +324,29 @@ export async function updateLocalNoteLocked({
   userId: string;
   data: NoteLockedUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    locked: data.locked,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        locked: data.locked,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteLocked",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteLocked",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteFullWidth({
@@ -286,21 +358,29 @@ export async function updateLocalNoteFullWidth({
   userId: string;
   data: NoteFullWidthUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    fullWidth: data.fullWidth,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        fullWidth: data.fullWidth,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteFullWidth",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteFullWidth",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function updateLocalNoteFolder({
@@ -312,21 +392,29 @@ export async function updateLocalNoteFolder({
   userId: string;
   data: NoteFolderUpdate;
 }) {
-  const updatedNoteCount = await localDB.notes.update(noteId, {
-    folderId: data.folderId,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const updatedNoteCount = await localDB.notes.update(noteId, {
+        folderId: data.folderId,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "updateNoteFolder",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "updateNoteFolder",
+          data,
+        },
+      });
+
+      return updatedNoteCount;
     },
-  });
+  );
 
-  return updatedNoteCount;
+  return tx;
 }
 
 export async function deleteLocalNote({
@@ -336,15 +424,23 @@ export async function deleteLocalNote({
   noteId: string;
   userId: string;
 }) {
-  const deletedCount = await localDB.notes.delete(noteId);
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const deletedCount = await localDB.notes.delete(noteId);
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      noteId,
-      type: "deleteNote",
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId,
+          type: "deleteNote",
+        },
+      });
+
+      return deletedCount;
     },
-  });
+  );
 
-  return deletedCount;
+  return tx;
 }

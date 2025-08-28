@@ -11,9 +11,9 @@ export class LocalDB extends Dexie {
   constructor() {
     super("local-db");
     this.version(1).stores({
-      folders: "id, serverId, userId, [userId+sortOrder]",
+      folders: "id, userId, [userId+sortOrder]",
       notes:
-        "id, serverId, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
+        "id, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
       syncOperations: "id, userId, timestamp, [userId+status+timestamp]",
     });
   }

@@ -18,30 +18,38 @@ export async function createLocalFolder({
 
   const sortOrder = (lastFolder?.sortOrder ?? 0) + 1;
 
-  const folderId = await localDB.folders.add({
-    id: nanoid(),
-    userId,
-    emoji: data.emoji,
-    name: data.name,
-    sortOrder,
-
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  });
-
-  await operationQueue.add({
-    userId,
-    operation: {
-      folderId,
-      type: "createFolder",
-      data: {
-        ...data,
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.folders, localDB.syncOperations],
+    async () => {
+      const folderId = await localDB.folders.add({
+        id: nanoid(),
+        userId,
+        emoji: data.emoji,
+        name: data.name,
         sortOrder,
-      },
-    },
-  });
 
-  return folderId;
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      await operationQueue.add({
+        userId,
+        operation: {
+          folderId,
+          type: "createFolder",
+          data: {
+            ...data,
+            sortOrder,
+          },
+        },
+      });
+
+      return folderId;
+    },
+  );
+
+  return tx;
 }
 
 export async function updateLocalFolder({
@@ -53,21 +61,29 @@ export async function updateLocalFolder({
   userId: string;
   data: FolderInsert;
 }) {
-  const updatedFolderCount = await localDB.folders.update(folderId, {
-    ...data,
-    updatedAt: Date.now(),
-  });
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.folders, localDB.syncOperations],
+    async () => {
+      const updatedFolderCount = await localDB.folders.update(folderId, {
+        ...data,
+        updatedAt: Date.now(),
+      });
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      folderId,
-      type: "updateFolder",
-      data,
+      await operationQueue.add({
+        userId,
+        operation: {
+          folderId,
+          type: "updateFolder",
+          data,
+        },
+      });
+
+      return updatedFolderCount;
     },
-  });
+  );
 
-  return updatedFolderCount;
+  return tx;
 }
 
 export async function deleteLocalFolder({
@@ -77,17 +93,25 @@ export async function deleteLocalFolder({
   folderId: string;
   userId: string;
 }) {
-  const deletedCount = await localDB.deleteFolder(folderId);
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.folders, localDB.syncOperations],
+    async () => {
+      const deletedCount = await localDB.deleteFolder(folderId);
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      folderId,
-      type: "deleteFolder",
+      await operationQueue.add({
+        userId,
+        operation: {
+          folderId,
+          type: "deleteFolder",
+        },
+      });
+
+      return deletedCount;
     },
-  });
+  );
 
-  return deletedCount;
+  return tx;
 }
 
 export async function reorderLocalFolders({
@@ -97,23 +121,31 @@ export async function reorderLocalFolders({
   userId: string;
   data: FolderOrder;
 }) {
-  const updatedFolderCount = await localDB.folders.bulkUpdate(
-    data.map((item) => ({
-      key: item.id,
-      changes: {
-        sortOrder: item.order,
-        updatedAt: Date.now(),
-      },
-    })),
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.folders, localDB.syncOperations],
+    async () => {
+      const updatedFolderCount = await localDB.folders.bulkUpdate(
+        data.map((item) => ({
+          key: item.id,
+          changes: {
+            sortOrder: item.order,
+            updatedAt: Date.now(),
+          },
+        })),
+      );
+
+      await operationQueue.add({
+        userId,
+        operation: {
+          type: "reorderFolders",
+          data,
+        },
+      });
+
+      return updatedFolderCount;
+    },
   );
 
-  await operationQueue.add({
-    userId,
-    operation: {
-      type: "reorderFolders",
-      data,
-    },
-  });
-
-  return updatedFolderCount;
+  return tx;
 }
