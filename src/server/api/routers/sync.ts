@@ -1,4 +1,5 @@
 import { syncOperationSchema } from "@/lib/schema/sync";
+import { tryCatch } from "@/lib/try-catch";
 import type { SyncOperation } from "@/local/schema/sync";
 import { authedProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { DB } from "@/server/db";
@@ -169,6 +170,36 @@ export const syncRouter = createTRPCRouter({
       }
 
       return results;
+    }),
+
+  pull: authedProcedure
+    .input(
+      z.object({
+        since: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const result = await tryCatch(
+        Promise.all([
+          DB.folders.queries.getAllSince(userId, input.since),
+          DB.notes.queries.getAllSince(userId, input.since),
+        ]),
+      );
+
+      if (result.error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to pull data",
+        });
+      }
+
+      return {
+        now: Date.now(),
+        folders: result.data[0],
+        notes: result.data[1],
+      };
     }),
 });
 

@@ -2,11 +2,13 @@ import type { LocalFolder } from "@/local/schema/folder";
 import type { LocalNote } from "@/local/schema/note";
 import Dexie, { type Table } from "dexie";
 import type { SyncOperation } from "./schema/sync";
+import type { SyncMeta } from "./schema/sync-meta";
 
 export class LocalDB extends Dexie {
   folders!: Table<LocalFolder, string>;
   notes!: Table<LocalNote, string>;
   syncOperations!: Table<SyncOperation, string>;
+  syncMeta!: Table<SyncMeta, string>;
 
   constructor() {
     super("local-db");
@@ -15,6 +17,7 @@ export class LocalDB extends Dexie {
       notes:
         "id, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
       syncOperations: "id, userId, timestamp, [userId+status+timestamp]",
+      syncMeta: "userId",
     });
   }
 

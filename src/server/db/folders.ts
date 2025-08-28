@@ -3,18 +3,10 @@ import { db } from "./root";
 
 export const _folders = {
   queries: {
-    getNotes: (folderId: string, userId: string) => {
-      return db.note.findMany({
-        where: { folderId, userId, isTrashed: false, isArchived: false },
+    getAllSince: async (userId: string, since: number) => {
+      return db.folder.findMany({
+        where: { userId, updatedAt: { gt: new Date(since) } },
         orderBy: { sortOrder: "asc" },
-        select: {
-          id: true,
-          title: true,
-          sortOrder: true,
-          isFavorite: true,
-          createdAt: true,
-          updatedAt: true,
-        },
       });
     },
   },

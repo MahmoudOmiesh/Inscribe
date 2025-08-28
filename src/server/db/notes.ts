@@ -17,27 +17,10 @@ import { nanoid } from "nanoid";
 
 export const _notes = {
   queries: {
-    get: (noteId: string, userId: string) => {
-      return db.note.findUnique({
-        where: { id: noteId, userId },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-
-          isFavorite: true,
-          isArchived: true,
-          isTrashed: true,
-
-          font: true,
-          smallText: true,
-          fullWidth: true,
-          locked: true,
-
-          folderId: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+    getAllSince: async (userId: string, since: number) => {
+      return db.note.findMany({
+        where: { userId, updatedAt: { gt: new Date(since) } },
+        orderBy: { sortOrder: "asc" },
       });
     },
   },
