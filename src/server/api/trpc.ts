@@ -5,10 +5,12 @@ import { ZodError } from "zod";
 import { db } from "@/server/db/root";
 import { tryCatch } from "@/lib/try-catch";
 import { auth } from "@/lib/auth";
+import { syncEventEmitter } from "@/sync/emitter";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   return {
     db,
+    syncEventEmitter,
     ...opts,
   };
 };

@@ -3,10 +3,25 @@ import { tryCatch } from "@/lib/try-catch";
 import type { SyncOperation } from "@/local/schema/sync";
 import { authedProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { DB } from "@/server/db";
+import { type UserDataSyncedEvent } from "@/sync/emitter";
 import { TRPCError } from "@trpc/server";
+import { on } from "events";
 import z from "zod";
 
 export const syncRouter = createTRPCRouter({
+  onSyncOperation: authedProcedure.subscription(async function* (opts) {
+    console.log("onSyncOperation");
+    const userId = opts.ctx.session.user.id;
+    for await (const [data] of on(opts.ctx.syncEventEmitter, "userDataSynced", {
+      signal: opts.signal,
+    })) {
+      const userDataSyncedEvent = data as UserDataSyncedEvent;
+      if (userDataSyncedEvent.userId !== userId) continue;
+
+      yield userDataSyncedEvent;
+    }
+  }),
+
   syncOperations: authedProcedure
     .input(z.array(syncOperationSchema))
     .mutation(async ({ ctx, input }) => {
@@ -155,19 +170,24 @@ export const syncRouter = createTRPCRouter({
 
           results.push({
             id: op.id,
-            status: "success",
+            status: "success" as const,
           });
         } catch (error) {
           console.error(`Error processing operation ${op.id}:`, error);
 
           results.push({
             id: op.id,
-            status: "error",
+            status: "error" as const,
           });
 
           break;
         }
       }
+
+      ctx.syncEventEmitter.emit("userDataSynced", {
+        userId,
+        results,
+      });
 
       return results;
     }),

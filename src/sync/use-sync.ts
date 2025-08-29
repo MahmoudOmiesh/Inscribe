@@ -4,7 +4,7 @@ import { mutationStatusStore } from "@/lib/mutation-status-store";
 import { api } from "@/trpc/react";
 import { operationQueue } from "./operation-queue";
 import { tryCatch } from "@/lib/try-catch";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useUserId } from "@/app/notes/_components/user-context";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getLastPulledAt } from "@/local/queries/sync-meta";
@@ -14,13 +14,26 @@ import {
   updateFoldersFromPull,
   updateNotesFromPull,
 } from "@/local/mutations/sync-meta";
+import { useSyncSubscription } from "./use-sync-subscription";
 
 export function useSync() {
+  useSyncSubscription();
+
+  const isSyncingRef = useRef(false);
+  const isPullingRef = useRef(false);
+
   const syncMutation = api.sync.syncOperations.useMutation();
   const utils = api.useUtils();
   const userId = useUserId();
 
   const applyPull = useCallback(async () => {
+    return;
+
+    if (isSyncingRef.current) {
+      return;
+    }
+    isPullingRef.current = true;
+
     const since = (await getLastPulledAt(userId)) ?? 0;
     const pulled = await tryCatch(
       utils.sync.pull.fetch({
@@ -49,9 +62,16 @@ export function useSync() {
         await setLastPulledAt(userId, data.now);
       },
     );
+
+    isPullingRef.current = false;
   }, [userId, utils.sync.pull]);
 
   const sync = useCallback(async () => {
+    if (isPullingRef.current) {
+      return;
+    }
+    isSyncingRef.current = true;
+
     mutationStatusStore.start();
 
     const pendingOperations = await operationQueue.getPendingOperations(userId);
@@ -70,6 +90,8 @@ export function useSync() {
       .filter((r) => r.status === "success")
       .map((r) => r.id);
     await operationQueue.removeSyncedOperations(syncedIds);
+
+    isSyncingRef.current = false;
 
     const { error: applyError } = await tryCatch(applyPull());
     if (applyError) {
