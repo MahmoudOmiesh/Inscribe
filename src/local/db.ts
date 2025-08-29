@@ -39,6 +39,7 @@ export class LocalDB extends Dexie {
 export const localDB = new LocalDB();
 
 export function resetLocalDB() {
+  console.log("resetLocalDB");
   return localDB.transaction(
     "rw",
     [localDB.folders, localDB.notes, localDB.syncOperations, localDB.syncMeta],

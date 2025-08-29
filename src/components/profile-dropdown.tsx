@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { resetLocalDB } from "@/local/db";
+import { useRouter } from "next/navigation";
 
 export function ProfileDropdown({
   name,
@@ -23,6 +25,8 @@ export function ProfileDropdown({
   photoUrl: string;
   className?: string;
 }) {
+  const router = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -35,7 +39,15 @@ export function ProfileDropdown({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => authClient.signOut()}>
+          <DropdownMenuItem
+            onClick={async () => {
+              await Promise.all([
+                authClient.signOut(),
+                resetLocalDB(),
+                router.push("/"),
+              ]);
+            }}
+          >
             <LogOutIcon />
             <span>Log out</span>
           </DropdownMenuItem>
