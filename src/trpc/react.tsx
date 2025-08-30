@@ -2,11 +2,10 @@
 
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import {
-  createWSClient,
   httpBatchStreamLink,
+  httpSubscriptionLink,
   loggerLink,
   splitLink,
-  wsLink,
 } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
@@ -44,10 +43,6 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
  */
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
-const wsClient = createWSClient({
-  url: `ws://localhost:3001`,
-});
-
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
@@ -61,9 +56,9 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
         }),
         splitLink({
           condition: (op) => op.type === "subscription",
-          true: wsLink({
-            client: wsClient,
+          true: httpSubscriptionLink({
             transformer: SuperJSON,
+            url: getBaseUrl() + "/api/trpc",
           }),
           false: httpBatchStreamLink({
             transformer: SuperJSON,

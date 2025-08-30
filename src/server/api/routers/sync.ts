@@ -10,13 +10,15 @@ import z from "zod";
 
 export const syncRouter = createTRPCRouter({
   onSyncOperation: authedProcedure.subscription(async function* (opts) {
-    console.log("onSyncOperation");
     const userId = opts.ctx.session.user.id;
     for await (const [data] of on(opts.ctx.syncEventEmitter, "userDataSynced", {
       signal: opts.signal,
     })) {
       const userDataSyncedEvent = data as UserDataSyncedEvent;
-      if (userDataSyncedEvent.userId !== userId) continue;
+
+      if (userDataSyncedEvent.userId !== userId) {
+        continue;
+      }
 
       yield userDataSyncedEvent;
     }
@@ -163,11 +165,6 @@ export const syncRouter = createTRPCRouter({
               throw new Error("Invalid operation type:");
           }
 
-          console.log(
-            `Successfully processed operation ${op.id} with result:`,
-            result,
-          );
-
           results.push({
             id: op.id,
             status: "success" as const,
@@ -184,11 +181,12 @@ export const syncRouter = createTRPCRouter({
         }
       }
 
-      ctx.syncEventEmitter.emit("userDataSynced", {
+      const eventData = {
         userId,
         results,
-      });
+      };
 
+      ctx.syncEventEmitter.emit("userDataSynced", eventData);
       return results;
     }),
 
