@@ -17,8 +17,6 @@ import {
 import { useSyncSubscription } from "./use-sync-subscription";
 
 export function useSync() {
-  useSyncSubscription();
-
   const isSyncingRef = useRef(false);
   const isPullingRef = useRef(false);
 
@@ -27,11 +25,13 @@ export function useSync() {
   const userId = useUserId();
 
   const applyPull = useCallback(async () => {
-    return;
-
-    if (isSyncingRef.current) {
+    if (isSyncingRef.current || isPullingRef.current) {
+      setTimeout(() => {
+        void applyPull();
+      }, 1000);
       return;
     }
+
     isPullingRef.current = true;
 
     const since = (await getLastPulledAt(userId)) ?? 0;
@@ -42,6 +42,7 @@ export function useSync() {
     );
 
     if (pulled.error) {
+      isPullingRef.current = false;
       throw new Error("Failed to pull data");
     }
 
@@ -67,22 +68,27 @@ export function useSync() {
   }, [userId, utils.sync.pull]);
 
   const sync = useCallback(async () => {
-    if (isPullingRef.current) {
+    if (isSyncingRef.current || isPullingRef.current) {
+      setTimeout(() => {
+        void sync();
+      }, 1000);
       return;
     }
-    isSyncingRef.current = true;
 
+    isSyncingRef.current = true;
     mutationStatusStore.start();
 
     const pendingOperations = await operationQueue.getPendingOperations(userId);
     if (pendingOperations.length === 0) {
       mutationStatusStore.success();
+      isSyncingRef.current = false;
       return;
     }
 
     const results = await tryCatch(syncMutation.mutateAsync(pendingOperations));
     if (results.error) {
       mutationStatusStore.error();
+      isSyncingRef.current = false;
       return;
     }
 
@@ -92,15 +98,12 @@ export function useSync() {
     await operationQueue.removeSyncedOperations(syncedIds);
 
     isSyncingRef.current = false;
-
-    const { error: applyError } = await tryCatch(applyPull());
-    if (applyError) {
-      mutationStatusStore.error();
-      return;
-    }
-
     mutationStatusStore.success();
-  }, [syncMutation, userId, applyPull]);
+  }, [syncMutation, userId]);
+
+  useSyncSubscription(() => {
+    void tryCatch(applyPull());
+  });
 
   useEffect(() => {
     void tryCatch(applyPull());
@@ -108,7 +111,7 @@ export function useSync() {
   }, []);
 
   const debouncedSync = useDebouncedCallback(() => {
-    void sync();
+    void tryCatch(sync());
   }, 1000);
 
   return debouncedSync;

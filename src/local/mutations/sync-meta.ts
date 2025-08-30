@@ -33,8 +33,8 @@ export async function updateNotesFromPull(
   const toUpsert = notes.filter((note) => note.deletedAt == null);
 
   return Promise.all([
-    await localDB.notes.bulkDelete(toDelete.map((note) => note.id)),
-    await localDB.notes.bulkPut(
+    localDB.notes.bulkDelete(toDelete.map((note) => note.id)),
+    localDB.notes.bulkPut(
       toUpsert.map(({ deletedAt: _, ...note }) => ({
         ...note,
         content: JSON.stringify(note.content),
