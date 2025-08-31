@@ -1,67 +1,64 @@
 "use client";
 
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
-  AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogCancel,
-  AlertDialogFooter,
-  AlertDialogTrigger,
   AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   EmojiPicker,
-  EmojiPickerSearch,
   EmojiPickerContent,
   EmojiPickerFooter,
+  EmojiPickerSearch,
 } from "@/components/ui/emoji-picker";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/spinner";
-import { FolderInsertSchema, type FolderInsert } from "@/lib/schema/folder";
-import type { LocalFolder } from "@/local/schema/folder";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import {
-  Form,
   FormControl,
-  FormItem,
   FormField,
+  FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { useForm } from "react-hook-form";
+import { FolderInsertSchema, type FolderInsert } from "@/lib/schema/folder";
 import {
   createLocalFolder,
   deleteLocalFolder,
   updateLocalFolder,
 } from "@/local/mutations/folders";
+import type { LocalFolder } from "@/local/schema/folder";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { FolderPenIcon, SaveIcon, Trash2Icon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Form } from "@/components/ui/form";
 import { useUserId } from "../user-context";
-import { SaveIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
-export function FolderCreateDialog({
+export function FolderCreateDropdown({
   children,
-}: {
+  ...props
+}: React.ComponentProps<typeof DropdownMenuContent> & {
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const userId = useUserId();
-
   const createFolder = useMutation({
     mutationFn: createLocalFolder,
     onMutate: () => setIsDialogOpen(false),
@@ -70,93 +67,120 @@ export function FolderCreateDialog({
     },
   });
 
-  function handleSubmit(data: FolderInsert) {
-    createFolder.mutate({
-      userId,
-      data,
-    });
-  }
-
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create a Folder</DialogTitle>
-        </DialogHeader>
-        <FolderForm onSubmit={handleSubmit} />
-      </DialogContent>
-    </Dialog>
+    <DropdownMenu open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent {...props} onClick={(e) => e.stopPropagation()}>
+        <FolderForm
+          onSubmit={(data) => createFolder.mutate({ userId, data })}
+        />
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
-export function FolderRenameDialog({
+export function FolderMoreDropdown({
   folder,
   children,
-}: {
+  ...props
+}: React.ComponentProps<typeof DropdownMenuContent> & {
   folder: LocalFolder;
   children: React.ReactNode;
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const userId = useUserId();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const updateFolder = useMutation({
     mutationFn: updateLocalFolder,
-    onMutate: () => setIsDialogOpen(false),
+    onMutate: () => setIsDropdownOpen(false),
     meta: {
       toastOnError: "Failed to rename folder. Please try again.",
     },
   });
 
-  function handleSubmit(data: FolderInsert) {
-    updateFolder.mutate({
-      folderId: folder.id,
-      userId,
-      data,
-    });
-  }
+  useEffect(() => {
+    if (!isDropdownOpen) {
+      setTimeout(() => setIsFormOpen(false), 200);
+    }
+  }, [isDropdownOpen]);
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Rename Folder</DialogTitle>
-        </DialogHeader>
-        <FolderForm
-          onSubmit={handleSubmit}
-          defaultValues={{ name: folder.name, emoji: folder.emoji }}
-          isEdit
-        />
-      </DialogContent>
-    </Dialog>
+    <>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent
+          {...props}
+          onClick={(e) => e.stopPropagation()}
+          hidden={isDeleteDialogOpen}
+          className="min-w-[200px]"
+        >
+          {isFormOpen ? (
+            <FolderForm
+              defaultValues={{ name: folder.name, emoji: folder.emoji }}
+              onSubmit={(data) =>
+                updateFolder.mutate({ folderId: folder.id, userId, data })
+              }
+            />
+          ) : (
+            <>
+              <DropdownMenuLabel className="text-muted-foreground pt-1 text-xs font-medium">
+                Folder
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsFormOpen(true);
+                }}
+              >
+                <FolderPenIcon /> Rename Folder
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive-hover"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsDeleteDialogOpen(true);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <Trash2Icon /> Delete Permanently
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <FolderDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        folderId={folder.id}
+      />
+    </>
   );
 }
 
 export function FolderDeleteDialog({
+  open,
+  onOpenChange,
   folderId,
-  children,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   folderId: string;
-  children: React.ReactNode;
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const userId = useUserId();
 
   const deleteFolder = useMutation({
     mutationFn: deleteLocalFolder,
-    onMutate: () => setIsDialogOpen(false),
-    onError: (error) => {
-      console.log(error);
-    },
+    onMutate: () => onOpenChange(false),
     meta: {
       toastOnError: "Failed to delete folder. Please try again.",
     },
   });
 
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -170,10 +194,8 @@ export function FolderDeleteDialog({
           <Button
             variant="destructive"
             onClick={() => deleteFolder.mutate({ folderId, userId })}
-            disabled={deleteFolder.isPending}
           >
             Delete
-            {deleteFolder.isPending && <Spinner />}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -184,11 +206,9 @@ export function FolderDeleteDialog({
 export function FolderForm({
   defaultValues,
   onSubmit,
-  isEdit = false,
 }: {
   onSubmit: (data: FolderInsert) => void;
   defaultValues?: FolderInsert;
-  isEdit?: boolean;
 }) {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 

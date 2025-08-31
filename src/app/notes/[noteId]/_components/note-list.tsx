@@ -1,10 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -15,7 +14,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  MoreHorizontalIcon,
   StarIcon,
   ArchiveIcon,
   LinkIcon,
@@ -24,99 +22,99 @@ import {
   Trash2Icon,
   ExternalLinkIcon,
   AlertTriangleIcon,
+  FileIcon,
+  MoreHorizontal,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocalFolderNotes } from "@/local/queries/folders";
-import { Spinner } from "@/components/spinner";
+import { HoverButton } from "@/components/hover-button";
+import Link from "next/link";
+import { NoteEmptyState, NoteLoadingState } from "./states";
 
 export function NoteList({ folderId }: { folderId: string }) {
   const pathname = usePathname();
   const notes = useLocalFolderNotes(folderId);
 
   if (!notes) {
-    return (
-      <div className="flex h-16 items-center justify-center p-2">
-        <Spinner />
-      </div>
-    );
+    return <NoteLoadingState />;
   }
 
   const isEmpty = notes.length === 0;
 
   return (
-    <SidebarMenuSub
-      className={cn("mr-0 pr-[0.3rem]", isEmpty && "ml-0 border-l-0")}
-    >
-      {isEmpty && (
-        <SidebarMenuSubItem className="text-muted-foreground flex h-8 w-full items-center justify-center gap-2 text-center text-sm italic">
-          <p>This folder is empty</p>
-        </SidebarMenuSubItem>
-      )}
+    <SidebarMenu>
+      {isEmpty && <NoteEmptyState />}
       {notes.map((note) => (
-        <SidebarMenuSubItem
-          key={note.id}
-          className="flex w-full items-center justify-between gap-2"
-        >
-          <SidebarMenuSubButton
-            asChild
-            isActive={pathname === `/notes/${note.id}`}
-            tabIndex={0}
-            className="flex w-full items-center justify-between gap-2 truncate"
-          >
-            <Link href={`/notes/${note.id}`}>{note.title}</Link>
-          </SidebarMenuSubButton>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                title="More"
-                variant="ghost"
-                size="icon"
-                className="size-5"
-              >
-                <MoreHorizontalIcon className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <StarIcon /> Add to Favorites
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ArchiveIcon /> Archive Note
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <LinkIcon /> Copy Link
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CopyIcon /> Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CornerUpRightIcon /> Move To
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Trash2Icon /> Move to Trash
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <ExternalLinkIcon />
-                  Open in New Tab
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <AlertTriangleIcon className="text-destructive" />
-                  Delete Permanently
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuSubItem>
+        <SidebarMenuItem key={note.id}>
+          <Link href={`/notes/${note.id}`}>
+            <SidebarMenuButton
+              className="group/button h-fit gap-0 py-1.5 pl-8"
+              isActive={pathname === `/notes/${note.id}`}
+            >
+              <FileIcon />
+              <div className="ml-2 truncate group-hover/button:mr-2">
+                {note.title}
+              </div>
+              <div className="ml-auto flex items-center">
+                <NoteDropdown side="right" align="start">
+                  <HoverButton title="More...">
+                    <MoreHorizontal />
+                  </HoverButton>
+                </NoteDropdown>
+              </div>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem>
       ))}
-    </SidebarMenuSub>
+    </SidebarMenu>
+  );
+}
+
+function NoteDropdown({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+} & React.ComponentProps<typeof DropdownMenuContent>) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent {...props}>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <StarIcon /> Add to Favorites
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <ArchiveIcon /> Archive Note
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <LinkIcon /> Copy Link
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <CopyIcon /> Duplicate
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <CornerUpRightIcon /> Move To
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Trash2Icon /> Move to Trash
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <ExternalLinkIcon />
+            Open in New Tab
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <AlertTriangleIcon className="text-destructive" />
+            Delete Permanently
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

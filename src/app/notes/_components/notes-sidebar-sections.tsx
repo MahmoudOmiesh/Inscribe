@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FileIcon, StarIcon, ArchiveIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
-import { NotesSidebarFolders } from "./notes-sidebar-folders";
+import { NotesSidebarFolders } from "./folders/notes-sidebar-folders";
 
 const SIDERBAR_SECTIONS = [
   {
