@@ -8,16 +8,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { SearchIcon } from "lucide-react";
-import { NotesSidebarFavorites } from "./notes-sidebar-favorites";
-import { NotesSidebarFolders } from "./folders/notes-sidebar-folders";
 import { NotesSidebarHeader } from "./notes-sidebar-header";
-import { NotesSidebarTrash } from "./notes-sidebar-trash";
-import { NotesSidebarArchive } from "./notes-siderbar-archive";
+import { NotesSidebarSections } from "./notes-sidebar-sections";
 
 export function NotesSidebar() {
   return (
     <Sidebar>
       <NotesSidebarHeader />
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -31,13 +29,7 @@ export function NotesSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <NotesSidebarFavorites />
-
-        <NotesSidebarFolders />
-
-        <NotesSidebarArchive />
-
-        <NotesSidebarTrash />
+        <NotesSidebarSections />
       </SidebarContent>
     </Sidebar>
   );

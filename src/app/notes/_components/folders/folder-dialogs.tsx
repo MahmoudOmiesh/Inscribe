@@ -52,6 +52,7 @@ import {
 } from "@/local/mutations/folders";
 import { useMutation } from "@tanstack/react-query";
 import { useUserId } from "../user-context";
+import { SaveIcon } from "lucide-react";
 
 export function FolderCreateDialog({
   children,
@@ -180,7 +181,7 @@ export function FolderDeleteDialog({
   );
 }
 
-function FolderForm({
+export function FolderForm({
   defaultValues,
   onSubmit,
   isEdit = false,
@@ -204,15 +205,15 @@ function FolderForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
           <div>
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Folder Name</FormLabel>
-                  <div className="flex items-stretch gap-2">
+                  <FormLabel className="sr-only">Folder Name</FormLabel>
+                  <div className="flex items-stretch gap-1">
                     <Popover
                       open={isEmojiPickerOpen}
                       onOpenChange={setIsEmojiPickerOpen}
@@ -223,6 +224,7 @@ function FolderForm({
                           type="button"
                           variant="outline"
                           size="icon"
+                          className="size-8 rounded-xs"
                           onClick={() => setIsEmojiPickerOpen(true)}
                         >
                           {emoji}
@@ -249,8 +251,9 @@ function FolderForm({
                     <FormControl>
                       <Input
                         placeholder="Enter Folder Name"
+                        autoFocus
+                        className="focus-visible:border-border h-auto w-full flex-1 rounded-xs focus-visible:ring-0"
                         {...field}
-                        className="w-full flex-1"
                       />
                     </FormControl>
                   </div>
@@ -259,13 +262,9 @@ function FolderForm({
               )}
             />
           </div>
-          <div className="space-x-2 self-end">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-
-            <Button type="submit">{isEdit ? "Update" : "Create"}</Button>
-          </div>
+          <Button type="submit" size="icon" className="size-8 rounded-xs">
+            <SaveIcon />
+          </Button>
         </div>
       </form>
     </Form>

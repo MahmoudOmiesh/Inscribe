@@ -21,14 +21,14 @@ export default async function Layout({
 
   return (
     <main className="flex-1">
-      <UserProvider userId={session.user.id}>
-        <SidebarProvider>
+      <SidebarProvider>
+        <UserProvider userId={session.user.id}>
           <SyncHandler>
             <NotesSidebar />
             <div className="flex flex-1 flex-col">{children}</div>
           </SyncHandler>
-        </SidebarProvider>
-      </UserProvider>
+        </UserProvider>
+      </SidebarProvider>
     </main>
   );
 }

@@ -39,9 +39,11 @@ function TooltipContent({
   sideOffset = 0,
   children,
   variant = "default",
+  arrow = true,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content> & {
   variant?: "default" | "muted";
+  arrow?: boolean;
 }) {
   return (
     <TooltipPrimitive.Portal>
@@ -56,12 +58,14 @@ function TooltipContent({
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow
-          className={cn(
-            "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
-            variant === "muted" && "bg-muted fill-muted",
-          )}
-        />
+        {arrow && (
+          <TooltipPrimitive.Arrow
+            className={cn(
+              "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
+              variant === "muted" && "bg-muted fill-muted",
+            )}
+          />
+        )}
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
