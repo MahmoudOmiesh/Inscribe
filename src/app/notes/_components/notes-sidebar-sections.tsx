@@ -10,7 +10,10 @@ import {
 import { cn } from "@/lib/utils";
 import { FileIcon, StarIcon, ArchiveIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
-import { NotesSidebarFolders } from "./folders/notes-sidebar-folders";
+import { NotesSidebarFolders } from "./sections/folders/notes-sidebar-folders";
+import { NotesSidebarFavorites } from "./sections/notes-sidebar-favorites";
+import { NotesSidebarTrash } from "./sections/notes-sidebar-trash";
+import { NotesSidebarArchive } from "./sections/notes-siderbar-archive";
 
 const SIDERBAR_SECTIONS = [
   {
@@ -23,19 +26,19 @@ const SIDERBAR_SECTIONS = [
     code: "favorites" as const,
     label: "Favorites",
     icon: <StarIcon />,
-    component: <div>favorites</div>,
+    component: <NotesSidebarFavorites />,
   },
   {
     code: "archive" as const,
     label: "Archive",
     icon: <ArchiveIcon />,
-    component: <div>archive</div>,
+    component: <NotesSidebarArchive />,
   },
   {
     code: "trash" as const,
     label: "Trash",
     icon: <Trash2Icon />,
-    component: <div>trash</div>,
+    component: <NotesSidebarTrash />,
   },
 ];
 

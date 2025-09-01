@@ -1,10 +1,10 @@
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function NoteEmptyState() {
+export function NoteEmptyState({ label }: { label: string }) {
   return (
     <SidebarMenuItem className="py-2 text-center">
-      <p className="text-muted-foreground text-sm">This folder is empty</p>
+      <p className="text-muted-foreground text-sm">{label}</p>
     </SidebarMenuItem>
   );
 }

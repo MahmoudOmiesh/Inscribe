@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { StarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteFavorite } from "@/local/mutations/notes";
-import { useUserId } from "../../_components/user-context";
+import { useUserId } from "../../../_components/user-context";
 
 export function NoteFavorite() {
   const { note } = useNoteEditor();

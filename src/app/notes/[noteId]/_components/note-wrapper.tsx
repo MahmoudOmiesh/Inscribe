@@ -1,14 +1,14 @@
 "use client";
 
-import { NoteContent } from "./note-content";
+import { NoteContent } from "./body/note-content";
 import { NoteEditorProvider } from "./note-editor-context";
-import { NoteHeader } from "./note-header";
+import { NoteHeader } from "./header/note-header";
 import { useLocalNote } from "@/local/queries/notes";
 import { Button } from "@/components/ui/button";
 import type { LocalNote } from "@/local/schema/note";
 import Link from "next/link";
 import { Spinner } from "@/components/spinner";
-import { NoteBanner } from "./note-banner";
+import { NoteBanner } from "./header/note-banner";
 
 export function NoteWrapper({ noteId }: { noteId: string }) {
   const note = useLocalNote(noteId);

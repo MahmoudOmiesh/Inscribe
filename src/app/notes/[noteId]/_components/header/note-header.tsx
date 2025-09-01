@@ -7,7 +7,7 @@ import { FileIcon, Redo2Icon, Undo2Icon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { MutationStatusIndicator } from "@/components/mutation-status-indicator";
 import { NoteFavorite } from "./note-favorite";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import { NoteHeaderDropdown } from "./note-header-dropdown";
 
 export function NoteHeader() {

@@ -20,14 +20,17 @@ import { useLocalFolders } from "@/local/queries/folders";
 import { FolderCreateDropdown, FolderMoreDropdown } from "./utils";
 import { HoverButton } from "@/components/hover-button";
 import { FolderEmptyState, FolderLoadingState } from "./states";
-import { NoteList } from "../../[noteId]/_components/note-list";
+import { NoteList } from "../../../[noteId]/_components/lists/note-list";
 import { createLocalNote } from "@/local/mutations/notes";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useUserId } from "../user-context";
+import { useUserId } from "../../user-context";
+import { useDelayedVisible } from "@/hooks/use-delayed-visible";
 
 export function NotesSidebarFolders() {
   const folders = useLocalFolders();
+
+  const showLoading = useDelayedVisible(!folders);
 
   return (
     <Collapsible defaultOpen>
@@ -54,12 +57,18 @@ export function NotesSidebarFolders() {
           <SidebarGroupContent>
             <SidebarMenu>
               {!folders ? (
-                <FolderLoadingState />
+                showLoading ? (
+                  <FolderLoadingState />
+                ) : null
               ) : folders.length === 0 ? (
                 <FolderEmptyState />
               ) : (
-                folders.map((folder) => (
-                  <NotesSiderbarFolder key={folder.id} folder={folder} />
+                folders.map((folder, idx) => (
+                  <NotesSiderbarFolder
+                    key={folder.id}
+                    folder={folder}
+                    defaultOpen={idx === 0}
+                  />
                 ))
               )}
             </SidebarMenu>
@@ -70,7 +79,13 @@ export function NotesSidebarFolders() {
   );
 }
 
-function NotesSiderbarFolder({ folder }: { folder: LocalFolder }) {
+function NotesSiderbarFolder({
+  folder,
+  defaultOpen,
+}: {
+  folder: LocalFolder;
+  defaultOpen?: boolean;
+}) {
   const router = useRouter();
   const userId = useUserId();
 
@@ -85,7 +100,7 @@ function NotesSiderbarFolder({ folder }: { folder: LocalFolder }) {
   });
 
   return (
-    <Collapsible>
+    <Collapsible defaultOpen={defaultOpen}>
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           <SidebarMenuButton className="group/button relative gap-0 hover:pr-10 focus-visible:pr-10">

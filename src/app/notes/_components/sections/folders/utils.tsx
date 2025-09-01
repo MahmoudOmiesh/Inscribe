@@ -48,7 +48,7 @@ import { useMutation } from "@tanstack/react-query";
 import { FolderPenIcon, SaveIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Form } from "@/components/ui/form";
-import { useUserId } from "../user-context";
+import { useUserId } from "../../user-context";
 import { useForm } from "react-hook-form";
 
 export function FolderCreateDropdown({

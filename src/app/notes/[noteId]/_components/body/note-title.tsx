@@ -3,10 +3,10 @@
 import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { useEffect } from "react";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteTitle } from "@/local/mutations/notes";
-import { useUserId } from "../../_components/user-context";
+import { useUserId } from "../../../_components/user-context";
 
 export function NoteTitle() {
   const { note } = useNoteEditor();

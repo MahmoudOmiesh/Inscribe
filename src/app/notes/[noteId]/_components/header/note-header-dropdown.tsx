@@ -28,7 +28,7 @@ import {
   ArchiveIcon,
   CornerUpLeftIcon,
 } from "lucide-react";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import {
   EXPORT_FORMATS,
   FONT_TYPES,
@@ -65,7 +65,7 @@ import {
   updateLocalNoteTrash,
 } from "@/local/mutations/notes";
 import { useLocalFolders } from "@/local/queries/folders";
-import { useUserId } from "../../_components/user-context";
+import { useUserId } from "../../../_components/user-context";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();

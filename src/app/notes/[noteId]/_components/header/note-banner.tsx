@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import { Trash2Icon, Undo2Icon } from "lucide-react";
 import {
   deleteLocalNote,
@@ -8,7 +8,7 @@ import {
 } from "@/local/mutations/notes";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useUserId } from "../../_components/user-context";
+import { useUserId } from "../../../_components/user-context";
 
 export function NoteBanner() {
   const router = useRouter();

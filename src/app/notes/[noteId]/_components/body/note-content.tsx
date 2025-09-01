@@ -2,13 +2,13 @@
 
 import { NoteTitle } from "./note-title";
 import { TextEditor } from "@/text-editor/text-editor";
-import { useNoteEditor } from "./note-editor-context";
+import { useNoteEditor } from "../note-editor-context";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { cn } from "@/lib/utils";
 import type { EditorNode } from "@/text-editor/model/schema";
 import { useMutation } from "@tanstack/react-query";
 import { updateLocalNoteContent } from "@/local/mutations/notes";
-import { useUserId } from "../../_components/user-context";
+import { useUserId } from "../../../_components/user-context";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
