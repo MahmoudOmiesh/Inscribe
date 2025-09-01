@@ -9,6 +9,7 @@ import { MutationStatusIndicator } from "@/components/mutation-status-indicator"
 import { NoteFavorite } from "./note-favorite";
 import { useNoteEditor } from "../note-editor-context";
 import { NoteHeaderDropdown } from "./note-header-dropdown";
+import { NoteLock } from "./note-lock";
 
 export function NoteHeader() {
   const { data: session } = authClient.useSession();
@@ -16,11 +17,12 @@ export function NoteHeader() {
 
   return (
     <header className="bg-background flex flex-row items-center justify-between px-4 py-2 text-sm">
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-4">
         <div className="flex flex-row items-center gap-1">
           <FileIcon size={16} />
           <span className="max-w-[15em] truncate">{note.title}</span>
         </div>
+        {note.locked && <NoteLock />}
         <MutationStatusIndicator />
       </div>
       <div className="flex flex-row items-center gap-2">
