@@ -33,7 +33,6 @@ import {
   EXPORT_FORMATS,
   FONT_TYPES,
   type ExportFormat,
-  type FontType,
 } from "@/text-editor/model/schema";
 import { Spinner } from "@/components/spinner";
 import { Input } from "@/components/ui/input";
@@ -54,86 +53,18 @@ import {
 } from "@/components/ui/select";
 import { exportToMarkdown } from "@/text-editor/export/md";
 import { exportToHtml } from "@/text-editor/export/html";
-import { useMutation } from "@tanstack/react-query";
-import {
-  updateLocalNoteArchive,
-  updateLocalNoteFolder,
-  updateLocalNoteFont,
-  updateLocalNoteFullWidth,
-  updateLocalNoteLocked,
-  updateLocalNoteSmallText,
-  updateLocalNoteTrash,
-} from "@/local/mutations/notes";
 import { useLocalFolders } from "@/local/queries/folders";
-import { useUserId } from "../../../_components/user-context";
+import { NOTE_MUTATIONS } from "../../mutations";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
-  const userId = useUserId();
 
-  const updateTrash = useMutation({
-    mutationFn: (isTrashed: boolean) =>
-      updateLocalNoteTrash({
-        noteId: note.id,
-        userId,
-        data: { isTrashed },
-      }),
-    meta: {
-      toastOnError: "Failed to move to trash, please try again.",
-    },
-  });
-
-  const updateArchive = useMutation({
-    mutationFn: (isArchived: boolean) =>
-      updateLocalNoteArchive({
-        noteId: note.id,
-        userId,
-        data: { isArchived },
-      }),
-    meta: {
-      toastOnError: "Failed to archive, please try again.",
-    },
-  });
-
-  const updateFont = useMutation({
-    mutationFn: (font: FontType) =>
-      updateLocalNoteFont({ noteId: note.id, userId, data: { font } }),
-    meta: {
-      toastOnError: "Failed to update font, please try again.",
-    },
-  });
-
-  const updateSmallText = useMutation({
-    mutationFn: (smallText: boolean) =>
-      updateLocalNoteSmallText({
-        noteId: note.id,
-        userId,
-        data: { smallText },
-      }),
-    meta: {
-      toastOnError: "Failed to update small text, please try again.",
-    },
-  });
-
-  const updateLocked = useMutation({
-    mutationFn: (locked: boolean) =>
-      updateLocalNoteLocked({ noteId: note.id, userId, data: { locked } }),
-    meta: {
-      toastOnError: "Failed to update locked, please try again.",
-    },
-  });
-
-  const updateFullWidth = useMutation({
-    mutationFn: (fullWidth: boolean) =>
-      updateLocalNoteFullWidth({
-        noteId: note.id,
-        userId,
-        data: { fullWidth },
-      }),
-    meta: {
-      toastOnError: "Failed to update full width, please try again.",
-    },
-  });
+  const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
+  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
+  const updateFont = NOTE_MUTATIONS.updateFont(note.id);
+  const updateSmallText = NOTE_MUTATIONS.updateSmallText(note.id);
+  const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
+  const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
 
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
@@ -204,10 +135,7 @@ export function NoteHeaderDropdown() {
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
                       <DropdownMenuSubContent sideOffset={10}>
-                        <MoveToDropdown
-                          moveToArchive={() => updateArchive.mutate(true)}
-                          moveToTrash={() => updateTrash.mutate(true)}
-                        />
+                        <MoveToDropdown />
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
@@ -375,29 +303,14 @@ function downloadFile(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function MoveToDropdown({
-  moveToArchive,
-  moveToTrash,
-}: {
-  moveToArchive: () => void;
-  moveToTrash: () => void;
-}) {
+function MoveToDropdown() {
+  const { note } = useNoteEditor();
   const [search, setSearch] = useState("");
   const folders = useLocalFolders();
-  const { note } = useNoteEditor();
-  const userId = useUserId();
 
-  const updateFolder = useMutation({
-    mutationFn: (folderId: string) =>
-      updateLocalNoteFolder({
-        noteId: note.id,
-        userId,
-        data: { folderId },
-      }),
-    meta: {
-      toastOnError: "Failed to update folder, please try again.",
-    },
-  });
+  const updateFolder = NOTE_MUTATIONS.updateFolder(note.id);
+  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
+  const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
 
   const filteredFolders =
     folders?.filter((folder) =>
@@ -435,10 +348,10 @@ function MoveToDropdown({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={moveToArchive}>
+            <DropdownMenuItem onClick={() => updateArchive.mutate(true)}>
               <ArchiveIcon /> archive
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={moveToTrash}>
+            <DropdownMenuItem onClick={() => updateTrash.mutate(true)}>
               <Trash2Icon /> trash
             </DropdownMenuItem>
           </>

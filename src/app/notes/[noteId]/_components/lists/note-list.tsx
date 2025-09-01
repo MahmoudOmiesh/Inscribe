@@ -41,7 +41,7 @@ export function NoteList({ folderId }: { folderId: string }) {
                 {note.title}
               </div>
               <div className="ml-auto flex items-center">
-                <NoteDropdown side="right" align="start">
+                <NoteDropdown note={note} side="right" align="start">
                   <HoverButton title="More...">
                     <MoreHorizontal />
                   </HoverButton>

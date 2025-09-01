@@ -41,7 +41,11 @@ export function NoteArchiveList() {
                 {archive.title}
               </div>
               <div className="ml-auto flex items-center">
-                <NoteArchiveDropdown side="right" align="start">
+                <NoteArchiveDropdown
+                  noteId={archive.id}
+                  side="right"
+                  align="start"
+                >
                   <HoverButton title="More...">
                     <MoreHorizontal />
                   </HoverButton>

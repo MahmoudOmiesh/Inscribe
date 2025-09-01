@@ -1,53 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useNoteEditor } from "../note-editor-context";
 import { Trash2Icon, Undo2Icon } from "lucide-react";
-import {
-  deleteLocalNote,
-  updateLocalNoteArchive,
-  updateLocalNoteTrash,
-} from "@/local/mutations/notes";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useUserId } from "../../../_components/user-context";
+import { NOTE_MUTATIONS } from "../../mutations";
 
 export function NoteBanner() {
-  const router = useRouter();
-  const userId = useUserId();
   const { note } = useNoteEditor();
 
-  const restoreNote = useMutation({
-    mutationFn: () =>
-      updateLocalNoteTrash({
-        noteId: note.id,
-        userId,
-        data: { isTrashed: false },
-      }),
-    meta: {
-      toastOnError: "Failed to restore note, please try again.",
-    },
-  });
-
-  const deleteNote = useMutation({
-    mutationFn: () => deleteLocalNote({ noteId: note.id, userId }),
-    meta: {
-      toastOnError: "Failed to delete note, please try again.",
-    },
-    onMutate: () => {
-      router.push("/notes");
-    },
-  });
-
-  const unarchiveNote = useMutation({
-    mutationFn: () =>
-      updateLocalNoteArchive({
-        noteId: note.id,
-        userId,
-        data: { isArchived: false },
-      }),
-    meta: {
-      toastOnError: "Failed to unarchive note, please try again.",
-    },
-  });
+  const restoreNote = NOTE_MUTATIONS.restoreNote(note.id);
+  const deleteNote = NOTE_MUTATIONS.deleteNote(note.id);
+  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
 
   if (note.isTrashed) {
     return (
@@ -83,7 +44,7 @@ export function NoteBanner() {
           variant="outline"
           size="sm"
           className="border-white bg-transparent hover:bg-white/[0.01] dark:border-white dark:bg-transparent dark:hover:bg-white/[0.01]"
-          onClick={() => unarchiveNote.mutate()}
+          onClick={() => updateArchive.mutate(false)}
         >
           <Undo2Icon /> Unarchive note
         </Button>

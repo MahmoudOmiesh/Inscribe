@@ -41,7 +41,7 @@ export function NoteFavoritesList() {
                 {favorite.title}
               </div>
               <div className="ml-auto flex items-center">
-                <NoteDropdown side="right" align="start">
+                <NoteDropdown note={favorite} side="right" align="start">
                   <HoverButton title="More...">
                     <MoreHorizontal />
                   </HoverButton>

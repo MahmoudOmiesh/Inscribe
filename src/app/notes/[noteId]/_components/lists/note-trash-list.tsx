@@ -41,7 +41,7 @@ export function NoteTrashList() {
                 {trash.title}
               </div>
               <div className="ml-auto flex items-center">
-                <NoteTrashDropdown side="right" align="start">
+                <NoteTrashDropdown noteId={trash.id} side="right" align="start">
                   <HoverButton title="More...">
                     <MoreHorizontal />
                   </HoverButton>

@@ -1,170 +1,169 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { api } from "@/trpc/react";
+import {
+  deleteLocalNote,
+  updateLocalNoteArchive,
+  updateLocalNoteFavorite,
+  updateLocalNoteFolder,
+  updateLocalNoteFont,
+  updateLocalNoteFullWidth,
+  updateLocalNoteLocked,
+  updateLocalNoteSmallText,
+  updateLocalNoteTrash,
+} from "@/local/mutations/notes";
+import { useMutation } from "@tanstack/react-query";
+import { useUserId } from "../_components/user-context";
+import type { FontType } from "@/text-editor/model/schema";
 import { useRouter } from "next/navigation";
 
 export const NOTE_MUTATIONS = {
-  toggleFavorite: (noteId: number) => {
-    const utils = api.useUtils();
+  updateTrash: (noteId: string) => {
+    const userId = useUserId();
 
-    const toggleFavorite = api.note.toggleFavorite.useMutation({
-      onMutate: async () => {
-        await utils.note.get.cancel();
-
-        const prevNote = utils.note.get.getData({ noteId });
-
-        utils.note.get.setData({ noteId }, (old) => {
-          if (!old) return old;
-          return { ...old, isFavorite: !old.isFavorite };
-        });
-
-        return { prevNote };
-      },
-      onError: (_e, _v, context) => {
-        utils.note.get.setData({ noteId }, context?.prevNote);
-      },
+    return useMutation({
+      mutationFn: (isTrashed: boolean) =>
+        updateLocalNoteTrash({
+          noteId,
+          userId,
+          data: { isTrashed },
+        }),
       meta: {
-        subscribeToMutationStatus: true,
+        toastOnError: "Failed to move to trash, please try again.",
       },
     });
-
-    return toggleFavorite;
   },
 
-  updateFont: (noteId: number) => {
-    const utils = api.useUtils();
+  updateArchive: (noteId: string) => {
+    const userId = useUserId();
 
-    const updateFont = api.note.updateFont.useMutation({
-      onMutate: async (data) => {
-        await utils.note.get.cancel();
-
-        const prevNote = utils.note.get.getData({ noteId });
-
-        utils.note.get.setData({ noteId }, (old) => {
-          if (!old) return old;
-          return { ...old, font: data.font };
-        });
-
-        return { prevNote };
-      },
-      onError: (_e, _v, context) => {
-        utils.note.get.setData({ noteId }, context?.prevNote);
-      },
+    return useMutation({
+      mutationFn: (isArchived: boolean) =>
+        updateLocalNoteArchive({
+          noteId,
+          userId,
+          data: { isArchived },
+        }),
       meta: {
-        subscribeToMutationStatus: true,
+        toastOnError: "Failed to archive, please try again.",
       },
     });
-
-    return updateFont;
   },
 
-  updateSmallText: (noteId: number) => {
-    const utils = api.useUtils();
+  updateFavorite: (noteId: string) => {
+    const userId = useUserId();
 
-    const updateSmallText = api.note.updateSmallText.useMutation({
-      onMutate: async (data) => {
-        await utils.note.get.cancel();
-
-        const prevNote = utils.note.get.getData({ noteId });
-
-        utils.note.get.setData({ noteId }, (old) => {
-          if (!old) return old;
-          return { ...old, smallText: data.smallText };
-        });
-
-        return { prevNote };
-      },
-      onError: (_e, _v, context) => {
-        utils.note.get.setData({ noteId }, context?.prevNote);
-      },
+    return useMutation({
+      mutationFn: (isFavorite: boolean) =>
+        updateLocalNoteFavorite({
+          noteId,
+          userId,
+          data: { isFavorite },
+        }),
       meta: {
-        subscribeToMutationStatus: true,
+        toastOnError: "Failed to toggle favorite, please try again.",
       },
     });
-
-    return updateSmallText;
   },
 
-  updateLocked: (noteId: number) => {
-    const utils = api.useUtils();
+  updateFolder: (noteId: string) => {
+    const userId = useUserId();
 
-    const updateLocked = api.note.updateLocked.useMutation({
-      onMutate: async (data) => {
-        await utils.note.get.cancel();
-
-        const prevNote = utils.note.get.getData({ noteId });
-
-        utils.note.get.setData({ noteId }, (old) => {
-          if (!old) return old;
-          return { ...old, locked: data.locked };
-        });
-
-        return { prevNote };
-      },
-      onError: (_e, _v, context) => {
-        utils.note.get.setData({ noteId }, context?.prevNote);
-      },
+    return useMutation({
+      mutationFn: (folderId: string) =>
+        updateLocalNoteFolder({
+          noteId,
+          userId,
+          data: { folderId },
+        }),
       meta: {
-        subscribeToMutationStatus: true,
+        toastOnError: "Failed to update folder, please try again.",
       },
     });
-
-    return updateLocked;
   },
 
-  updateFullWidth: (noteId: number) => {
-    const utils = api.useUtils();
+  updateFont: (noteId: string) => {
+    const userId = useUserId();
 
-    const updateFullWidth = api.note.updateFullWidth.useMutation({
-      onMutate: async (data) => {
-        await utils.note.get.cancel();
-
-        const prevNote = utils.note.get.getData({ noteId });
-
-        utils.note.get.setData({ noteId }, (old) => {
-          if (!old) return old;
-          return { ...old, fullWidth: data.fullWidth };
-        });
-
-        return { prevNote };
-      },
-      onError: (_e, _v, context) => {
-        utils.note.get.setData({ noteId }, context?.prevNote);
-      },
+    return useMutation({
+      mutationFn: (font: FontType) =>
+        updateLocalNoteFont({ noteId, userId, data: { font } }),
       meta: {
-        subscribeToMutationStatus: true,
+        toastOnError: "Failed to update font, please try again.",
       },
     });
-
-    return updateFullWidth;
   },
 
-  updateFolder: () => {
-    const utils = api.useUtils();
+  updateSmallText: (noteId: string) => {
+    const userId = useUserId();
 
-    const updateFolder = api.note.updateFolder.useMutation({
+    return useMutation({
+      mutationFn: (smallText: boolean) =>
+        updateLocalNoteSmallText({
+          noteId,
+          userId,
+          data: { smallText },
+        }),
       meta: {
-        subscribeToMutationStatus: true,
-        invalidateQueries: () => utils.folder.getNotes.invalidate(),
-        onSuccessMessage: "Note moved to folder",
+        toastOnError: "Failed to update small text, please try again.",
       },
     });
-
-    return updateFolder;
   },
 
-  duplicate: (folderId: number) => {
+  updateLocked: (noteId: string) => {
+    const userId = useUserId();
+
+    return useMutation({
+      mutationFn: (locked: boolean) =>
+        updateLocalNoteLocked({ noteId, userId, data: { locked } }),
+      meta: {
+        toastOnError: "Failed to update locked, please try again.",
+      },
+    });
+  },
+
+  updateFullWidth: (noteId: string) => {
+    const userId = useUserId();
+
+    return useMutation({
+      mutationFn: (fullWidth: boolean) =>
+        updateLocalNoteFullWidth({
+          noteId,
+          userId,
+          data: { fullWidth },
+        }),
+      meta: {
+        toastOnError: "Failed to update full width, please try again.",
+      },
+    });
+  },
+
+  restoreNote: (noteId: string) => {
+    const userId = useUserId();
+
+    return useMutation({
+      mutationFn: () =>
+        updateLocalNoteTrash({
+          noteId,
+          userId,
+          data: { isTrashed: false },
+        }),
+      meta: {
+        toastOnError: "Failed to restore note, please try again.",
+      },
+    });
+  },
+
+  deleteNote: (noteId: string) => {
     const router = useRouter();
-    const utils = api.useUtils();
+    const userId = useUserId();
 
-    const duplicate = api.note.duplicate.useMutation({
-      onSuccess: (data) => {
-        router.push(`/notes/${data.id}`);
-      },
+    return useMutation({
+      mutationFn: () => deleteLocalNote({ noteId, userId }),
       meta: {
-        invalidateQueries: () => utils.folder.getNotes.invalidate({ folderId }),
+        toastOnError: "Failed to delete note, please try again.",
+      },
+      onMutate: () => {
+        router.push("/notes");
       },
     });
-
-    return duplicate;
   },
 };
