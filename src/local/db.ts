@@ -16,7 +16,7 @@ export class LocalDB extends Dexie {
       folders: "id, userId, [userId+sortOrder]",
       notes:
         "id, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
-      syncOperations: "id, userId, timestamp, [userId+status+timestamp]",
+      syncOperations: "id, [userId+status+timestamp]",
       syncMeta: "userId",
     });
   }

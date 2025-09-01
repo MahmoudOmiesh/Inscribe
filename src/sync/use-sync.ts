@@ -50,14 +50,19 @@ export function useSync() {
 
     await localDB.transaction(
       "rw",
-      [localDB.folders, localDB.notes, localDB.syncMeta],
+      [
+        localDB.folders,
+        localDB.notes,
+        localDB.syncMeta,
+        localDB.syncOperations,
+      ],
       async () => {
         if (data.folders.length > 0) {
           await updateFoldersFromPull(data.folders);
         }
 
         if (data.notes.length > 0) {
-          await updateNotesFromPull(data.notes);
+          await updateNotesFromPull(data.notes, userId);
         }
 
         await setLastPulledAt(userId, data.now);
