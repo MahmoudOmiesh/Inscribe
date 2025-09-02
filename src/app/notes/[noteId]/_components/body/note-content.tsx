@@ -30,11 +30,11 @@ export function NoteContent() {
   return (
     <div
       className={cn(
-        "mx-auto w-full flex-1 px-4 py-30",
+        "mx-auto w-full flex-1 px-4 py-10 md:py-30",
         note.fullWidth ? "max-w-screen-xl" : "max-w-3xl",
       )}
     >
-      <div className="mb-8 w-full">
+      <div className="mb-4 w-full md:mb-8">
         <NoteTitle />
       </div>
       <div className="w-full">

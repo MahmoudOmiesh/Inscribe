@@ -27,6 +27,7 @@ import {
   SearchIcon,
   ArchiveIcon,
   CornerUpLeftIcon,
+  LockKeyholeIcon,
 } from "lucide-react";
 import { useNoteEditor } from "../note-editor-context";
 import {
@@ -51,10 +52,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { exportToMarkdown } from "@/text-editor/export/md";
-import { exportToHtml } from "@/text-editor/export/html";
 import { useLocalFolders } from "@/local/queries/folders";
-import { NOTE_MUTATIONS } from "../../mutations";
+import { exportNote, NOTE_MUTATIONS } from "../../mutations";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
@@ -65,6 +64,7 @@ export function NoteHeaderDropdown() {
   const updateSmallText = NOTE_MUTATIONS.updateSmallText(note.id);
   const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
   const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
+  const copyNoteLink = NOTE_MUTATIONS.copyNoteLink(note.id);
 
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
@@ -113,11 +113,7 @@ export function NoteHeaderDropdown() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() =>
-                    navigator.clipboard.writeText(window.location.href)
-                  }
-                >
+                <DropdownMenuItem onClick={() => copyNoteLink.mutate()}>
                   <LinkIcon /> Copy link
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -175,7 +171,8 @@ export function NoteHeaderDropdown() {
                     updateLocked.mutate(!note.locked);
                   }}
                 >
-                  <LockKeyholeOpenIcon /> Lock page{" "}
+                  {note.locked ? <LockKeyholeOpenIcon /> : <LockKeyholeIcon />}
+                  Lock page
                   <Switch
                     id="lock-page"
                     className="pointer-events-none ml-auto"
@@ -230,28 +227,11 @@ function ExportDialog({
   const [exportFormat, setExportFormat] = useState<ExportFormat>("html");
 
   function handleExport() {
-    switch (exportFormat) {
-      case "html": {
-        const html = exportToHtml(editor.state.nodes, {
-          title: note.title,
-          smallText: note.smallText,
-          font: note.font,
-        });
-        const blob = new Blob([html], { type: "text/html" });
-        downloadFile(blob, `${note.title}-${note.id}-export.html`);
-        break;
-      }
-      case "markdown": {
-        const markdown = exportToMarkdown(editor.state.nodes);
-        const blob = new Blob([markdown], { type: "text/markdown" });
-        downloadFile(blob, `${note.title}-${note.id}-export.${exportFormat}`);
-        break;
-      }
-      default:
-        const _: never = exportFormat;
-        return _;
-    }
-
+    exportNote({
+      note,
+      format: exportFormat,
+      editorNodes: editor.state.nodes,
+    });
     onOpenChange(false);
   }
 
@@ -292,15 +272,6 @@ function ExportDialog({
       </DialogContent>
     </Dialog>
   );
-}
-
-function downloadFile(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 function MoveToDropdown() {

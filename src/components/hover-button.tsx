@@ -27,7 +27,7 @@ export function HoverButton({
           variant: "ghost",
           size: "icon",
         }),
-        "size-5 rounded-sm opacity-0 transition-opacity duration-100 group-hover/button:opacity-100 group-focus-visible/button:opacity-100 focus:opacity-100 dark:hover:bg-gray-100/10",
+        "size-5 rounded-sm transition-opacity duration-100 group-hover/button:opacity-100 group-focus-visible/button:opacity-100 focus:opacity-100 lg:opacity-0 dark:hover:bg-gray-100/10",
         className,
       )}
       onClick={(e) => {

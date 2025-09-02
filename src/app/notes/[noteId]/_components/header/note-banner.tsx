@@ -12,7 +12,7 @@ export function NoteBanner() {
 
   if (note.isTrashed) {
     return (
-      <div className="bg-destructive flex items-center justify-center gap-6 px-5 py-2 text-center">
+      <div className="bg-destructive flex flex-col items-center justify-center gap-3 px-5 py-2 text-center md:flex-row md:gap-6">
         <p className="text-sm">You moved this note to trash</p>
         <div className="flex flex-row items-center justify-center gap-2">
           <Button
@@ -38,7 +38,7 @@ export function NoteBanner() {
 
   if (note.isArchived) {
     return (
-      <div className="bg-muted flex items-center justify-center gap-6 px-5 py-2 text-center">
+      <div className="bg-muted flex flex-col items-center justify-center gap-3 px-5 py-2 text-center md:flex-row md:gap-6">
         <p className="text-sm">You archived this note</p>
         <Button
           variant="outline"

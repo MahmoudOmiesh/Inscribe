@@ -13,7 +13,9 @@ import { NoteBanner } from "./header/note-banner";
 export function NoteWrapper({ noteId }: { noteId: string }) {
   const note = useLocalNote(noteId);
 
-  if (note && "isPending" in note && note.isPending) {
+  const isNotePending = note && "isPending" in note && note.isPending;
+
+  if (isNotePending) {
     return <SuspenseFallback />;
   }
 

@@ -38,7 +38,7 @@ export function NoteTitle() {
       defaultValue={note.title}
       onInput={handleTitleChange}
       placeholder="New Note"
-      className="resize-none rounded-none border-0 bg-transparent font-bold whitespace-pre-wrap shadow-none outline-0 focus-visible:ring-0 md:text-4xl dark:bg-transparent"
+      className="min-h-fit resize-none rounded-none border-0 bg-transparent text-2xl font-bold whitespace-pre-wrap shadow-none outline-0 focus-visible:ring-0 md:text-4xl dark:bg-transparent"
       rows={1}
       wrap="soft"
     />

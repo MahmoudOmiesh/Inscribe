@@ -3,6 +3,13 @@ import { localDB } from "../db";
 import { useUserId } from "@/app/notes/_components/user-context";
 import Dexie from "dexie";
 
+export function useLocalFolder(folderId: string) {
+  return useLiveQuery(
+    () => localDB.folders.where("id").equals(folderId).first(),
+    [folderId],
+  );
+}
+
 export function useLocalFolders() {
   const userId = useUserId();
   return useLiveQuery(() =>

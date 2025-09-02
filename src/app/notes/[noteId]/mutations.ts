@@ -12,8 +12,15 @@ import {
 } from "@/local/mutations/notes";
 import { useMutation } from "@tanstack/react-query";
 import { useUserId } from "../_components/user-context";
-import type { FontType } from "@/text-editor/model/schema";
+import type {
+  EditorNode,
+  ExportFormat,
+  FontType,
+} from "@/text-editor/model/schema";
 import { useRouter } from "next/navigation";
+import { exportToHtml } from "@/text-editor/export/html";
+import type { LocalNote } from "@/local/schema/note";
+import { exportToMarkdown } from "@/text-editor/export/md";
 
 export const NOTE_MUTATIONS = {
   updateTrash: (noteId: string) => {
@@ -166,4 +173,58 @@ export const NOTE_MUTATIONS = {
       },
     });
   },
+
+  copyNoteLink: (noteId: string) => {
+    return useMutation({
+      mutationFn: () =>
+        navigator.clipboard.writeText(
+          `${window.location.origin}/notes/${noteId}`,
+        ),
+      meta: {
+        toastOnError: "Failed to copy note link, please try again.",
+        onSuccessMessage: "Copied to clipboard",
+      },
+    });
+  },
 };
+
+export function exportNote({
+  note,
+  format,
+  editorNodes,
+}: {
+  note: LocalNote;
+  format: ExportFormat;
+  editorNodes: EditorNode[];
+}) {
+  switch (format) {
+    case "html": {
+      const html = exportToHtml(editorNodes, {
+        title: note.title,
+        smallText: note.smallText,
+        font: note.font,
+      });
+      const blob = new Blob([html], { type: "text/html" });
+      downloadFile(blob, `${note.title}-${note.id}-export.html`);
+      break;
+    }
+    case "markdown": {
+      const markdown = exportToMarkdown(editorNodes);
+      const blob = new Blob([markdown], { type: "text/markdown" });
+      downloadFile(blob, `${note.title}-${note.id}-export.${format}`);
+      break;
+    }
+    default:
+      const _: never = format;
+      return _;
+  }
+
+  function downloadFile(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+}

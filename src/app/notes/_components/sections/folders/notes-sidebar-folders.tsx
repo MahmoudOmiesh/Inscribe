@@ -113,7 +113,7 @@ function NotesSiderbarFolder({
             <div className="ml-2 truncate group-hover/button:mr-2 group-focus-visible/button:mr-2">
               {folder.name}
             </div>
-            <div className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity duration-100 group-hover/button:opacity-100">
+            <div className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center gap-1 transition-opacity duration-100 group-hover/button:opacity-100 lg:opacity-0">
               <FolderMoreDropdown side="right" align="start" folder={folder}>
                 <HoverButton title="More...">
                   <MoreHorizontal />
