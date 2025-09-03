@@ -15,8 +15,11 @@ import {
   updateNotesFromPull,
 } from "@/local/mutations/sync-meta";
 import { useSyncSubscription } from "./use-sync-subscription";
+import { useIsOnline } from "@/hooks/use-is-online";
 
 export function useSync() {
+  const isOnline = useIsOnline();
+
   const isSyncingRef = useRef(false);
   const isPullingRef = useRef(false);
 
@@ -73,6 +76,10 @@ export function useSync() {
   }, [userId, utils.sync.pull]);
 
   const sync = useCallback(async () => {
+    if (!isOnline) {
+      return;
+    }
+
     if (isSyncingRef.current || isPullingRef.current) {
       setTimeout(() => {
         void sync();
@@ -104,7 +111,7 @@ export function useSync() {
 
     isSyncingRef.current = false;
     mutationStatusStore.success();
-  }, [syncMutation, userId]);
+  }, [isOnline, syncMutation, userId]);
 
   useSyncSubscription(() => {
     void tryCatch(applyPull());
@@ -114,6 +121,13 @@ export function useSync() {
     void tryCatch(applyPull());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (isOnline) {
+      void tryCatch(sync());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
 
   const debouncedSync = useDebouncedCallback(() => {
     void tryCatch(sync());

@@ -124,6 +124,8 @@ export async function updateLocalNoteContent({
     "rw",
     [localDB.notes, localDB.syncOperations],
     async () => {
+      console.log("updateLocalNoteContent", noteId, data);
+
       const updatedNoteCount = await localDB.notes.update(noteId, {
         content: JSON.stringify(data.content),
         updatedAt: Date.now(),

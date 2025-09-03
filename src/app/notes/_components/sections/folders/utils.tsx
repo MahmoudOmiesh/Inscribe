@@ -65,6 +65,7 @@ export function FolderCreateDropdown({
     meta: {
       toastOnError: "Failed to create folder. Please try again.",
     },
+    networkMode: "always",
   });
 
   return (
@@ -98,6 +99,7 @@ export function FolderMoreDropdown({
     meta: {
       toastOnError: "Failed to rename folder. Please try again.",
     },
+    networkMode: "always",
   });
 
   useEffect(() => {
@@ -177,6 +179,7 @@ export function FolderDeleteDialog({
     meta: {
       toastOnError: "Failed to delete folder. Please try again.",
     },
+    networkMode: "always",
   });
 
   return (

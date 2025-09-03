@@ -97,6 +97,7 @@ function NotesSiderbarFolder({
     meta: {
       toastOnError: "Failed to create note. Please try again.",
     },
+    networkMode: "always",
   });
 
   return (

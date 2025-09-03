@@ -11,43 +11,27 @@ import { useNoteEditor } from "../note-editor-context";
 import { NoteHeaderDropdown } from "./note-header-dropdown";
 import { NoteLock } from "./note-lock";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { useLocalFolder } from "@/local/queries/folders";
 import { NoteHeaderDrawer } from "./note-header-drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsOnline } from "@/hooks/use-is-online";
+import { NoteOffline } from "./note-offline";
+import { NoteBreadcrumb } from "./note-breadcrumb";
 
 export function NoteHeader() {
   const { data: session } = authClient.useSession();
 
   const { note, editor } = useNoteEditor();
-  const folder = useLocalFolder(note.folderId);
 
   const isMobile = useIsMobile();
+  const isOffline = !useIsOnline();
 
   return (
     <header className="bg-background flex flex-row items-center justify-between px-4 py-3 text-sm sm:py-2">
       <div className="flex flex-row items-center gap-4">
         <SidebarTrigger />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="line-clamp-1 hidden sm:block">
-              {folder?.emoji} {folder?.name}
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden sm:block" />
-            <BreadcrumbItem className="line-clamp-1">
-              <BreadcrumbLink href={`/notes/${note.id}`}>
-                {note.title}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <NoteBreadcrumb />
         {note.locked && <NoteLock />}
+        {isOffline && <NoteOffline />}
         <MutationStatusIndicator />
       </div>
       <div className="flex flex-row items-center gap-2">

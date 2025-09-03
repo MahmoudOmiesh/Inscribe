@@ -4,21 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { useEffect } from "react";
 import { useNoteEditor } from "../note-editor-context";
-import { useMutation } from "@tanstack/react-query";
-import { updateLocalNoteTitle } from "@/local/mutations/notes";
-import { useUserId } from "../../../_components/user-context";
+import { NOTE_MUTATIONS } from "../../mutations";
 
 export function NoteTitle() {
   const { note } = useNoteEditor();
-  const userId = useUserId();
 
-  const updateTitle = useMutation({
-    mutationFn: (title: string) =>
-      updateLocalNoteTitle({ noteId: note.id, userId, data: { title } }),
-    meta: {
-      toastOnError: "Failed to update title, please try again.",
-    },
-  });
+  const updateTitle = NOTE_MUTATIONS.updateTitle(note.id);
 
   function handleTitleChange(e: React.FormEvent<HTMLTextAreaElement>) {
     const title = (e.target as HTMLTextAreaElement).value;

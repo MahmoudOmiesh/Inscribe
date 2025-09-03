@@ -2,12 +2,14 @@
 import {
   deleteLocalNote,
   updateLocalNoteArchive,
+  updateLocalNoteContent,
   updateLocalNoteFavorite,
   updateLocalNoteFolder,
   updateLocalNoteFont,
   updateLocalNoteFullWidth,
   updateLocalNoteLocked,
   updateLocalNoteSmallText,
+  updateLocalNoteTitle,
   updateLocalNoteTrash,
 } from "@/local/mutations/notes";
 import { useMutation } from "@tanstack/react-query";
@@ -23,6 +25,32 @@ import type { LocalNote } from "@/local/schema/note";
 import { exportToMarkdown } from "@/text-editor/export/md";
 
 export const NOTE_MUTATIONS = {
+  updateTitle: (noteId: string) => {
+    const userId = useUserId();
+
+    return useMutation({
+      mutationFn: (title: string) =>
+        updateLocalNoteTitle({ noteId, userId, data: { title } }),
+      meta: {
+        toastOnError: "Failed to update title, please try again.",
+      },
+      networkMode: "always",
+    });
+  },
+
+  updateContent: (noteId: string) => {
+    const userId = useUserId();
+
+    return useMutation({
+      mutationFn: (content: EditorNode[]) =>
+        updateLocalNoteContent({ noteId, userId, data: { content } }),
+      meta: {
+        toastOnError: "Failed to update content, please try again.",
+      },
+      networkMode: "always",
+    });
+  },
+
   updateTrash: (noteId: string) => {
     const userId = useUserId();
 
@@ -36,6 +64,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to move to trash, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -52,6 +81,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to archive, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -68,6 +98,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to toggle favorite, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -84,6 +115,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to update folder, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -112,6 +144,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to update small text, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -124,6 +157,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to update locked, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -140,6 +174,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to update full width, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -156,6 +191,7 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to restore note, please try again.",
       },
+      networkMode: "always",
     });
   },
 
@@ -171,6 +207,7 @@ export const NOTE_MUTATIONS = {
       onMutate: () => {
         router.push("/notes");
       },
+      networkMode: "always",
     });
   },
 
@@ -184,6 +221,7 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to copy note link, please try again.",
         onSuccessMessage: "Copied to clipboard",
       },
+      networkMode: "always",
     });
   },
 };
