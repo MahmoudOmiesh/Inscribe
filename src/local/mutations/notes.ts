@@ -29,7 +29,8 @@ export async function createLocalNote({
     .last();
 
   const sortOrder = (lastNote?.sortOrder ?? 0) + 1;
-  const content = JSON.stringify([createParagraph()]);
+  const title = "New Note";
+  const content = [createParagraph()];
 
   const tx = await localDB.transaction(
     "rw",
@@ -40,7 +41,7 @@ export async function createLocalNote({
         userId,
         folderId,
 
-        title: "New Note",
+        title,
         content,
         sortOrder,
 
@@ -55,6 +56,8 @@ export async function createLocalNote({
 
         createdAt: Date.now(),
         updatedAt: Date.now(),
+
+        searchWords: [],
       });
 
       await operationQueue.add({
@@ -124,10 +127,8 @@ export async function updateLocalNoteContent({
     "rw",
     [localDB.notes, localDB.syncOperations],
     async () => {
-      console.log("updateLocalNoteContent", noteId, data);
-
       const updatedNoteCount = await localDB.notes.update(noteId, {
-        content: JSON.stringify(data.content),
+        content: data.content,
         updatedAt: Date.now(),
       });
 

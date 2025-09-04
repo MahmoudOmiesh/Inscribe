@@ -293,7 +293,7 @@ function MoveToDropdown() {
   return (
     <div>
       <DropdownMenuGroup>
-        <div className="focus-within:ring-ring focus-within:border-primary flex cursor-text items-center gap-2 rounded-sm border p-1">
+        <div className="focus-within:border-primary flex cursor-text items-center gap-2 rounded-md border p-2">
           <SearchIcon className="text-muted-foreground size-4" />
           <Input
             placeholder="Move to..."

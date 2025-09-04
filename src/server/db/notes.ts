@@ -34,7 +34,7 @@ export const _notes = {
           userId,
           sortOrder: data.sortOrder,
           title: "New Note",
-          content: JSON.parse(data.content) as unknown as Prisma.InputJsonValue,
+          content: data.content as unknown as Prisma.InputJsonValue,
         },
         select: { id: true },
       });
@@ -91,7 +91,9 @@ export const _notes = {
     ) => {
       return db.note.update({
         where: { id: noteId, userId },
-        data: { content: data.content as Prisma.InputJsonValue },
+        data: {
+          content: data.content as Prisma.InputJsonValue,
+        },
         select: { id: true },
       });
     },

@@ -63,7 +63,7 @@ async function getNotesToUpdate(
       if (!localNoteExists || localNote == null) {
         return {
           ...serverNote,
-          content: JSON.stringify(serverNote.content),
+          content: serverNote.content,
           isArchived: serverNote.isArchived ? 1 : 0,
           isTrashed: serverNote.isTrashed ? 1 : 0,
           isFavorite: serverNote.isFavorite ? 1 : 0,
@@ -114,7 +114,7 @@ async function getNotesToUpdate(
           : serverNote.title,
         content: fieldsWithPendingOperations.has("content")
           ? localNote.content
-          : JSON.stringify(serverNote.content),
+          : serverNote.content,
         isArchived: fieldsWithPendingOperations.has("isArchived")
           ? localNote.isArchived
           : serverNote.isArchived

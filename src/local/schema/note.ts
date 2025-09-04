@@ -1,4 +1,4 @@
-import type { FontType } from "@/text-editor/model/schema";
+import type { EditorNode, FontType } from "@/text-editor/model/schema";
 
 export interface LocalNote {
   id: string;
@@ -6,8 +6,7 @@ export interface LocalNote {
   folderId: string;
 
   title: string;
-  content: string;
-
+  content: EditorNode[];
   sortOrder: number;
 
   isArchived: 0 | 1;
@@ -21,4 +20,6 @@ export interface LocalNote {
 
   createdAt: number;
   updatedAt: number;
+
+  searchWords: string[];
 }

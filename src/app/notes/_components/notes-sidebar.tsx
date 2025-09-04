@@ -1,34 +1,16 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { SearchIcon } from "lucide-react";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { NotesSidebarHeader } from "./notes-sidebar-header";
 import { NotesSidebarSections } from "./notes-sidebar-sections";
+import { NotesSidebarSearch } from "./notes-sidebar-search";
 
 export function NotesSidebar() {
   return (
     <Sidebar>
       <NotesSidebarHeader />
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <SearchIcon /> Search
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <NotesSidebarSearch />
 
+      <SidebarContent>
         <NotesSidebarSections />
       </SidebarContent>
     </Sidebar>

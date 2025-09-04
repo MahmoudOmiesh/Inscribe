@@ -3,6 +3,7 @@ import type { LocalNote } from "@/local/schema/note";
 import Dexie, { type Table } from "dexie";
 import type { SyncOperation } from "./schema/sync";
 import type { SyncMeta } from "./schema/sync-meta";
+import { getDistinctWordsFromText } from "@/lib/utils";
 
 export class LocalDB extends Dexie {
   folders!: Table<LocalFolder, string>;
@@ -15,7 +16,7 @@ export class LocalDB extends Dexie {
     this.version(1).stores({
       folders: "id, userId, [userId+sortOrder]",
       notes:
-        "id, userId, folderId, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
+        "id, userId, folderId, *searchWords, [folderId+sortOrder], [userId+isFavorite+isTrashed+isArchived+createdAt], [userId+isArchived+isTrashed+createdAt], [userId+isTrashed+createdAt]",
       syncOperations: "id, [userId+status+timestamp]",
       syncMeta: "userId",
     });
@@ -37,6 +38,22 @@ export class LocalDB extends Dexie {
 }
 
 export const localDB = new LocalDB();
+
+localDB.notes.hook("creating", (_, note) => {
+  const text = `${note.title} ${note.content.map((c) => c.text).join(" ")}`;
+  note.searchWords = getDistinctWordsFromText(text);
+});
+
+localDB.notes.hook("updating", (mods, _, note) => {
+  if (!mods.hasOwnProperty("content") && !mods.hasOwnProperty("title")) {
+    return;
+  }
+
+  const text = `${note.title} ${note.content.map((c) => c.text).join(" ")}`;
+  return {
+    searchWords: getDistinctWordsFromText(text),
+  };
+});
 
 export function resetLocalDB() {
   console.log("resetLocalDB");

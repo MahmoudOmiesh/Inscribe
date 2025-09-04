@@ -3,7 +3,6 @@
 import type { LocalNote } from "@/local/schema/note";
 import { useEditor } from "@/text-editor/hooks/use-editor";
 import { useEditorActions } from "@/text-editor/hooks/use-editor-actions";
-import type { EditorNode } from "@/text-editor/model/schema";
 import { createContext, use } from "react";
 
 interface NoteEditorContextType {
@@ -21,7 +20,7 @@ export function NoteEditorProvider({
   children: React.ReactNode;
   note: LocalNote;
 }) {
-  const editor = useEditor(JSON.parse(note.content) as EditorNode[]);
+  const editor = useEditor(note.content);
   const actions = useEditorActions(
     editor.getState,
     editor.dispatch,

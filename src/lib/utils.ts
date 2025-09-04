@@ -32,3 +32,15 @@ export function debounce<Args extends unknown[]>(
     }, delayMs);
   };
 }
+
+export function getDistinctWordsFromText(text: string) {
+  const words = text.split(" ");
+  const distinctWords = words.reduce(
+    (acc, word) => {
+      acc[word] = true;
+      return acc;
+    },
+    {} as Record<string, boolean>,
+  );
+  return Object.keys(distinctWords);
+}

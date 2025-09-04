@@ -5,7 +5,7 @@ import z from "zod";
 export const NoteInsertSchema = z.object({
   folderId: z.string(),
   sortOrder: z.number().positive().int(),
-  content: z.string(), // JSON stringified EditorNode[]
+  content: z.array(EditorNodeSchema),
 });
 
 export const NoteTitleUpdateSchema = z.object({
