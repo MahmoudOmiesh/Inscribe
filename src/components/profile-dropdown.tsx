@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOutIcon } from "lucide-react";
+import { FileIcon, LogOutIcon } from "lucide-react";
 import { AvatarWithFallback } from "./avatar-with-fallback";
 import {
   DropdownMenu,
@@ -39,6 +39,10 @@ export function ProfileDropdown({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => router.push("/notes")}>
+            <FileIcon />
+            <span>My Notes</span>
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={async () => {
               await Promise.all([

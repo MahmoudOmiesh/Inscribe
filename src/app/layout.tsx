@@ -9,9 +9,9 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Keep",
-  description: "A Google Keep Clone, Only much worse.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: "Inscribe",
+  description:
+    "A local-first note-taking app that helps you capture and organize your thoughts.",
 };
 
 const inter = Inter({

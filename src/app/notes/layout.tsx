@@ -16,7 +16,7 @@ export default async function Layout({
   });
 
   if (!session) {
-    redirect("/");
+    redirect("/auth?callbackURL=notes");
   }
 
   return (
