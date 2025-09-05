@@ -44,11 +44,22 @@ export const _folders = {
     },
 
     delete: (folderId: string, userId: string) => {
-      console.log("delete folder", folderId, userId);
+      const deletedAt = new Date();
       return db.folder.update({
         where: { id: folderId, userId },
         data: {
-          deletedAt: new Date(),
+          deletedAt,
+          notes: {
+            updateMany: {
+              where: {
+                folderId,
+                deletedAt: null,
+              },
+              data: {
+                deletedAt,
+              },
+            },
+          },
         },
         select: {
           id: true,

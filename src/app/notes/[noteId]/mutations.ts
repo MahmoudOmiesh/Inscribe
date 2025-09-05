@@ -19,7 +19,7 @@ import type {
   ExportFormat,
   FontType,
 } from "@/text-editor/model/schema";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { exportToHtml } from "@/text-editor/export/html";
 import type { LocalNote } from "@/local/schema/note";
 import { exportToMarkdown } from "@/text-editor/export/md";
@@ -198,6 +198,7 @@ export const NOTE_MUTATIONS = {
   deleteNote: (noteId: string) => {
     const router = useRouter();
     const userId = useUserId();
+    const pathname = usePathname();
 
     return useMutation({
       mutationFn: () => deleteLocalNote({ noteId, userId }),
@@ -205,7 +206,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to delete note, please try again.",
       },
       onMutate: () => {
-        router.push("/notes");
+        if (pathname === `/notes/${noteId}`) {
+          router.push("/notes");
+        }
       },
       networkMode: "always",
     });

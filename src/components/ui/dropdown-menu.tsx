@@ -47,6 +47,7 @@ function DropdownMenuContent({
           className,
         )}
         onCloseAutoFocus={(e) => e.preventDefault()}
+        onClick={(e) => e.stopPropagation()}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
