@@ -133,7 +133,7 @@ function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {
       );
     case "code":
       return (
-        <code className="rounded-sm bg-gray-700 p-1 text-inherit">
+        <code className="rounded-[3px] border border-neutral-600 bg-neutral-700 px-[0.2rem] py-[0.1rem] font-(family-name:--font-mono) text-sm">
           {content}
         </code>
       );

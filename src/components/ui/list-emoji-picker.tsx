@@ -78,7 +78,7 @@ function ListEmojiPickerEmoji({
       className={cn("max-w-full flex-1 justify-start px-2 text-sm", className)}
     >
       <span>{emoji.emoji}</span>
-      <span className="truncate text-left font-(family-name:--font-inter)">
+      <span className="truncate text-left font-(family-name:--font-sans)">
         {emoji.label}
       </span>
     </Button>

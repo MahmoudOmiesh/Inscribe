@@ -243,3 +243,7 @@
 html {
   @apply scroll-smooth;
 }
+
+.text-gradient-main {
+  @apply via-primary bg-gradient-to-tl from-indigo-400 to-indigo-600 bg-clip-text text-transparent;
+}

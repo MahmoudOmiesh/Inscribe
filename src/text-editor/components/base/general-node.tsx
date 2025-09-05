@@ -1,4 +1,4 @@
-import { memo, type ComponentProps } from "react";
+import { memo, type ComponentProps, type RefObject } from "react";
 import { Heading } from "./headings";
 import { CheckList, OrderedList, UnorderedList } from "./lists";
 import { Paragraph } from "./paragraph";
@@ -117,7 +117,9 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
         nodeModifierGetReferenceProps,
       )}
       {showNodeModifier && (
-        <FloatingPortal>
+        <FloatingPortal
+          root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
+        >
           <div
             ref={nodeModifierRefs.setFloating}
             style={nodeModifierFloatingStyles}
@@ -134,7 +136,9 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
         </FloatingPortal>
       )}
       {showAIPrompt && (
-        <FloatingPortal>
+        <FloatingPortal
+          root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
+        >
           <div
             ref={aiRefs.setFloating}
             style={aiFloatingStyles}

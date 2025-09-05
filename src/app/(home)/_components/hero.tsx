@@ -10,15 +10,13 @@ export function Hero() {
       <DiagonalFadeGrid direction="top-right" />
       <DiagonalFadeGrid direction="bottom-left" />
 
-      <MaxWidthWrapper className="relative z-10 flex flex-col items-center gap-4">
+      <MaxWidthWrapper className="flex flex-col items-center gap-4">
         <Badge className="rounded-sm">
           <PencilLineIcon /> Scribble Smarter With Inscribe
         </Badge>
         <h1 className="mt-4 max-w-[20ch] text-5xl leading-14 font-extrabold tracking-tight text-balance">
           Capture ideas. Organize everything. Think in{" "}
-          <span className="from-primary bg-gradient-to-tl via-violet-500 to-purple-500 bg-clip-text text-transparent">
-            Inscribe.
-          </span>
+          <span className="text-gradient-main">Inscribe.</span>
         </h1>
         <p className="text-muted-foreground max-w-[70ch] text-lg text-pretty">
           Write, organize, and sync your thoughts seamlessly across all your
@@ -50,7 +48,7 @@ function DiagonalFadeGrid({
 
   return (
     <div
-      className="absolute inset-0 z-0"
+      className="absolute inset-0 -z-10"
       style={{
         backgroundImage: `
         linear-gradient(to right, color-mix(in oklch, var(--foreground) 10%, transparent) 1px, transparent 1px),

@@ -1,68 +1,19 @@
 import { MaxWidthWrapper } from "@/components/max-width-wrapper";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Check, Sparkles, Stars, Zap } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Hero } from "./_components/hero";
+import { Features } from "./_components/features";
+import { Editor } from "./_components/editor";
 
 export default function Home() {
   return (
     <div className="relative flex-1">
       <Hero />
 
-      <section id="features" className="bg-muted/30 py-16 sm:py-24">
-        <MaxWidthWrapper>
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="text-3xl font-bold text-balance sm:text-4xl">
-              Everything you need to think clearly
-            </h2>
-            <p className="text-muted-foreground mt-2">
-              Thoughtful details and speed where it matters.
-            </p>
-          </div>
+      <Editor />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-primary/10 text-primary mb-3 grid size-10 place-items-center rounded-md">
-                  <Stars className="size-5" />
-                </div>
-                <h3 className="text-lg font-semibold">Delightful editor</h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Powerful formatting, slash commands, emoji, lists and more —
-                  all with a snappy UX.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-primary/10 text-primary mb-3 grid size-10 place-items-center rounded-md">
-                  <Zap className="size-5" />
-                </div>
-                <h3 className="text-lg font-semibold">Offline-first sync</h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Your notes are available instantly — with background sync when
-                  you go online.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-primary/10 text-primary mb-3 grid size-10 place-items-center rounded-md">
-                  <Check className="size-5" />
-                </div>
-                <h3 className="text-lg font-semibold">Organize with ease</h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Folders, favorites, and fast search to keep everything tidy
-                  and findable.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </MaxWidthWrapper>
-      </section>
+      <Features />
 
       <section className="py-16 sm:py-24">
         <MaxWidthWrapper>

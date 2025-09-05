@@ -14,7 +14,7 @@ export function Header() {
   const isSignedIn = !!session?.user;
 
   return (
-    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-primary fixed inset-x-40 top-5 z-50 flex items-center justify-between rounded-full border px-8 py-3.5 backdrop-blur">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 fixed inset-x-40 top-5 z-50 flex items-center justify-between rounded-full border px-8 py-3.5 backdrop-blur">
       <Link href="/" className="flex items-center gap-2">
         <Logo />
         <span className="hidden text-2xl font-bold sm:block">Inscribe</span>
