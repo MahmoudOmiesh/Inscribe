@@ -73,7 +73,7 @@ export function TextEditor({
 }
 
 // TODO
-// - fix floating node modifier not closing when clicking outside
+// - fix floating node modifier not closing when clicking outside or after ai panel is opened
 // - handle losing focus
 // - imrpove the ui
 // - fix paste when html

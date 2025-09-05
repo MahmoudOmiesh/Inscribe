@@ -51,8 +51,8 @@ function DiagonalFadeGrid({
       className="absolute inset-0 -z-10"
       style={{
         backgroundImage: `
-        linear-gradient(to right, color-mix(in oklch, var(--foreground) 10%, transparent) 1px, transparent 1px),
-        linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 10%, transparent) 1px, transparent 1px)
+        linear-gradient(to right, color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px),
+        linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px)
       `,
         backgroundSize: "32px 32px",
         WebkitMaskImage: `radial-gradient(ellipse 60% 100% at ${at}, var(--background) 10%, transparent 90%)`,
