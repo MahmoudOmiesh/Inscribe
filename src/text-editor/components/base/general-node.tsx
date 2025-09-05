@@ -137,7 +137,8 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
       )}
       {showAIPrompt && (
         <FloatingPortal
-          root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
+        // TODO: can't seem to to be able to write in the ai prompt when the root is the node modifier refs
+        // root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
         >
           <div
             ref={aiRefs.setFloating}

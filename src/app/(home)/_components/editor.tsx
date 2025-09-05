@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { NotebookPenIcon, Redo2Icon, Undo2Icon } from "lucide-react";
 import type { EditorNode } from "@/text-editor/model/schema";
+import { MaxWidthWrapper } from "@/components/max-width-wrapper";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const LANDING_NODES: EditorNode[] = [
   {
@@ -241,6 +243,7 @@ export const LANDING_NODES: EditorNode[] = [
 ];
 
 export function Editor() {
+  const isMobile = useIsMobile();
   const editor = useEditor(LANDING_NODES);
   const actions = useEditorActions(
     editor.getState,
@@ -249,9 +252,9 @@ export function Editor() {
   );
 
   return (
-    <div className="isolate -mt-40">
-      <div className="relative mx-auto h-[600px] max-w-6xl rounded-xl p-1">
-        <div className="from-primary/50 absolute inset-0 rounded-xl bg-gradient-to-b to-transparent blur-lg"></div>
+    <div className="isolate -mt-16 md:-mt-24">
+      <MaxWidthWrapper className="relative h-[600px] max-w-5xl rounded-xl">
+        <div className="from-primary/50 absolute inset-1.5 hidden rounded-xl bg-gradient-to-b to-transparent blur-lg lg:block"></div>
         <div className="bg-card relative z-10 h-full rounded-[calc(var(--radius)+4px-var(--spacing))] border">
           <div className="flex items-center justify-between border-b px-5 py-1">
             <div className="flex items-center gap-2">
@@ -278,12 +281,18 @@ export function Editor() {
             </div>
           </div>
           <ScrollArea className="h-[530px] overflow-hidden">
-            <div className="mx-auto max-w-3xl p-2 py-8">
-              <TextEditor editor={editor} actions={actions} />
+            <div className="mx-auto max-w-3xl p-1 py-6 sm:p-2 sm:py-8">
+              <TextEditor
+                editor={editor}
+                actions={actions}
+                options={{
+                  smallText: isMobile,
+                }}
+              />
             </div>
           </ScrollArea>
         </div>
-      </div>
+      </MaxWidthWrapper>
     </div>
   );
 }

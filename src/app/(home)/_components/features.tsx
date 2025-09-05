@@ -49,7 +49,7 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section id="features" className="py-16 sm:py-24">
+    <section id="features" className="py-24 md:py-36">
       <MaxWidthWrapper>
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-balance sm:text-4xl">

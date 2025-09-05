@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] pt-60 pb-30 text-center">
+    <section className="relative grid min-h-[90vh] place-items-center text-center">
       <DiagonalFadeGrid direction="top-right" />
       <DiagonalFadeGrid direction="bottom-left" />
 
@@ -14,11 +14,11 @@ export function Hero() {
         <Badge className="rounded-sm">
           <PencilLineIcon /> Scribble Smarter With Inscribe
         </Badge>
-        <h1 className="mt-4 max-w-[20ch] text-5xl leading-14 font-extrabold tracking-tight text-balance">
+        <h1 className="mt-1 max-w-[20ch] text-4xl font-extrabold tracking-tight text-balance md:mt-4 md:max-w-[20ch] md:text-5xl">
           Capture ideas. Organize everything. Think in{" "}
           <span className="text-gradient-main">Inscribe.</span>
         </h1>
-        <p className="text-muted-foreground max-w-[70ch] text-lg text-pretty">
+        <p className="text-muted-foreground mt-2 max-w-[70ch] text-base text-pretty md:text-lg">
           Write, organize, and sync your thoughts seamlessly across all your
           devices. Experience fast performance with local-first technology and a
           beautiful, distraction-free editor.

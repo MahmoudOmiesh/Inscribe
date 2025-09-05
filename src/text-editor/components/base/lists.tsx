@@ -58,7 +58,7 @@ function UnorderedListNested({
   return (
     <ul
       className={cn(
-        "pl-(--editor-ul-pl) leading-[1.6]",
+        "pl-(--editor-ul-pl) text-(length:--editor-ul-s) leading-[1.6]",
         level === 0 && "my-(--editor-ul-my) list-[disc]",
         level === 1 && "list-[circle]",
         level >= 2 && "list-[square]",
