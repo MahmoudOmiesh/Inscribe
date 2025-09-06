@@ -11,7 +11,4 @@ export default async function NotePage({
 }
 
 //TODO:
-// - figure out caching solution for useLiveQuery
-// - database performance stuff
-// -- indexes
-// -- pagination + useInfiniteQuery
+// -- pagination?

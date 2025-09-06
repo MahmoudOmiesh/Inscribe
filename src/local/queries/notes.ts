@@ -75,8 +75,13 @@ export function useLocalNotesSearch(query: string) {
   }, [query]);
 }
 
-export async function getFirstNote(userId: string) {
-  const firstNote = await localDB.notes.where("userId").equals(userId).first();
-  // query data cannot be undefined
-  return firstNote ?? null;
+export function useFirstNote() {
+  const userId = useUserId();
+  return useLiveQuery(
+    () => localDB.notes.where("userId").equals(userId).first(),
+    [userId],
+    {
+      isPending: true,
+    },
+  );
 }

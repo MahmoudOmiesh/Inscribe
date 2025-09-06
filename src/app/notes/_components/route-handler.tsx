@@ -2,22 +2,34 @@
 
 import { NotebookPenIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useUserId } from "./user-context";
-import { getFirstNote } from "@/local/queries/notes";
-import { useQuery } from "@tanstack/react-query";
+import { useFirstNote } from "@/local/queries/notes";
 import { Spinner } from "@/components/spinner";
+import { useLastPulledAt } from "@/local/queries/sync-meta";
 import { useDelayedVisible } from "@/hooks/use-delayed-visible";
 
 export function RouteHandler() {
-  const userId = useUserId();
-  const { data: firstNote, isLoading } = useQuery({
-    queryKey: ["firstNote", userId],
-    queryFn: () => getFirstNote(userId),
-  });
+  const firstNote = useFirstNote();
+  const lastPulledAt = useLastPulledAt();
 
-  const showLoading = useDelayedVisible(isLoading);
+  const isFirstNotePending =
+    (firstNote && "isPending" in firstNote && firstNote.isPending) ?? false;
+  const showLoading = useDelayedVisible(isFirstNotePending);
 
-  if (isLoading) {
+  if (lastPulledAt === undefined) {
+    return (
+      <div className="bg-background/90 fixed inset-0 z-50 grid place-items-center">
+        <div className="bg-card max-w-2xs space-y-2 rounded-lg p-6 text-center">
+          <h3 className="text-xl font-bold">Setting up your notes</h3>
+          <p className="text-muted-foreground text-sm">
+            We are setting up your notes for you. This may take a few seconds.
+          </p>
+          <Spinner size="sm" className="mt-4" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isFirstNotePending) {
     return (
       showLoading && (
         <div className="flex h-full w-full items-center justify-center">
@@ -27,7 +39,7 @@ export function RouteHandler() {
     );
   }
 
-  if (firstNote) {
+  if (firstNote && "id" in firstNote) {
     redirect(`/notes/${firstNote.id}`);
   }
 
