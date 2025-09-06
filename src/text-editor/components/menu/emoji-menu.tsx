@@ -29,6 +29,7 @@ export function EmojiMenu({
   actions: ReturnType<typeof useEditorActions>;
 }) {
   const [query, setQuery] = useState("");
+  const [isPositioned, setIsPositioned] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const rangeRef = useRef<SelectionRange | null>(getSelectionRange());
@@ -48,23 +49,34 @@ export function EmojiMenu({
   const { getFloatingProps } = useInteractions([dismiss]);
 
   useEffect(() => {
-    const selection = window.getSelection();
-    const range =
-      typeof selection?.rangeCount === "number" && selection.rangeCount > 0
-        ? selection.getRangeAt(0)
-        : null;
+    requestAnimationFrame(() => {
+      if (!isOpen) {
+        setIsPositioned(false);
+        return;
+      }
 
-    if (!range) {
-      setIsOpen(false);
-      return;
-    }
+      const selection = window.getSelection();
+      const range =
+        typeof selection?.rangeCount === "number" && selection.rangeCount > 0
+          ? selection.getRangeAt(0)
+          : null;
 
-    refs.setReference({
-      getBoundingClientRect: () => range.getBoundingClientRect(),
+      if (!range) {
+        setIsOpen(false);
+        return;
+      }
+
+      refs.setReference({
+        getBoundingClientRect: () => range.getBoundingClientRect(),
+        getClientRects: () => range.getClientRects(),
+      });
+      setIsPositioned(true);
+
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
     });
-    setIsOpen(true);
-    inputRef.current?.focus();
-  }, [refs, setIsOpen]);
+  }, [refs, isOpen, setIsOpen]);
 
   function executeCommand(emoji: string) {
     if (!rangeRef.current) return;
@@ -104,7 +116,8 @@ export function EmojiMenu({
   }
 
   return (
-    isOpen && (
+    isOpen &&
+    isPositioned && (
       <div
         ref={refs.setFloating}
         style={floatingStyles}

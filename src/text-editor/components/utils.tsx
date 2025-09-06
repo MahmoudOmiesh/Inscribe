@@ -186,9 +186,17 @@ export function EditorTooltip({
   tooltip: string;
 }) {
   return (
-    <Tooltip>
+    <Tooltip disableHoverableContent={true}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent>{tooltip}</TooltipContent>
+      <TooltipContent
+        variant="muted"
+        arrow={false}
+        side="top"
+        sideOffset={8}
+        className="border"
+      >
+        {tooltip}
+      </TooltipContent>
     </Tooltip>
   );
 }

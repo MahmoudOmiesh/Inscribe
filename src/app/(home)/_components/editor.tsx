@@ -280,7 +280,7 @@ export function Editor() {
               </Button>
             </div>
           </div>
-          <ScrollArea className="h-[530px] overflow-hidden">
+          <ScrollArea className="h-[530px]">
             <div className="mx-auto max-w-3xl p-1 py-6 sm:p-2 sm:py-8">
               <TextEditor
                 editor={editor}
