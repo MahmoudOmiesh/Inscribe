@@ -7,7 +7,7 @@ export function pasteStep(
   contentType: "plain" | "html",
 ): Step {
   return (state: EditorState) => {
-    const { nodes, nodeIdIndex, selection } = state;
+    // const { nodes, nodeIdIndex, selection } = state;
 
     if (contentType === "plain") {
       return insertTextStep(content)(state);

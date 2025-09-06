@@ -161,6 +161,7 @@ export const syncRouter = createTRPCRouter({
               );
               break;
             case "deleteNote":
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               result = await DB.notes.mutations.delete(
                 operation.noteId,
                 userId,

@@ -18,7 +18,7 @@ export function exportToHtml(
   {
     title,
     smallText,
-    font,
+    // font,
   }: { title: string; smallText: boolean; font: FontType },
 ) {
   const parts: string[] = [];
