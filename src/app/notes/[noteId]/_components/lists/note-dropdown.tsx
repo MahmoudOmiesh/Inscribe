@@ -25,7 +25,7 @@ import {
   Undo2Icon,
   SearchIcon,
 } from "lucide-react";
-import { NOTE_MUTATIONS } from "../../mutations";
+import { useNoteMutations } from "../../mutations";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLocalFolders } from "@/local/queries/folders";
@@ -40,11 +40,13 @@ export function NoteDropdown({
   note: LocalNote;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
-  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
-  const updateFavorite = NOTE_MUTATIONS.updateFavorite(note.id);
-  const duplicateNote = NOTE_MUTATIONS.duplicateNote(note.id);
-  const deleteNote = NOTE_MUTATIONS.deleteNote(note.id);
+  const {
+    updateTrash,
+    updateArchive,
+    updateFavorite,
+    duplicateNote,
+    deleteNote,
+  } = useNoteMutations(note.id);
 
   return (
     <DropdownMenu>
@@ -112,9 +114,7 @@ export function NoteArchiveDropdown({
   noteId: string;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const updateArchive = NOTE_MUTATIONS.updateArchive(noteId);
-  const deleteNote = NOTE_MUTATIONS.deleteNote(noteId);
-  const duplicateNote = NOTE_MUTATIONS.duplicateNote(noteId);
+  const { updateArchive, deleteNote, duplicateNote } = useNoteMutations(noteId);
 
   return (
     <DropdownMenu>
@@ -155,8 +155,7 @@ export function NoteTrashDropdown({
   noteId: string;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const restoreNote = NOTE_MUTATIONS.restoreNote(noteId);
-  const deleteNote = NOTE_MUTATIONS.deleteNote(noteId);
+  const { restoreNote, deleteNote } = useNoteMutations(noteId);
 
   return (
     <DropdownMenu>
@@ -183,7 +182,7 @@ function MoveToDropdown({ noteId }: { noteId: string }) {
   const [search, setSearch] = useState("");
   const folders = useLocalFolders();
 
-  const updateFolder = NOTE_MUTATIONS.updateFolder(noteId);
+  const { updateFolder } = useNoteMutations(noteId);
   const filteredFolders =
     folders?.filter((folder) =>
       folder.name.toLowerCase().includes(search.toLowerCase()),

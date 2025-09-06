@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import {
   deleteLocalNote,
   duplicateLocalNote,
@@ -25,12 +24,13 @@ import { exportToHtml } from "@/text-editor/export/html";
 import type { LocalNote } from "@/local/schema/note";
 import { exportToMarkdown } from "@/text-editor/export/md";
 
-export const NOTE_MUTATIONS = {
-  duplicateNote: (noteId: string) => {
-    const userId = useUserId();
-    const router = useRouter();
+export function useNoteMutations(noteId: string) {
+  const pathname = usePathname();
+  const userId = useUserId();
+  const router = useRouter();
 
-    return useMutation({
+  return {
+    duplicateNote: useMutation({
       mutationFn: () => duplicateLocalNote({ noteId, userId }),
       onSuccess: (id) => {
         router.push(`/notes/${id}`);
@@ -38,39 +38,27 @@ export const NOTE_MUTATIONS = {
       meta: {
         toastOnError: "Failed to duplicate note, please try again.",
       },
-    });
-  },
+    }),
 
-  updateTitle: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateTitle: useMutation({
       mutationFn: (title: string) =>
         updateLocalNoteTitle({ noteId, userId, data: { title } }),
       meta: {
         toastOnError: "Failed to update title, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateContent: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateContent: useMutation({
       mutationFn: (content: EditorNode[]) =>
         updateLocalNoteContent({ noteId, userId, data: { content } }),
       meta: {
         toastOnError: "Failed to update content, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateTrash: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateTrash: useMutation({
       mutationFn: (isTrashed: boolean) =>
         updateLocalNoteTrash({
           noteId,
@@ -81,13 +69,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to move to trash, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateArchive: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateArchive: useMutation({
       mutationFn: (isArchived: boolean) =>
         updateLocalNoteArchive({
           noteId,
@@ -98,13 +82,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to archive, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateFavorite: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateFavorite: useMutation({
       mutationFn: (isFavorite: boolean) =>
         updateLocalNoteFavorite({
           noteId,
@@ -115,13 +95,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to toggle favorite, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateFolder: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateFolder: useMutation({
       mutationFn: (folderId: string) =>
         updateLocalNoteFolder({
           noteId,
@@ -132,25 +108,17 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to update folder, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateFont: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateFont: useMutation({
       mutationFn: (font: FontType) =>
         updateLocalNoteFont({ noteId, userId, data: { font } }),
       meta: {
         toastOnError: "Failed to update font, please try again.",
       },
-    });
-  },
+    }),
 
-  updateSmallText: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateSmallText: useMutation({
       mutationFn: (smallText: boolean) =>
         updateLocalNoteSmallText({
           noteId,
@@ -161,26 +129,18 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to update small text, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateLocked: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateLocked: useMutation({
       mutationFn: (locked: boolean) =>
         updateLocalNoteLocked({ noteId, userId, data: { locked } }),
       meta: {
         toastOnError: "Failed to update locked, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  updateFullWidth: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    updateFullWidth: useMutation({
       mutationFn: (fullWidth: boolean) =>
         updateLocalNoteFullWidth({
           noteId,
@@ -191,13 +151,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to update full width, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  restoreNote: (noteId: string) => {
-    const userId = useUserId();
-
-    return useMutation({
+    restoreNote: useMutation({
       mutationFn: () =>
         updateLocalNoteTrash({
           noteId,
@@ -208,15 +164,9 @@ export const NOTE_MUTATIONS = {
         toastOnError: "Failed to restore note, please try again.",
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  deleteNote: (noteId: string) => {
-    const router = useRouter();
-    const userId = useUserId();
-    const pathname = usePathname();
-
-    return useMutation({
+    deleteNote: useMutation({
       mutationFn: () => deleteLocalNote({ noteId, userId }),
       meta: {
         toastOnError: "Failed to delete note, please try again.",
@@ -227,11 +177,9 @@ export const NOTE_MUTATIONS = {
         }
       },
       networkMode: "always",
-    });
-  },
+    }),
 
-  copyNoteLink: (noteId: string) => {
-    return useMutation({
+    copyNoteLink: useMutation({
       mutationFn: () =>
         navigator.clipboard.writeText(
           `${window.location.origin}/notes/${noteId}`,
@@ -241,9 +189,9 @@ export const NOTE_MUTATIONS = {
         onSuccessMessage: "Copied to clipboard",
       },
       networkMode: "always",
-    });
-  },
-};
+    }),
+  };
+}
 
 export function exportNote({
   note,

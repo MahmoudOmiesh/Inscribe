@@ -5,12 +5,12 @@ import { TextEditor } from "@/text-editor/text-editor";
 import { useNoteEditor } from "../note-editor-context";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { cn } from "@/lib/utils";
-import { NOTE_MUTATIONS } from "../../mutations";
+import { useNoteMutations } from "../../mutations";
 
 export function NoteContent() {
   const { editor, actions, note } = useNoteEditor();
 
-  const updateContent = NOTE_MUTATIONS.updateContent(note.id);
+  const { updateContent } = useNoteMutations(note.id);
 
   const debouncedUpdateContentMutate = useDebouncedCallback(
     updateContent.mutate,

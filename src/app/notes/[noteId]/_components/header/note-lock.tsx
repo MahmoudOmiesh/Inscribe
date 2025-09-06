@@ -5,12 +5,12 @@ import {
 } from "@/components/ui/tooltip";
 import { LockKeyholeIcon } from "lucide-react";
 import { useNoteEditor } from "../note-editor-context";
-import { NOTE_MUTATIONS } from "../../mutations";
+import { useNoteMutations } from "../../mutations";
 
 export function NoteLock() {
   const { note } = useNoteEditor();
 
-  const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
+  const { updateLocked } = useNoteMutations(note.id);
 
   return (
     <Tooltip>

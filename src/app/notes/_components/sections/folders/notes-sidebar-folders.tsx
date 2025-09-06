@@ -91,7 +91,11 @@ function NotesSiderbarFolder({
 
   const createNote = useMutation({
     mutationFn: createLocalNote,
+    onMutate: () => {
+      console.log("onMutate");
+    },
     onSuccess: (id) => {
+      console.log("onSuccess");
       router.push(`/notes/${id}`);
     },
     meta: {

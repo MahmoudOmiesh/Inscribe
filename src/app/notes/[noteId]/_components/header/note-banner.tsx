@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNoteEditor } from "../note-editor-context";
 import { Trash2Icon, Undo2Icon } from "lucide-react";
-import { NOTE_MUTATIONS } from "../../mutations";
+import { useNoteMutations } from "../../mutations";
 
 export function NoteBanner() {
   const { note } = useNoteEditor();
-
-  const restoreNote = NOTE_MUTATIONS.restoreNote(note.id);
-  const deleteNote = NOTE_MUTATIONS.deleteNote(note.id);
-  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
+  const { restoreNote, deleteNote, updateArchive } = useNoteMutations(note.id);
 
   if (note.isTrashed) {
     return (

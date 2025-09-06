@@ -1,19 +1,27 @@
 "use client";
 
 import { NotebookPenIcon } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useFirstNote } from "@/local/queries/notes";
 import { Spinner } from "@/components/spinner";
 import { useLastPulledAt } from "@/local/queries/sync-meta";
 import { useDelayedVisible } from "@/hooks/use-delayed-visible";
+import { useEffect } from "react";
 
 export function RouteHandler() {
   const firstNote = useFirstNote();
   const lastPulledAt = useLastPulledAt();
+  const router = useRouter();
 
   const isFirstNotePending =
     (firstNote && "isPending" in firstNote && firstNote.isPending) ?? false;
   const showLoading = useDelayedVisible(isFirstNotePending);
+
+  useEffect(() => {
+    if (firstNote && "id" in firstNote) {
+      router.replace(`/notes/${firstNote.id}`);
+    }
+  }, [firstNote, router]);
 
   if (lastPulledAt === undefined) {
     return (
@@ -37,10 +45,6 @@ export function RouteHandler() {
         </div>
       )
     );
-  }
-
-  if (firstNote && "id" in firstNote) {
-    redirect(`/notes/${firstNote.id}`);
   }
 
   return (

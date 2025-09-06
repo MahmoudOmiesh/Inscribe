@@ -34,7 +34,7 @@ import {
   Trash2Icon,
   Undo2Icon,
 } from "lucide-react";
-import { exportNote, NOTE_MUTATIONS } from "../../mutations";
+import { exportNote, useNoteMutations } from "../../mutations";
 import { useNoteEditor } from "../note-editor-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -51,15 +51,17 @@ export function NoteHeaderDrawer() {
 
   const { note, editor } = useNoteEditor();
 
-  const updateFont = NOTE_MUTATIONS.updateFont(note.id);
-  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
-  const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
-  const updateFavorite = NOTE_MUTATIONS.updateFavorite(note.id);
-  const updateSmallText = NOTE_MUTATIONS.updateSmallText(note.id);
-  const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
-  const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
-  const copyNoteLink = NOTE_MUTATIONS.copyNoteLink(note.id);
-  const duplicateNote = NOTE_MUTATIONS.duplicateNote(note.id);
+  const {
+    updateFont,
+    updateArchive,
+    updateTrash,
+    updateFavorite,
+    updateSmallText,
+    updateLocked,
+    updateFullWidth,
+    copyNoteLink,
+    duplicateNote,
+  } = useNoteMutations(note.id);
 
   const canUndoOrRedo = editor.canUndo || editor.canRedo;
 
@@ -297,9 +299,9 @@ function MoveToDrawer({
   const [search, setSearch] = useState("");
   const folders = useLocalFolders();
 
-  const updateFolder = NOTE_MUTATIONS.updateFolder(note.id);
-  const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
-  const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
+  const { updateFolder, updateArchive, updateTrash } = useNoteMutations(
+    note.id,
+  );
 
   const filteredFolders =
     folders?.filter((folder) =>
