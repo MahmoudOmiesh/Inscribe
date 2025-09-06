@@ -43,6 +43,7 @@ export function NoteDropdown({
   const updateTrash = NOTE_MUTATIONS.updateTrash(note.id);
   const updateArchive = NOTE_MUTATIONS.updateArchive(note.id);
   const updateFavorite = NOTE_MUTATIONS.updateFavorite(note.id);
+  const duplicateNote = NOTE_MUTATIONS.duplicateNote(note.id);
   const deleteNote = NOTE_MUTATIONS.deleteNote(note.id);
 
   return (
@@ -69,7 +70,7 @@ export function NoteDropdown({
           <DropdownMenuItem onClick={() => copyNoteLink(note.id)}>
             <LinkIcon /> Copy link
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
             <CopyIcon /> Duplicate
           </DropdownMenuItem>
           <DropdownMenuSub>
@@ -113,6 +114,7 @@ export function NoteArchiveDropdown({
 } & React.ComponentProps<typeof DropdownMenuContent>) {
   const updateArchive = NOTE_MUTATIONS.updateArchive(noteId);
   const deleteNote = NOTE_MUTATIONS.deleteNote(noteId);
+  const duplicateNote = NOTE_MUTATIONS.duplicateNote(noteId);
 
   return (
     <DropdownMenu>
@@ -122,7 +124,7 @@ export function NoteArchiveDropdown({
           <DropdownMenuItem onClick={() => copyNoteLink(noteId)}>
             <LinkIcon /> Copy link
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
             <CopyIcon /> Duplicate
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => updateArchive.mutate(false)}>

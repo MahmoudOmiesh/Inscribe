@@ -59,6 +59,7 @@ export function NoteHeaderDrawer() {
   const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
   const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
   const copyNoteLink = NOTE_MUTATIONS.copyNoteLink(note.id);
+  const duplicateNote = NOTE_MUTATIONS.duplicateNote(note.id);
 
   const canUndoOrRedo = editor.canUndo || editor.canRedo;
 
@@ -152,7 +153,9 @@ export function NoteHeaderDrawer() {
                     </DrawerGroupItemButton>
                   </DrawerGroupItem>
                   <DrawerGroupItem>
-                    <DrawerGroupItemButton>
+                    <DrawerGroupItemButton
+                      onClick={() => duplicateNote.mutate()}
+                    >
                       <CopyIcon /> Duplicate
                     </DrawerGroupItemButton>
                   </DrawerGroupItem>

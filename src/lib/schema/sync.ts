@@ -3,6 +3,7 @@ import { FolderInsertSchema, FolderOrderSchema } from "./folder";
 import {
   NoteArchiveUpdateSchema,
   NoteContentUpdateSchema,
+  NoteDuplicateSchema,
   NoteFavoriteUpdateSchema,
   NoteFolderUpdateSchema,
   NoteFontUpdateSchema,
@@ -42,6 +43,11 @@ export const noteSyncOperationSchema = z.discriminatedUnion("type", [
     noteId: z.string(),
     type: z.literal("createNote"),
     data: NoteInsertSchema,
+  }),
+  z.object({
+    noteId: z.string(),
+    type: z.literal("duplicateNote"),
+    data: NoteDuplicateSchema,
   }),
   z.object({
     noteId: z.string(),

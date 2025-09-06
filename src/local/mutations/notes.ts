@@ -80,6 +80,52 @@ export async function createLocalNote({
   return tx;
 }
 
+export async function duplicateLocalNote({
+  noteId,
+  userId,
+}: {
+  noteId: string;
+  userId: string;
+}) {
+  const note = await localDB.notes.get(noteId);
+
+  if (!note) {
+    throw new Error("Note not found");
+  }
+
+  const lastNote = await localDB.notes
+    .where("[folderId+sortOrder]")
+    .between([note.folderId, Dexie.minKey], [note.folderId, Dexie.maxKey])
+    .last();
+
+  const sortOrder = (lastNote?.sortOrder ?? 0) + 1;
+  const tx = await localDB.transaction(
+    "rw",
+    [localDB.notes, localDB.syncOperations],
+    async () => {
+      const duplicatedNoteId = await localDB.notes.add({
+        ...note,
+        id: nanoid(),
+        title: `${note.title} (Duplicate)`,
+        sortOrder,
+      });
+
+      await operationQueue.add({
+        userId,
+        operation: {
+          noteId: duplicatedNoteId,
+          type: "duplicateNote",
+          data: { originalNoteId: noteId, sortOrder },
+        },
+      });
+
+      return duplicatedNoteId;
+    },
+  );
+
+  return tx;
+}
+
 export async function updateLocalNoteTitle({
   noteId,
   userId,

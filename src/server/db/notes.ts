@@ -1,6 +1,7 @@
 import type {
   NoteArchiveUpdate,
   NoteContentUpdate,
+  NoteDuplicate,
   NoteFavoriteUpdate,
   NoteFolderUpdate,
   NoteFontUpdate,
@@ -13,7 +14,6 @@ import type {
 } from "@/lib/schema/note";
 import { db } from "./root";
 import type { Prisma } from "@prisma/client";
-import { nanoid } from "nanoid";
 
 export const _notes = {
   queries: {
@@ -40,34 +40,25 @@ export const _notes = {
       });
     },
 
-    duplicate: async (noteId: string, userId: string) => {
-      const note = await db.note.findUnique({
-        where: { id: noteId, userId },
-        select: { title: true, content: true, folderId: true },
-      });
+    duplicate: async (noteId: string, userId: string, data: NoteDuplicate) => {
+      return db.$transaction(async (tx) => {
+        const originalNote = await tx.note.findUnique({
+          where: { id: data.originalNoteId, userId },
+        });
 
-      if (note === null) {
-        throw new Error("Note not found");
-      }
+        if (!originalNote) {
+          throw new Error("Note not found");
+        }
 
-      const last = await db.note.findFirst({
-        where: { folderId: note.folderId, userId },
-        orderBy: { sortOrder: "desc" },
-        select: { sortOrder: true },
-      });
-
-      const sortOrder = (last?.sortOrder ?? 0) + 1;
-
-      return db.note.create({
-        data: {
-          id: nanoid(),
-          title: `${note.title} (Duplicate)`,
-          content: note.content as Prisma.InputJsonValue,
-          sortOrder,
-          folderId: note.folderId,
-          userId,
-        },
-        select: { id: true },
+        await tx.note.create({
+          data: {
+            ...originalNote,
+            id: noteId,
+            title: `${originalNote.title} (Duplicate)`,
+            content: originalNote.content as unknown as Prisma.InputJsonValue,
+            sortOrder: data.sortOrder,
+          },
+        });
       });
     },
 

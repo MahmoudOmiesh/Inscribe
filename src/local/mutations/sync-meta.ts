@@ -3,6 +3,7 @@ import { localDB } from "../db";
 import type { NoteSyncOperation } from "../schema/sync";
 import type { LocalNote } from "../schema/note";
 import { operationQueue } from "@/sync/operation-queue";
+import type { EditorNode } from "@/text-editor/model/schema";
 
 export function setLastPulledAt(userId: string, lastPulledAt: number) {
   return localDB.syncMeta.put({
@@ -40,7 +41,9 @@ export async function updateNotesFromPull(
 
   return Promise.all([
     localDB.notes.bulkDelete(toDelete.map((note) => note.id)),
-    localDB.notes.bulkPut(updatedNotes as LocalNote[]),
+    localDB.notes.bulkPut(
+      updatedNotes.filter((note) => note !== null) as LocalNote[],
+    ),
   ]);
 }
 
@@ -57,13 +60,19 @@ async function getNotesToUpdate(
 
   return await Promise.all(
     toUpsert.map(async ({ deletedAt: _, ...serverNote }) => {
-      const localNoteExists = pendingNoteIds.has(serverNote.id);
+      const localNoteHasPendingOps = pendingNoteIds.has(serverNote.id);
       const localNote = await localDB.notes.get(serverNote.id);
 
-      if (!localNoteExists || localNote == null) {
+      if (localNoteHasPendingOps && localNote == null) {
+        // if the note has pending operations but doesn't exist locally
+        // that means the note was deleted
+        return null;
+      }
+
+      if (!localNoteHasPendingOps || localNote == null) {
         return {
           ...serverNote,
-          content: serverNote.content,
+          content: serverNote.content as unknown as EditorNode[],
           isArchived: serverNote.isArchived ? 1 : 0,
           isTrashed: serverNote.isTrashed ? 1 : 0,
           isFavorite: serverNote.isFavorite ? 1 : 0,
@@ -114,7 +123,7 @@ async function getNotesToUpdate(
           : serverNote.title,
         content: fieldsWithPendingOperations.has("content")
           ? localNote.content
-          : serverNote.content,
+          : (serverNote.content as unknown as EditorNode[]),
         isArchived: fieldsWithPendingOperations.has("isArchived")
           ? localNote.isArchived
           : serverNote.isArchived

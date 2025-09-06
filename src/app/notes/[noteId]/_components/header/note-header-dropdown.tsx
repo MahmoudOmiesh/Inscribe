@@ -65,6 +65,7 @@ export function NoteHeaderDropdown() {
   const updateLocked = NOTE_MUTATIONS.updateLocked(note.id);
   const updateFullWidth = NOTE_MUTATIONS.updateFullWidth(note.id);
   const copyNoteLink = NOTE_MUTATIONS.copyNoteLink(note.id);
+  const duplicateNote = NOTE_MUTATIONS.duplicateNote(note.id);
 
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
@@ -116,7 +117,7 @@ export function NoteHeaderDropdown() {
                 <DropdownMenuItem onClick={() => copyNoteLink.mutate()}>
                   <LinkIcon /> Copy link
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
                   <CopyIcon /> Duplicate
                 </DropdownMenuItem>
                 {note.isArchived ? (

@@ -11,6 +11,7 @@ import type {
   NoteTrashUpdate,
   NoteFolderUpdate,
   NoteInsert,
+  NoteDuplicate,
 } from "@/lib/schema/note";
 
 export interface SyncOperation {
@@ -48,6 +49,11 @@ export type NoteSyncOperation =
       noteId: string;
       type: "createNote";
       data: NoteInsert;
+    }
+  | {
+      noteId: string;
+      type: "duplicateNote";
+      data: NoteDuplicate;
     }
   | {
       noteId: string;

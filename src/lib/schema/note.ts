@@ -8,6 +8,11 @@ export const NoteInsertSchema = z.object({
   content: z.array(EditorNodeSchema),
 });
 
+export const NoteDuplicateSchema = z.object({
+  originalNoteId: z.string(),
+  sortOrder: z.number().positive().int(),
+});
+
 export const NoteTitleUpdateSchema = z.object({
   title: z.string(),
 });
@@ -49,6 +54,7 @@ export const NoteFolderUpdateSchema = z.object({
 });
 
 export type NoteInsert = z.infer<typeof NoteInsertSchema>;
+export type NoteDuplicate = z.infer<typeof NoteDuplicateSchema>;
 export type NoteTitleUpdate = z.infer<typeof NoteTitleUpdateSchema>;
 export type NoteContentUpdate = z.infer<typeof NoteContentUpdateSchema>;
 export type NoteFavoriteUpdate = z.infer<typeof NoteFavoriteUpdateSchema>;

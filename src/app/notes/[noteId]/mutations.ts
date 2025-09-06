@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
   deleteLocalNote,
+  duplicateLocalNote,
   updateLocalNoteArchive,
   updateLocalNoteContent,
   updateLocalNoteFavorite,
@@ -25,6 +26,21 @@ import type { LocalNote } from "@/local/schema/note";
 import { exportToMarkdown } from "@/text-editor/export/md";
 
 export const NOTE_MUTATIONS = {
+  duplicateNote: (noteId: string) => {
+    const userId = useUserId();
+    const router = useRouter();
+
+    return useMutation({
+      mutationFn: () => duplicateLocalNote({ noteId, userId }),
+      onSuccess: (id) => {
+        router.push(`/notes/${id}`);
+      },
+      meta: {
+        toastOnError: "Failed to duplicate note, please try again.",
+      },
+    });
+  },
+
   updateTitle: (noteId: string) => {
     const userId = useUserId();
 

@@ -83,6 +83,13 @@ export const syncRouter = createTRPCRouter({
                 operation.data,
               );
               break;
+            case "duplicateNote":
+              result = await DB.notes.mutations.duplicate(
+                operation.noteId,
+                userId,
+                operation.data,
+              );
+              break;
             case "updateNoteTitle":
               result = await DB.notes.mutations.updateTitle(
                 operation.noteId,
