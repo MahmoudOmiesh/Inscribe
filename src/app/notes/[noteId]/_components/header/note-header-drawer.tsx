@@ -17,6 +17,7 @@ import {
 } from "@/text-editor/model/schema";
 import {
   AArrowDown,
+  AlertTriangleIcon,
   ArchiveIcon,
   ArrowRightFromLineIcon,
   CheckIcon,
@@ -43,11 +44,13 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/spinner";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { NoteDeleteAlert } from "../body/note-delete-alert";
 
 export function NoteHeaderDrawer() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMoveToDrawerOpen, setIsMoveToDrawerOpen] = useState(false);
   const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const { note, editor } = useNoteEditor();
 
@@ -98,6 +101,15 @@ export function NoteHeaderDrawer() {
                     }}
                   >
                     <Trash2Icon /> Restore from trash
+                  </DrawerGroupItemButton>
+                  <DrawerGroupItemButton
+                    onClick={() => {
+                      setIsDeleteAlertOpen(true);
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    <AlertTriangleIcon className="text-destructive" /> Delete
+                    permanently
                   </DrawerGroupItemButton>
                 </DrawerGroupItem>
                 <DrawerGroupItem>
@@ -181,6 +193,15 @@ export function NoteHeaderDrawer() {
                       </DrawerGroupItemButton>
                     </DrawerGroupItem>
                   )}
+                  <DrawerGroupItemButton
+                    onClick={() => {
+                      setIsDeleteAlertOpen(true);
+                      setIsDrawerOpen(false);
+                    }}
+                  >
+                    <AlertTriangleIcon className="text-destructive" /> Delete
+                    permanently
+                  </DrawerGroupItemButton>
                 </DrawerGroup>
 
                 <DrawerGroup>
@@ -283,6 +304,12 @@ export function NoteHeaderDrawer() {
       <ExportDrawer
         isOpen={isExportDrawerOpen}
         onOpenChange={setIsExportDrawerOpen}
+      />
+
+      <NoteDeleteAlert
+        noteId={note.id}
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
       />
     </>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileIcon, LogOutIcon } from "lucide-react";
+import { LogOutIcon, Monitor, Moon, PaletteIcon, Sun } from "lucide-react";
 import { AvatarWithFallback } from "./avatar-with-fallback";
 import {
   DropdownMenu,
@@ -8,11 +8,15 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 import { resetLocalDB } from "@/local/db";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 
 export function ProfileDropdown({
   name,
@@ -26,9 +30,10 @@ export function ProfileDropdown({
   className?: string;
 }) {
   const router = useRouter();
+  const { setTheme } = useTheme();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger>
         <AvatarWithFallback src={photoUrl} className={className} />
       </DropdownMenuTrigger>
@@ -39,10 +44,29 @@ export function ProfileDropdown({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => router.push("/notes")}>
-            <FileIcon />
-            <span>My Notes</span>
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <PaletteIcon className="text-muted-foreground size-4" />
+              Theme
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                <Sun className="size-4" />
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <Moon className="size-4" />
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                <Monitor className="size-4" />
+                System
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={async () => {
               await Promise.all([

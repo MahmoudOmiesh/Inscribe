@@ -214,7 +214,7 @@ export function exportNote({
       break;
     }
     case "markdown": {
-      const markdown = exportToMarkdown(editorNodes);
+      const markdown = exportToMarkdown(editorNodes, note.title);
       const blob = new Blob([markdown], { type: "text/markdown" });
       downloadFile(blob, `${note.title}-${note.id}-export.${format}`);
       break;

@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/popover";
 import { FolderInsertSchema, type FolderInsert } from "@/lib/schema/folder";
 import {
-  createLocalFolder,
   deleteLocalFolder,
   updateLocalFolder,
 } from "@/local/mutations/folders";
@@ -50,35 +49,6 @@ import { useEffect, useState } from "react";
 import { Form } from "@/components/ui/form";
 import { useUserId } from "../../user-context";
 import { useForm } from "react-hook-form";
-
-export function FolderCreateDropdown({
-  children,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuContent> & {
-  children: React.ReactNode;
-}) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const userId = useUserId();
-  const createFolder = useMutation({
-    mutationFn: createLocalFolder,
-    onMutate: () => setIsDialogOpen(false),
-    meta: {
-      toastOnError: "Failed to create folder. Please try again.",
-    },
-    networkMode: "always",
-  });
-
-  return (
-    <DropdownMenu open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent {...props} onClick={(e) => e.stopPropagation()}>
-        <FolderForm
-          onSubmit={(data) => createFolder.mutate({ userId, data })}
-        />
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 
 export function FolderMoreDropdown({
   folder,

@@ -1,5 +1,5 @@
 import { Logo } from "@/components/logo";
-import { SidebarHeader } from "@/components/ui/sidebar";
+import { SidebarHeader, SidebarTriggerMobile } from "@/components/ui/sidebar";
 import Link from "next/link";
 
 export function NotesSidebarHeader() {
@@ -9,6 +9,7 @@ export function NotesSidebarHeader() {
         <Logo />
         <span className="hidden text-xl font-bold sm:block">Inscribe</span>
       </Link>
+      <SidebarTriggerMobile />
     </SidebarHeader>
   );
 }

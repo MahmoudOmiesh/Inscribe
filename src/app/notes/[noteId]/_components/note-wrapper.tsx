@@ -9,14 +9,17 @@ import type { LocalNote } from "@/local/schema/note";
 import Link from "next/link";
 import { Spinner } from "@/components/spinner";
 import { NoteBanner } from "./header/note-banner";
+import { useDelayedVisible } from "@/hooks/use-delayed-visible";
 
 export function NoteWrapper({ noteId }: { noteId: string }) {
   const note = useLocalNote(noteId);
 
-  const isNotePending = note && "isPending" in note && note.isPending;
+  const isNotePending =
+    (note && "isPending" in note && note.isPending) ?? false;
+  const showLoading = useDelayedVisible(isNotePending);
 
   if (isNotePending) {
-    return <SuspenseFallback />;
+    return showLoading ? <SuspenseFallback /> : null;
   }
 
   if (!note) {

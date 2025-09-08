@@ -81,6 +81,7 @@ export type ActiveMarkDescriptor =
 export interface BaseNode {
   id: string;
   text: string;
+  placeholder?: string;
   alignment: Alignment;
   marks: Mark[];
 }

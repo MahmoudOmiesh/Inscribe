@@ -28,6 +28,7 @@ import {
   ArchiveIcon,
   CornerUpLeftIcon,
   LockKeyholeIcon,
+  AlertTriangleIcon,
 } from "lucide-react";
 import { useNoteEditor } from "../note-editor-context";
 import {
@@ -54,6 +55,7 @@ import {
 } from "@/components/ui/select";
 import { useLocalFolders } from "@/local/queries/folders";
 import { exportNote, useNoteMutations } from "../../mutations";
+import { NoteDeleteAlert } from "../body/note-delete-alert";
 
 export function NoteHeaderDropdown() {
   const { note, editor } = useNoteEditor();
@@ -69,13 +71,15 @@ export function NoteHeaderDropdown() {
     duplicateNote,
   } = useNoteMutations(note.id);
 
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const canUndoOrRedo = editor.canUndo || editor.canRedo;
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
             <MoreVerticalIcon className="text-muted-foreground" />
@@ -88,10 +92,20 @@ export function NoteHeaderDropdown() {
                 <DropdownMenuItem onClick={() => updateTrash.mutate(false)}>
                   <Trash2Icon /> Restore from trash
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsDeleteAlertOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  <AlertTriangleIcon className="text-destructive" />
+                  Delete permanently
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
+                <DropdownMenuItem onClick={() => setIsExportDialogOpen(true)}>
                   <ArrowRightFromLineIcon className="-rotate-90" /> Export
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -139,6 +153,16 @@ export function NoteHeaderDropdown() {
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
                 )}
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsDeleteAlertOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  <AlertTriangleIcon className="text-destructive" />
+                  Delete permanently
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
@@ -202,7 +226,7 @@ export function NoteHeaderDropdown() {
               )}
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setExportDialogOpen(true)}>
+                <DropdownMenuItem onClick={() => setIsExportDialogOpen(true)}>
                   <ArrowRightFromLineIcon className="-rotate-90" /> Export
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -212,8 +236,14 @@ export function NoteHeaderDropdown() {
       </DropdownMenu>
 
       <ExportDialog
-        isOpen={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
+        isOpen={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+      />
+
+      <NoteDeleteAlert
+        noteId={note.id}
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
       />
     </>
   );

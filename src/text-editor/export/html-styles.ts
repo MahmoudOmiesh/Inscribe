@@ -25,6 +25,11 @@ h3 {
   line-height: 1.2;
 }
 
+body > h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
 .editor > h1,
 .editor > h2,
 .editor > h3,

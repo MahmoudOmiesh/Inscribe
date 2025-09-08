@@ -31,6 +31,7 @@ import { useState } from "react";
 import { useLocalFolders } from "@/local/queries/folders";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/spinner";
+import { NoteDeleteAlert } from "../body/note-delete-alert";
 
 export function NoteDropdown({
   note,
@@ -40,69 +41,81 @@ export function NoteDropdown({
   note: LocalNote;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const {
-    updateTrash,
-    updateArchive,
-    updateFavorite,
-    duplicateNote,
-    deleteNote,
-  } = useNoteMutations(note.id);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+
+  const { updateTrash, updateArchive, updateFavorite, duplicateNote } =
+    useNoteMutations(note.id);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent {...props}>
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => updateFavorite.mutate(!note.isFavorite)}
-          >
-            <StarIcon
-              className={cn(
-                note.isFavorite && "fill-yellow-500 text-yellow-500",
-              )}
-            />{" "}
-            {note.isFavorite ? "Remove from favorites" : "Add to favorites"}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => updateArchive.mutate(true)}>
-            <ArchiveIcon /> Archive note
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => copyNoteLink(note.id)}>
-            <LinkIcon /> Copy link
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
-            <CopyIcon /> Duplicate
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="flex items-center gap-2">
-              <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
-              Move to
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent sideOffset={10}>
-                <MoveToDropdown noteId={note.id} />
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem onClick={() => updateTrash.mutate(true)}>
-            <Trash2Icon /> Move to trash
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => openNoteInNewTab(note.id)}>
-            <ExternalLinkIcon />
-            Open in new tab
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteNote.mutate()}>
-            <AlertTriangleIcon className="text-destructive" />
-            Delete permanently
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent {...props}>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={() => updateFavorite.mutate(!note.isFavorite)}
+            >
+              <StarIcon
+                className={cn(
+                  note.isFavorite && "fill-yellow-500 text-yellow-500",
+                )}
+              />{" "}
+              {note.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateArchive.mutate(true)}>
+              <ArchiveIcon /> Archive note
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => copyNoteLink(note.id)}>
+              <LinkIcon /> Copy link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
+              <CopyIcon /> Duplicate
+            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="flex items-center gap-2">
+                <CornerUpRightIcon className="text-muted-foreground size-4" />{" "}
+                Move to
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent sideOffset={10}>
+                  <MoveToDropdown noteId={note.id} />
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+            <DropdownMenuItem onClick={() => updateTrash.mutate(true)}>
+              <Trash2Icon /> Move to trash
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => openNoteInNewTab(note.id)}>
+              <ExternalLinkIcon />
+              Open in new tab
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDeleteAlertOpen(true);
+                setIsDropdownOpen(false);
+              }}
+            >
+              <AlertTriangleIcon className="text-destructive" />
+              Delete permanently
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <NoteDeleteAlert
+        noteId={note.id}
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
+      />
+    </>
   );
 }
 
@@ -114,36 +127,52 @@ export function NoteArchiveDropdown({
   noteId: string;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const { updateArchive, deleteNote, duplicateNote } = useNoteMutations(noteId);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const { updateArchive, duplicateNote } = useNoteMutations(noteId);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent {...props}>
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => copyNoteLink(noteId)}>
-            <LinkIcon /> Copy link
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
-            <CopyIcon /> Duplicate
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => updateArchive.mutate(false)}>
-            <Undo2Icon /> Unarchive
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => openNoteInNewTab(noteId)}>
-            <ExternalLinkIcon />
-            Open in new tab
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => deleteNote.mutate()}>
-            <AlertTriangleIcon className="text-destructive" />
-            Delete permanently
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent {...props}>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => copyNoteLink(noteId)}>
+              <LinkIcon /> Copy link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => duplicateNote.mutate()}>
+              <CopyIcon /> Duplicate
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateArchive.mutate(false)}>
+              <Undo2Icon /> Unarchive
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => openNoteInNewTab(noteId)}>
+              <ExternalLinkIcon />
+              Open in new tab
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDeleteAlertOpen(true);
+                setIsDropdownOpen(false);
+              }}
+            >
+              <AlertTriangleIcon className="text-destructive" />
+              Delete permanently
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <NoteDeleteAlert
+        noteId={noteId}
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
+      />
+    </>
   );
 }
 
@@ -155,26 +184,42 @@ export function NoteTrashDropdown({
   noteId: string;
   children: React.ReactNode;
 } & React.ComponentProps<typeof DropdownMenuContent>) {
-  const { restoreNote, deleteNote } = useNoteMutations(noteId);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const { restoreNote } = useNoteMutations(noteId);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent {...props}>
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => restoreNote.mutate()}>
-            <Undo2Icon /> Restore note
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => deleteNote.mutate()}>
-            <AlertTriangleIcon className="text-destructive" />
-            Delete permanently
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>{" "}
-    </DropdownMenu>
+    <>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent {...props}>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => restoreNote.mutate()}>
+              <Undo2Icon /> Restore note
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDeleteAlertOpen(true);
+                setIsDropdownOpen(false);
+              }}
+            >
+              <AlertTriangleIcon className="text-destructive" />
+              Delete permanently
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <NoteDeleteAlert
+        noteId={noteId}
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
+      />
+    </>
   );
 }
 

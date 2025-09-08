@@ -3,7 +3,7 @@ import type { ParagraphNode as ParagraphNodeType } from "../../model/schema";
 import { MarkRenderer } from "../mark-renderer";
 import { cn } from "@/lib/utils";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "../utils";
+import { alignmentToCss, placeholderToCss } from "../utils";
 
 export const Paragraph = memo(
   ({
@@ -18,8 +18,10 @@ export const Paragraph = memo(
     return (
       <p
         data-node-id={node.id}
+        data-placeholder={node.placeholder}
         className={cn(
           "mt-(--editor-paragraph-mt) text-(length:--editor-paragraph-s) whitespace-pre-wrap",
+          node.placeholder && node.text.length === 0 && placeholderToCss(),
           alignmentToCss(node.alignment),
         )}
         ref={setReference}

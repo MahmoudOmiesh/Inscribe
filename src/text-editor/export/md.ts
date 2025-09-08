@@ -1,8 +1,9 @@
 import type { EditorNode, Mark } from "../model/schema";
 
-export function exportToMarkdown(nodes: EditorNode[]) {
-  const mdNodes = nodes
-    .map((node) => {
+export function exportToMarkdown(nodes: EditorNode[], title: string) {
+  const mdNodes = [
+    `# ${title}`,
+    nodes.map((node) => {
       const text = generateText(node.text, node.marks);
 
       switch (node.type) {
@@ -39,10 +40,10 @@ export function exportToMarkdown(nodes: EditorNode[]) {
           const _: never = node;
           return _;
       }
-    })
-    .join("\n");
+    }),
+  ];
 
-  return mdNodes.startsWith("\n") ? mdNodes.slice(1) : mdNodes;
+  return mdNodes.join("\n");
 }
 
 function generateText(text: string, marks: Mark[]) {

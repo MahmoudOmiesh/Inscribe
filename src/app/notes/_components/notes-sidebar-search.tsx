@@ -29,14 +29,37 @@ import { useRouter } from "next/navigation";
 export function NotesSidebarSearch() {
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSearchDialogOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <>
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setIsSearchDialogOpen(true)}>
+              <SidebarMenuButton
+                variant="outline"
+                onClick={() => setIsSearchDialogOpen(true)}
+                className="transition-colors"
+              >
                 <SearchIcon /> Search
+                <span
+                  className={
+                    "bg-muted text-muted-foreground ml-auto rounded-sm p-1 text-xs tracking-widest"
+                  }
+                >
+                  ⌘K
+                </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -60,7 +83,7 @@ function SearchDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="flex min-h-[60vh] flex-col gap-4">
+      <DialogContent className="flex min-h-[40vh] flex-col gap-4 sm:max-w-xl">
         <SearchDialogContent closeDialog={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
@@ -118,12 +141,12 @@ function SearchDialogContent({ closeDialog }: { closeDialog: () => void }) {
         <Input
           autoFocus
           placeholder="Search your notes..."
-          className="h-fit rounded-none border-none bg-transparent p-0 shadow-none focus-visible:shadow-none focus-visible:ring-0 dark:bg-transparent"
+          className="h-fit rounded-none border-none bg-transparent p-0 text-sm shadow-none focus-visible:shadow-none focus-visible:ring-0 dark:bg-transparent"
           onChange={(e) => debouncedSetSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
         />
       </div>
-      <ScrollArea className="h-[45vh]">
+      <ScrollArea className="h-[30vh]">
         <div className="space-y-3 pr-3">
           {searchQuery === "" ? (
             <SearchDialogState type="no-search" />

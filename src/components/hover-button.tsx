@@ -47,14 +47,14 @@ export function HoverButton({
 
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={150}>
+      <Tooltip disableHoverableContent={true}>
         <TooltipTrigger asChild>{button}</TooltipTrigger>
         <TooltipContent
           side="bottom"
           variant="muted"
           arrow={false}
           sideOffset={8}
-          className="rounded-sm px-2 py-1.5"
+          className="pointer-events-none rounded-sm px-2 py-1.5"
         >
           {title}
         </TooltipContent>

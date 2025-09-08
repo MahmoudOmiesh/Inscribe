@@ -9,7 +9,7 @@ import { MarkRenderer } from "../mark-renderer";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "../utils";
+import { alignmentToCss, placeholderToCss } from "../utils";
 
 type NestedListItemNode<T extends ListItemNode> = {
   item: T;
@@ -247,7 +247,9 @@ export const CheckListItem = memo(
         <div className="min-w-0 flex-1">
           <p
             data-node-id={node.id}
+            data-placeholder={node.placeholder}
             className={cn(
+              node.placeholder && node.text.length === 0 && placeholderToCss(),
               node.type === "check-list-item" &&
                 node.checked &&
                 "text-muted-foreground line-through",
@@ -276,7 +278,9 @@ export const ListItem = memo(
       <li className={cn("whitespace-pre-wrap", alignmentToCss(node.alignment))}>
         <p
           data-node-id={node.id}
+          data-placeholder={node.placeholder}
           className={cn(
+            node.placeholder && node.text.length === 0 && placeholderToCss(),
             node.type === "check-list-item" &&
               node.checked &&
               "text-muted-foreground line-through",

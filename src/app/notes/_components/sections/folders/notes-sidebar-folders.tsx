@@ -17,7 +17,7 @@ import {
 import { ChevronRight, MoreHorizontal, PlusIcon } from "lucide-react";
 import type { LocalFolder } from "@/local/schema/folder";
 import { useLocalFolders } from "@/local/queries/folders";
-import { FolderCreateDropdown, FolderMoreDropdown } from "./utils";
+import { FolderMoreDropdown } from "./utils";
 import { HoverButton } from "@/components/hover-button";
 import { FolderEmptyState, FolderLoadingState } from "./states";
 import { NoteList } from "../../../[noteId]/_components/lists/note-list";
@@ -26,9 +26,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useUserId } from "../../user-context";
 import { useDelayedVisible } from "@/hooks/use-delayed-visible";
+import { createLocalFolder } from "@/local/mutations/folders";
 
 export function NotesSidebarFolders() {
+  const userId = useUserId();
   const folders = useLocalFolders();
+  const createFolder = useMutation({
+    mutationFn: createLocalFolder,
+    networkMode: "always",
+  });
 
   const showLoading = useDelayedVisible(!folders);
 
@@ -40,15 +46,18 @@ export function NotesSidebarFolders() {
             <Button variant="ghost" className="group/button justify-start">
               Folders
               <div className="ml-auto flex items-center">
-                <FolderCreateDropdown
-                  side="bottom"
-                  align="center"
-                  alignOffset={10}
+                <HoverButton
+                  title="Add Folder"
+                  className="lg:opacity-100"
+                  onClick={() =>
+                    createFolder.mutate({
+                      userId,
+                      data: { emoji: "📄", name: "New Folder" },
+                    })
+                  }
                 >
-                  <HoverButton title="Add Folder">
-                    <PlusIcon />
-                  </HoverButton>
-                </FolderCreateDropdown>
+                  <PlusIcon />
+                </HoverButton>
               </div>
             </Button>
           </CollapsibleTrigger>
@@ -108,7 +117,7 @@ function NotesSiderbarFolder({
     <Collapsible defaultOpen={defaultOpen}>
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton className="group/button relative gap-0 hover:pr-10 focus-visible:pr-10">
+          <SidebarMenuButton className="group/button relative mb-0.5 gap-0 hover:pr-10 focus-visible:pr-10">
             <div className="flex size-4 items-center justify-center">
               <span className="group-hover/button:hidden group-focus-visible/button:hidden">
                 {folder.emoji}

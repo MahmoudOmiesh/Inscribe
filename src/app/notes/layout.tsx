@@ -1,4 +1,4 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { NotesSidebar } from "./_components/notes-sidebar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -25,7 +25,10 @@ export default async function Layout({
         <UserProvider userId={session.user.id}>
           <SyncHandler>
             <NotesSidebar />
-            <div className="flex flex-1 flex-col">{children}</div>
+            <div className="relative flex flex-1 flex-col">
+              <SidebarTrigger className="bg-muted absolute top-0 left-4 z-12 mt-3.5 size-8 sm:mt-2.5" />
+              {children}
+            </div>
           </SyncHandler>
         </UserProvider>
       </SidebarProvider>

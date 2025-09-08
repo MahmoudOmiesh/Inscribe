@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { HeadingNode } from "../../model/schema";
 import { MarkRenderer } from "../mark-renderer";
 import type { GetReferenceProps, SetReference } from "./general-node";
-import { alignmentToCss } from "../utils";
+import { alignmentToCss, placeholderToCss } from "../utils";
 import type { ClassValue } from "clsx";
 
 const headingData: Record<
@@ -52,8 +52,10 @@ export const Heading = memo(
         {...getReferenceProps()}
         ref={setReference}
         data-node-id={node.id}
+        data-placeholder={node.placeholder}
         className={cn(
           "whitespace-pre-wrap",
+          node.placeholder && node.text.length === 0 && placeholderToCss(),
           className,
           alignmentToCss(node.alignment),
         )}

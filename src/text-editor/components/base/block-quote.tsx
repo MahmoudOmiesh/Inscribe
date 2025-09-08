@@ -3,7 +3,7 @@ import type { BlockquoteNode } from "../../model/schema";
 import type { GetReferenceProps, SetReference } from "./general-node";
 import { MarkRenderer } from "../mark-renderer";
 import { cn } from "@/lib/utils";
-import { alignmentToCss } from "../utils";
+import { alignmentToCss, placeholderToCss } from "../utils";
 
 export const Blockquote = memo(
   ({
@@ -24,7 +24,15 @@ export const Blockquote = memo(
         ref={setReference}
         {...getReferenceProps()}
       >
-        <p data-node-id={node.id}>
+        <p
+          data-node-id={node.id}
+          data-placeholder={node.placeholder}
+          className={
+            node.placeholder && node.text.length === 0
+              ? placeholderToCss()
+              : undefined
+          }
+        >
           {node.text.length > 0 ? (
             <MarkRenderer text={node.text} marks={node.marks} />
           ) : (

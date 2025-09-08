@@ -8,6 +8,8 @@ import { ProfileDropdown } from "./profile-dropdown";
 import { AuthDialog } from "./auth-dialog";
 import { ThemeSwitch } from "./ui/theme-switch";
 import { MaxWidthWrapper } from "./max-width-wrapper";
+import { Button } from "./ui/button";
+import { FileIcon } from "lucide-react";
 
 export function Header() {
   const { data: session, isPending } = authClient.useSession();
@@ -21,20 +23,28 @@ export function Header() {
           <span className="hidden text-2xl font-bold sm:block">Inscribe</span>
         </Link>
         <div className="flex items-center gap-4">
-          <ThemeSwitch />
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {isPending ? (
               <div className="grid h-9 place-items-center">
                 <Spinner size="md" />
               </div>
             ) : isSignedIn ? (
-              <ProfileDropdown
-                name={session.user.name}
-                email={session.user.email}
-                photoUrl={session.user.image ?? ""}
-              />
+              <>
+                <Button asChild variant="ghost">
+                  <Link href="/notes">
+                    <FileIcon />
+                    My Notes
+                  </Link>
+                </Button>
+                <ProfileDropdown
+                  name={session.user.name}
+                  email={session.user.email}
+                  photoUrl={session.user.image ?? ""}
+                />
+              </>
             ) : (
               <>
+                <ThemeSwitch />
                 <AuthDialog initialType="sign-in" />
                 <AuthDialog initialType="sign-up" />
               </>

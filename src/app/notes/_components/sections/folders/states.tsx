@@ -3,7 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FolderCreateDropdown } from "./utils";
+import { createLocalFolder } from "@/local/mutations/folders";
+import { useUserId } from "../../user-context";
+import { useMutation } from "@tanstack/react-query";
 
 export function FolderLoadingState() {
   return (
@@ -20,14 +22,28 @@ export function FolderLoadingState() {
 }
 
 export function FolderEmptyState() {
+  const userId = useUserId();
+  const createFolder = useMutation({
+    mutationFn: createLocalFolder,
+    networkMode: "always",
+  });
+
   return (
     <div className="text-center">
       <p className="text-muted-foreground text-sm">You have no folders yet</p>
-      <FolderCreateDropdown>
-        <Button variant="link" size="sm" className="h-fit">
-          Create a new folder
-        </Button>
-      </FolderCreateDropdown>
+      <Button
+        variant="link"
+        size="sm"
+        className="h-fit"
+        onClick={() =>
+          createFolder.mutate({
+            userId,
+            data: { emoji: "📄", name: "New Folder" },
+          })
+        }
+      >
+        Create a new folder
+      </Button>
     </div>
   );
 }

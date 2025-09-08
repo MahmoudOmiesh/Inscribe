@@ -18,10 +18,11 @@ export function exportToHtml(
   {
     title,
     smallText,
-    // font,
+    font,
   }: { title: string; smallText: boolean; font: FontType },
 ) {
   const parts: string[] = [];
+  const noteTitle = `<h1>${escapeHtml(title)}</h1>`;
 
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i]!;
@@ -97,11 +98,15 @@ export function exportToHtml(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       :root{${editorVariablesCssString}}
+      body {
+        font-family: ${getFontFamily(font)};
+      }
       ${HTML_STYLES_CSS}
     </style>
     <title>${escapeHtml(title)}</title>
   </head>
   <body>
+    ${noteTitle}
     <div class="editor">
       ${parts.join("\n")}
     </div>
@@ -282,4 +287,18 @@ function escapeHtml(text: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function getFontFamily(font: FontType) {
+  switch (font) {
+    case "serif":
+      return "serif";
+    case "mono":
+      return "monospace";
+    case "default":
+      return "sans-serif";
+    default:
+      const _: never = font;
+      return _;
+  }
 }

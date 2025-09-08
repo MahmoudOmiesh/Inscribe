@@ -74,9 +74,13 @@ export function TextEditor({
 
 // TODO
 // - fix floating node modifier not closing when clicking outside or after ai panel is opened
-// - handle losing focus
-// - imrpove the ui
 // - fix paste when html
+// - support for mobile phones
+// - deal with firefox bullshit
+// - improve the floating ui bits
+// - switch mark rendering algorithm to simple one
+
+// - handle losing focus
 // - move undo/redo to actions
 
 // idk

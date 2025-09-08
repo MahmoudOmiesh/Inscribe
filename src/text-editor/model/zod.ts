@@ -30,6 +30,7 @@ const MarkSchema = z.union([HighlightMarkSchema, SimpleMarkSchema]);
 const BaseNodeSchema = z.object({
   id: z.string(),
   text: z.string(),
+  placeholder: z.string().optional(),
   alignment: AlignmentSchema.default("left"),
   marks: z.array(MarkSchema).default([]),
 });

@@ -99,6 +99,37 @@ export function alignmentToCss(alignment: Alignment) {
   }
 }
 
+export function placeholderToCss() {
+  return `after:text-muted-foreground relative after:pointer-events-none after:absolute after:top-0 after:left-0 after:h-full after:w-full after:content-[attr(data-placeholder)] after:[font:inherit]`;
+}
+
+export function getPlaceholderText(nodeType: BlockType) {
+  switch (nodeType) {
+    case "heading-1":
+      return "Heading 1";
+    case "heading-2":
+      return "Heading 2";
+    case "heading-3":
+      return "Heading 3";
+    case "heading-4":
+      return "Heading 4";
+    case "paragraph":
+      return "Write, type '/' for commands...";
+    case "unordered-list-item":
+    case "ordered-list-item":
+      return "List";
+    case "check-list-item":
+      return "To-do";
+    case "separator":
+      return "Shouldn't appear";
+    case "blockquote":
+      return "Quote";
+    default:
+      const _: never = nodeType;
+      return _;
+  }
+}
+
 export function renderAlignmentLabel(alignment: Alignment) {
   switch (alignment) {
     case "left":

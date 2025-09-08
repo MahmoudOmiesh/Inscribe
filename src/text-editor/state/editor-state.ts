@@ -1,6 +1,6 @@
-import { buildNodeIdxMap } from "../model/nodes";
 import type { ActiveMarkDescriptor, EditorNode } from "../model/schema";
 import type { SelectionRange } from "../model/selection";
+import { normalizePipeline } from "../normalize/pipeline";
 
 export interface EditorState {
   nodes: EditorNode[];
@@ -13,10 +13,12 @@ export function createInitialEditorState(
   nodes: EditorNode[],
   selection: SelectionRange,
 ) {
-  return {
+  const initialState = {
     nodes,
     selection,
     typingMarks: [],
-    nodeIdIndex: buildNodeIdxMap(nodes),
+    nodeIdIndex: new Map(),
   };
+
+  return normalizePipeline(initialState);
 }

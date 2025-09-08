@@ -78,7 +78,14 @@ export function useLocalNotesSearch(query: string) {
 export function useFirstNote() {
   const userId = useUserId();
   return useLiveQuery(
-    () => localDB.notes.where("userId").equals(userId).first(),
+    () =>
+      localDB.notes
+        .where("[userId+isFavorite+isTrashed+isArchived+createdAt]")
+        .between(
+          [userId, 0, 0, 0, Dexie.minKey],
+          [userId, 1, 0, 0, Dexie.maxKey],
+        )
+        .first(),
     [userId],
     {
       isPending: true,

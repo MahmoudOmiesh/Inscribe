@@ -258,7 +258,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar, open } = useSidebar();
+  const { toggleSidebar, open, openMobile, isMobile } = useSidebar();
 
   return (
     <Button
@@ -266,14 +266,54 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("bg-muted/70 size-8", className)}
+      className={cn("bg-muted/70 size-8", openMobile && "hidden", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      {open ? <ChevronsLeft /> : <ChevronsRight />}
+      {isMobile ? (
+        openMobile ? (
+          <ChevronsLeft />
+        ) : (
+          <ChevronsRight />
+        )
+      ) : open ? (
+        <ChevronsLeft />
+      ) : (
+        <ChevronsRight />
+      )}
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  );
+}
+
+function SidebarTriggerMobile({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { toggleSidebar, openMobile } = useSidebar();
+
+  return (
+    <Button
+      data-sidebar="trigger"
+      data-slot="sidebar-trigger"
+      variant="ghost"
+      size="icon"
+      className={cn(
+        "bg-muted/70 hidden size-8",
+        openMobile && "flex",
+        className,
+      )}
+      onClick={(event) => {
+        onClick?.(event);
+        toggleSidebar();
+      }}
+      {...props}
+    >
+      {openMobile ? <ChevronsLeft /> : <ChevronsRight />}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
@@ -480,7 +520,7 @@ const sidebarMenuButtonVariants = cva(
       variant: {
         default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "bg-sidebar shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_var(--sidebar-accent)]",
       },
       size: {
         default: "h-8 text-sm",
@@ -722,5 +762,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarTriggerMobile,
   useSidebar,
 };

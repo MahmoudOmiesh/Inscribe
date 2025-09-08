@@ -7,7 +7,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 import { FileIcon, StarIcon, ArchiveIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { NotesSidebarFolders } from "./sections/folders/notes-sidebar-folders";
@@ -58,10 +57,7 @@ export function NotesSidebarSections() {
                 <SidebarMenuButton
                   isActive={activeSection === section.code}
                   onClick={() => setActiveSection(section.code)}
-                  className={cn(
-                    activeSection === section.code &&
-                      "inset-shadow-[-8px_0px_8px_-8px_var(--color-primary)]",
-                  )}
+                  className="data-[active=true]:font-normal data-[active=true]:inset-shadow-[-8px_0px_8px_-8px_var(--color-primary)]"
                 >
                   {section.icon} {section.label}
                 </SidebarMenuButton>

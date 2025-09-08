@@ -10,7 +10,6 @@ import { NoteFavorite } from "./note-favorite";
 import { useNoteEditor } from "../note-editor-context";
 import { NoteHeaderDropdown } from "./note-header-dropdown";
 import { NoteLock } from "./note-lock";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NoteHeaderDrawer } from "./note-header-drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useIsOnline } from "@/hooks/use-is-online";
@@ -26,9 +25,8 @@ export function NoteHeader() {
   const isOffline = !useIsOnline();
 
   return (
-    <header className="bg-background flex flex-row items-center justify-between px-4 py-3 text-sm sm:py-2">
+    <header className="bg-background flex flex-row items-center justify-between py-3 pr-4 pl-15 text-sm sm:py-2">
       <div className="flex flex-row items-center gap-4">
-        <SidebarTrigger />
         <NoteBreadcrumb />
         {note.locked && <NoteLock />}
         {isOffline && <NoteOffline />}
