@@ -57,7 +57,7 @@ export function NotesSidebarSections() {
                 <SidebarMenuButton
                   isActive={activeSection === section.code}
                   onClick={() => setActiveSection(section.code)}
-                  className="data-[active=true]:font-normal data-[active=true]:inset-shadow-[-8px_0px_8px_-8px_var(--color-primary)]"
+                  className="data-[active=true]:font-normal"
                 >
                   {section.icon} {section.label}
                 </SidebarMenuButton>

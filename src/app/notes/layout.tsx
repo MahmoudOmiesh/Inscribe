@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserProvider } from "./_components/user-context";
 import { SyncHandler } from "./_components/sync-handler";
+import { NotesEditorContextWrapper } from "./_components/notes-editor-context-wrapper";
 
 export default async function Layout({
   children,
@@ -27,7 +28,7 @@ export default async function Layout({
             <NotesSidebar />
             <div className="relative flex flex-1 flex-col">
               <SidebarTrigger className="bg-muted absolute top-0 left-4 z-12 mt-3.5 size-8 sm:mt-2.5" />
-              {children}
+              <NotesEditorContextWrapper>{children}</NotesEditorContextWrapper>
             </div>
           </SyncHandler>
         </UserProvider>

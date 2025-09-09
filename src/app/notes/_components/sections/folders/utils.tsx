@@ -37,46 +37,38 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { FolderInsertSchema, type FolderInsert } from "@/lib/schema/folder";
-import {
-  deleteLocalFolder,
-  updateLocalFolder,
-} from "@/local/mutations/folders";
+import { deleteLocalFolder } from "@/local/mutations/folders";
 import type { LocalFolder } from "@/local/schema/folder";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { FolderPenIcon, SaveIcon, Trash2Icon } from "lucide-react";
+import { FolderPenIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Form } from "@/components/ui/form";
 import { useUserId } from "../../user-context";
 import { useForm } from "react-hook-form";
+import { useClickOutside } from "@/hooks/use-click-outside";
 
 export function FolderMoreDropdown({
   folder,
   children,
+  onRename,
   ...props
 }: React.ComponentProps<typeof DropdownMenuContent> & {
+  onRename: () => void;
   folder: LocalFolder;
   children: React.ReactNode;
 }) {
-  const userId = useUserId();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const updateFolder = useMutation({
-    mutationFn: updateLocalFolder,
-    onMutate: () => setIsDropdownOpen(false),
-    meta: {
-      toastOnError: "Failed to rename folder. Please try again.",
-    },
-    networkMode: "always",
-  });
-
-  useEffect(() => {
-    if (!isDropdownOpen) {
-      setTimeout(() => setIsFormOpen(false), 200);
-    }
-  }, [isDropdownOpen]);
+  // const updateFolder = useMutation({
+  //   mutationFn: updateLocalFolder,
+  //   onMutate: () => setIsDropdownOpen(false),
+  //   meta: {
+  //     toastOnError: "Failed to rename folder. Please try again.",
+  //   },
+  //   networkMode: "always",
+  // });
 
   return (
     <>
@@ -88,38 +80,22 @@ export function FolderMoreDropdown({
           hidden={isDeleteDialogOpen}
           className="min-w-[200px]"
         >
-          {isFormOpen ? (
-            <FolderForm
-              defaultValues={{ name: folder.name, emoji: folder.emoji }}
-              onSubmit={(data) =>
-                updateFolder.mutate({ folderId: folder.id, userId, data })
-              }
-            />
-          ) : (
-            <>
-              <DropdownMenuLabel className="text-muted-foreground pt-1 text-xs font-medium">
-                Folder
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsFormOpen(true);
-                }}
-              >
-                <FolderPenIcon /> Rename Folder
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive-hover"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setIsDeleteDialogOpen(true);
-                  setIsDropdownOpen(false);
-                }}
-              >
-                <Trash2Icon /> Delete Permanently
-              </DropdownMenuItem>
-            </>
-          )}
+          <DropdownMenuLabel className="text-muted-foreground pt-1 text-xs font-medium">
+            Folder
+          </DropdownMenuLabel>
+          <DropdownMenuItem onClick={onRename}>
+            <FolderPenIcon /> Rename Folder
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            variant="destructive-hover"
+            onSelect={(e) => {
+              e.preventDefault();
+              setIsDeleteDialogOpen(true);
+              setIsDropdownOpen(false);
+            }}
+          >
+            <Trash2Icon /> Delete Permanently
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -194,71 +170,67 @@ export function FolderForm({
   });
 
   const emoji = form.watch("emoji");
+  const formRef = useClickOutside<HTMLFormElement>((form) => {
+    form.requestSubmit();
+  });
+
+  const { setFocus } = form;
+  useEffect(() => {
+    setFocus("name", {
+      shouldSelect: true,
+    });
+  }, [setFocus]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex gap-2">
-          <div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="sr-only">Folder Name</FormLabel>
-                  <div className="flex items-stretch gap-1">
-                    <Popover
-                      open={isEmojiPickerOpen}
-                      onOpenChange={setIsEmojiPickerOpen}
-                      modal={true}
+      <form onSubmit={form.handleSubmit(onSubmit)} ref={formRef}>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="sr-only">Folder Name</FormLabel>
+              <div className="mb-0.5 flex items-center px-2 py-0.5">
+                <Popover
+                  open={isEmojiPickerOpen}
+                  onOpenChange={setIsEmojiPickerOpen}
+                  modal={true}
+                >
+                  <PopoverTrigger asChild>
+                    <div className="flex size-4 cursor-pointer items-center justify-center transition-transform duration-100 hover:scale-110">
+                      {emoji}
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-fit p-0"
+                    side="top"
+                    align="start"
+                  >
+                    <EmojiPicker
+                      className="h-[342px]"
+                      onEmojiSelect={({ emoji }) => {
+                        form.setValue("emoji", emoji);
+                        setIsEmojiPickerOpen(false);
+                      }}
                     >
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="size-8 rounded-xs"
-                          onClick={() => setIsEmojiPickerOpen(true)}
-                        >
-                          {emoji}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-fit p-0"
-                        side="top"
-                        align="start"
-                      >
-                        <EmojiPicker
-                          className="h-[342px]"
-                          onEmojiSelect={({ emoji }) => {
-                            form.setValue("emoji", emoji);
-                            setIsEmojiPickerOpen(false);
-                          }}
-                        >
-                          <EmojiPickerSearch />
-                          <EmojiPickerContent />
-                          <EmojiPickerFooter />
-                        </EmojiPicker>
-                      </PopoverContent>
-                    </Popover>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter Folder Name"
-                        autoFocus
-                        className="focus-visible:border-border h-auto w-full flex-1 rounded-xs focus-visible:ring-0"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <Button type="submit" size="icon" className="size-8 rounded-xs">
-            <SaveIcon />
-          </Button>
-        </div>
+                      <EmojiPickerSearch />
+                      <EmojiPickerContent />
+                      <EmojiPickerFooter />
+                    </EmojiPicker>
+                  </PopoverContent>
+                </Popover>
+                <FormControl>
+                  <Input
+                    placeholder="Enter Folder Name"
+                    className="h-fit w-full flex-1 rounded-sm border-0 bg-transparent px-2 py-1 shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );

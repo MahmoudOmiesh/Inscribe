@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { useNoteEditor } from "../note-editor-context";
 import { Trash2Icon, Undo2Icon } from "lucide-react";

@@ -4,13 +4,11 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useLocalFolder } from "@/local/queries/folders";
 import { ArchiveIcon, Trash2Icon } from "lucide-react";
 import { useNoteEditor } from "../note-editor-context";
 
 export function NoteBreadcrumb() {
   const { note } = useNoteEditor();
-  const folder = useLocalFolder(note.folderId);
 
   return (
     <Breadcrumb>
@@ -29,7 +27,7 @@ export function NoteBreadcrumb() {
               </>
             ) : (
               <>
-                {folder?.emoji} {folder?.name}
+                {note.folderEmoji} {note.folderName}
               </>
             )}
           </span>

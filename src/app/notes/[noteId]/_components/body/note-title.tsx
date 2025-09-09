@@ -34,8 +34,8 @@ export function NoteTitle() {
 
   return (
     <Textarea
-      defaultValue={note.title}
-      onInput={handleTitleChange}
+      value={note.title}
+      onChange={handleTitleChange}
       onKeyDown={handleKeyDown}
       placeholder="New Note"
       className={cn(

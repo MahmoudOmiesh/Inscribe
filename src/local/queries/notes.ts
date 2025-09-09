@@ -4,9 +4,33 @@ import { useUserId } from "@/app/notes/_components/user-context";
 import Dexie from "dexie";
 
 export function useLocalNote(noteId: string) {
-  return useLiveQuery(() => localDB.notes.get(noteId), [noteId], {
-    isPending: true,
-  });
+  return useLiveQuery(
+    () => {
+      return localDB.transaction(
+        "r",
+        [localDB.notes, localDB.folders],
+        async () => {
+          const note = await localDB.notes.get(noteId);
+          if (!note) return undefined;
+
+          const folder = await localDB.folders.get(note.folderId);
+          if (!folder) return undefined;
+
+          // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          return {
+            ...note,
+            folderName: folder.name,
+            folderEmoji: folder.emoji,
+          };
+        },
+      );
+    },
+    [noteId],
+    {
+      isPending: true,
+    },
+  );
 }
 
 export function useLocalNoteFavorites() {

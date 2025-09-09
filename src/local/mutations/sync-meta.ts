@@ -12,6 +12,7 @@ export function setLastPulledAt(userId: string, lastPulledAt: number) {
   });
 }
 
+// TODO: should do the same thing I did in notes here too
 export async function updateFoldersFromPull(
   folders: RouterOutputs["sync"]["pull"]["folders"],
 ) {
