@@ -18,9 +18,10 @@ export const Separator = memo(
         ref={setReference}
         contentEditable={false}
         data-node-id={node.id}
-        className="my-[var(--editor-separator-my)] py-[var(--editor-separator-py)]"
+        tabIndex={-1}
+        className="my-[var(--editor-separator-my)] py-[var(--editor-separator-py)] select-none"
       >
-        <hr />
+        <hr contentEditable={false} />
       </div>
     );
   },

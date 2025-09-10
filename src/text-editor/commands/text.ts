@@ -20,7 +20,9 @@ export function streamText(
   text: string,
   marks?: Mark[],
 ) {
-  if (text.length === 0) return null;
+  // we allow empty text to be streamed
+  // because it's useful to stream empty text to clear the node
+  // if I discard the ai prompt
   return new Transaction(state).add(streamTextStep(nodeId, text, marks));
 }
 

@@ -5,22 +5,17 @@ import {
   useHover,
   safePolygon,
   useInteractions,
-  useDismiss,
   flip,
 } from "@floating-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useNodeModifier() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isInteracting, setIsInteracting] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
-    onOpenChange: (next) => {
-      if (!isInteracting) {
-        setIsOpen(next);
-      }
-    },
+    onOpenChange: setIsOpen,
     placement: "left",
     // Make sure the tooltip stays on the screen
     whileElementsMounted: autoUpdate,
@@ -29,22 +24,20 @@ export function useNodeModifier() {
 
   // Event listeners to change the open state
   const hover = useHover(context, {
+    enabled: !isMenuOpen,
     move: false,
     handleClose: safePolygon(),
-    delay: {
-      open: 200,
-      close: 0,
-    },
-  });
-  const dismiss = useDismiss(context, {
-    outsidePress: () => !isInteracting,
   });
 
-  // Merge all the interactions into prop getters
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    dismiss,
-  ]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 50);
+    }
+  }, [isMenuOpen]);
 
   return {
     isOpen,
@@ -52,6 +45,6 @@ export function useNodeModifier() {
     floatingStyles,
     getReferenceProps,
     getFloatingProps,
-    setIsInteracting,
+    setIsMenuOpen,
   };
 }

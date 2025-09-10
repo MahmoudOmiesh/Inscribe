@@ -253,7 +253,7 @@ export function Editor() {
 
   return (
     <div className="isolate -mt-16 md:-mt-24">
-      <MaxWidthWrapper className="relative h-[600px] max-w-5xl rounded-xl">
+      <MaxWidthWrapper className="relative h-[600px] rounded-xl">
         <div className="from-primary/50 absolute inset-1.5 hidden rounded-xl bg-gradient-to-b to-transparent blur-lg lg:block"></div>
         <div className="bg-card relative z-10 h-full rounded-[calc(var(--radius)+4px-var(--spacing))] border">
           <div className="flex items-center justify-between border-b px-5 py-1">
@@ -280,7 +280,7 @@ export function Editor() {
               </Button>
             </div>
           </div>
-          <ScrollArea className="h-[530px]">
+          <ScrollArea className="h-[530px] overflow-hidden">
             <div className="mx-auto max-w-3xl p-1 py-6 sm:p-2 sm:py-8">
               <TextEditor
                 editor={editor}

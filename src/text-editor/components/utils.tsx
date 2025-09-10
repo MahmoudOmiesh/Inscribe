@@ -100,7 +100,7 @@ export function alignmentToCss(alignment: Alignment) {
 }
 
 export function placeholderToCss() {
-  return `after:text-muted-foreground relative after:pointer-events-none after:absolute after:top-0 after:left-0 after:h-full after:w-full after:content-[attr(data-placeholder)] after:[font:inherit]`;
+  return `after:user-select-none after:text-muted-foreground relative after:pointer-events-none after:absolute after:top-0 after:left-0 after:h-full after:w-full after:content-[attr(data-placeholder)] after:[font:inherit]`;
 }
 
 export function getPlaceholderText(nodeType: BlockType) {

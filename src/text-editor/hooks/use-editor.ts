@@ -21,6 +21,7 @@ import {
 } from "../model/selection";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { useThrottleCallback } from "@/hooks/use-throttle-callback";
+import { isTargetNoIntercept } from "../input/editor-input-handler";
 
 export function useEditor(initialNodes?: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -144,7 +145,12 @@ export function useEditor(initialNodes?: EditorNode[]) {
 
   // Sync DOM selection after state changes
   useEffect(() => {
-    // console.log("editorState.nodes", editorState.nodes);
+    const activeEl = document.activeElement as HTMLElement | null;
+    if (isTargetNoIntercept(activeEl)) {
+      // don't change the selection if input/textarea/contenteditable=false is focused
+      return;
+    }
+
     setSelectionRange(editorState.selection);
   }, [editorState.selection, editorState.nodes]);
 

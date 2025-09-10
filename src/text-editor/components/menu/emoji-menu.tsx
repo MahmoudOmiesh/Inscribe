@@ -71,12 +71,16 @@ export function EmojiMenu({
         getClientRects: () => range.getClientRects(),
       });
       setIsPositioned(true);
-
-      requestAnimationFrame(() => {
-        inputRef.current?.focus();
-      });
     });
   }, [refs, isOpen, setIsOpen]);
+
+  useEffect(() => {
+    if (isOpen && isPositioned) {
+      inputRef.current?.focus({
+        preventScroll: true,
+      });
+    }
+  }, [isOpen, isPositioned]);
 
   function executeCommand(emoji: string) {
     if (!rangeRef.current) return;

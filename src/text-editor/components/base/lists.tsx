@@ -237,11 +237,12 @@ export const CheckListItem = memo(
           alignmentToCss(node.alignment),
         )}
       >
-        <label contentEditable={false} className="relative h-fit w-fit pt-0.5">
+        <label contentEditable={false} className="relative mt-[5px] size-4">
           <Checkbox
             checked={node.checked}
             onCheckedChange={() => toggleCheckbox(node.id)}
-            className="cursor-pointer select-none"
+            contentEditable={false}
+            className="absolute inset-0"
           />
         </label>
         <div className="min-w-0 flex-1">

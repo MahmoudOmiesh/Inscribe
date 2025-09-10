@@ -113,12 +113,16 @@ export function CommandMenu({
         getClientRects: () => range.getClientRects(),
       });
       setIsPositioned(true);
-
-      requestAnimationFrame(() => {
-        inputRef.current?.focus();
-      });
     });
   }, [refs, isOpen, setIsOpen]);
+
+  useEffect(() => {
+    if (isOpen && isPositioned) {
+      inputRef.current?.focus({
+        preventScroll: true,
+      });
+    }
+  }, [isOpen, isPositioned]);
 
   function executeCommand(index?: number) {
     const commandIndex = index ?? activeCommandIndex;

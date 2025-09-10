@@ -31,7 +31,9 @@ export function useAI() {
     ],
   });
 
-  const dismiss = useDismiss(context);
+  const dismiss = useDismiss(context, {
+    referencePress: true,
+  });
 
   // Merge all the interactions into prop getters
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);

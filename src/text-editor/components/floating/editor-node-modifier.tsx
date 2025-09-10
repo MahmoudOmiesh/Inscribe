@@ -3,7 +3,6 @@ import type { useEditorActions } from "../../hooks/use-editor-actions";
 import { TEXT_BLOCK_TYPES, type BlockType } from "../../model/schema";
 import {
   ArrowRightLeftIcon,
-  ChevronRightIcon,
   ClipboardIcon,
   CopyIcon,
   GripVerticalIcon,
@@ -12,191 +11,150 @@ import {
   SparklesIcon,
   TrashIcon,
 } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { renderBlockIcon, renderBlockLabel } from "../utils";
-import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 export function EditorNodeModifier({
   nodeId,
   actions,
   activeBlock,
-  onFloatingInteraction,
+  setIsMenuOpen,
   openAiPrompt,
 }: {
   nodeId: string;
   activeBlock: BlockType;
   actions: ReturnType<typeof useEditorActions>;
-  onFloatingInteraction: (open: boolean) => void;
+  setIsMenuOpen: (open: boolean) => void;
   openAiPrompt: () => void;
 }) {
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [turnIntoOpen, setTurnIntoOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const isSeparator = activeBlock === "separator";
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className={cn(
+        "flex items-center gap-2",
+        isDropdownOpen && "pointer-events-none",
+      )}
+    >
       <Button
         variant="ghost"
         size="icon"
+        className="size-6"
         onClick={() => actions.insertNodeAfter(nodeId)}
       >
         <PlusIcon />
       </Button>
-      <Popover
-        open={isPopoverOpen}
+      <DropdownMenu
+        modal={false}
+        open={isDropdownOpen}
         onOpenChange={(open) => {
-          onFloatingInteraction(open);
-          setIsPopoverOpen(open);
+          setIsDropdownOpen(open);
+          setIsMenuOpen(open);
         }}
       >
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon">
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="size-6">
             <GripVerticalIcon />
           </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          side="left"
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          side="right"
+          sideOffset={8}
           align="center"
-          className="bg-background w-fit p-1"
+          className="bg-background min-w-[210px] p-1"
         >
-          <div className="px-2 py-1.5 text-xs font-medium">
+          <DropdownMenuLabel className="text-xs">
             {renderBlockLabel(activeBlock)}
-          </div>
+          </DropdownMenuLabel>
           {!isSeparator && (
             <>
-              <ul>
-                <li>
-                  <Popover open={turnIntoOpen} onOpenChange={setTurnIntoOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={cn(
-                          "w-full justify-start",
-                          turnIntoOpen && "bg-accent dark:bg-accent/50",
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
-                        onMouseEnter={() => setTurnIntoOpen((o) => !o)}
+              <DropdownMenuGroup>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <ArrowRightLeftIcon className="text-muted-foreground size-4" />{" "}
+                    Turn Into
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="bg-background space-y-1">
+                    <DropdownMenuLabel className="text-xs">
+                      Turn Into
+                    </DropdownMenuLabel>
+                    {TEXT_BLOCK_TYPES.map((type) => (
+                      <DropdownMenuItem
+                        key={type}
+                        variant={type === activeBlock ? "primary" : "default"}
+                        onClick={() => actions.changeNodeType(nodeId, type)}
                       >
-                        <span className="flex items-center gap-1">
-                          <ArrowRightLeftIcon /> Turn Into
-                        </span>
-                        <ChevronRightIcon className="ml-auto" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      side="right"
-                      align="center"
-                      className="bg-background w-fit p-1"
-                      sideOffset={8}
-                    >
-                      <div className="px-2 py-1.5 text-xs font-medium">
-                        Turn Into
-                      </div>
-                      <ul>
-                        {TEXT_BLOCK_TYPES.map((type) => (
-                          <li key={type}>
-                            <Button
-                              variant={
-                                type === activeBlock ? "default" : "ghost"
-                              }
-                              size="sm"
-                              className="w-full justify-start"
-                              onClick={() =>
-                                actions.changeNodeType(nodeId, type)
-                              }
-                            >
-                              {renderBlockIcon(type)}
-                              {renderBlockLabel(type)}
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    </PopoverContent>
-                  </Popover>
-                </li>
-                <li>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => actions.resetFormatting(nodeId)}
-                  >
-                    <RotateCcwIcon /> Reset Formatting
-                  </Button>
-                </li>
-              </ul>
-              <Separator className="my-2" />
+                        {renderBlockIcon(type)}
+                        {renderBlockLabel(type)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem
+                  onClick={() => actions.resetFormatting(nodeId)}
+                >
+                  <RotateCcwIcon className="text-muted-foreground size-4" />{" "}
+                  Reset Formatting
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
             </>
           )}
-          <ul>
-            <li>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                size="sm"
-                onClick={() => actions.duplicateNode(nodeId)}
-              >
-                <CopyIcon /> Duplicate Node
-              </Button>
-            </li>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => actions.duplicateNode(nodeId)}>
+              <CopyIcon className="text-muted-foreground size-4" /> Duplicate
+              Node
+            </DropdownMenuItem>
             {!isSeparator && (
-              <li>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  size="sm"
-                >
-                  <ClipboardIcon /> Copy to Clipboard
-                </Button>
-              </li>
+              <DropdownMenuItem>
+                <ClipboardIcon className="text-muted-foreground size-4" /> Copy
+                to Clipboard
+              </DropdownMenuItem>
             )}
-          </ul>
+          </DropdownMenuGroup>
+
           {!isSeparator && (
             <>
-              <Separator className="my-2" />
-              <ul>
-                <li>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    size="sm"
-                    onClick={() => {
-                      openAiPrompt();
-                      setIsPopoverOpen(false);
-                    }}
-                  >
-                    <SparklesIcon /> Ask AI
-                  </Button>
-                </li>
-              </ul>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => {
+                    openAiPrompt();
+                  }}
+                >
+                  <SparklesIcon className="text-muted-foreground size-4" /> Ask
+                  AI
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
             </>
           )}
-          <Separator className="my-2" />
-          <ul>
-            <li>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                size="sm"
-                onClick={() => actions.deleteNode(nodeId)}
-              >
-                <TrashIcon /> Delete
-              </Button>
-            </li>
-          </ul>
-        </PopoverContent>
-      </Popover>
+
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              variant="destructive-hover"
+              onClick={() => actions.deleteNode(nodeId)}
+            >
+              <TrashIcon className="text-muted-foreground size-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

@@ -34,9 +34,7 @@ export function EditorAIPrompt({
   const originalMarks = useRef(nodeMarks);
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
+    textareaRef.current?.focus({ preventScroll: true });
   }, []);
 
   function onStop() {
@@ -113,10 +111,17 @@ export function EditorAIPrompt({
             }
             ref={textareaRef}
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onBeforeInput={(e) => {
+              e.stopPropagation();
+            }}
+            onChange={(e) => {
+              e.stopPropagation();
+              setPrompt(e.target.value);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
+                e.stopPropagation();
                 formRef.current?.requestSubmit();
               }
             }}

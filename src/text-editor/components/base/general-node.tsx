@@ -1,10 +1,9 @@
-import { memo, type ComponentProps, type RefObject } from "react";
+import { memo, type ComponentProps } from "react";
 import { Heading } from "./headings";
 import { CheckList, OrderedList, UnorderedList } from "./lists";
 import { Paragraph } from "./paragraph";
 
 import {
-  FloatingPortal,
   type ExtendedRefs,
   type UseInteractionsReturn,
 } from "@floating-ui/react";
@@ -83,13 +82,15 @@ type GeneralNodeProps = (
 };
 
 export const GeneralNode = memo((props: GeneralNodeProps) => {
+  const { locked } = useOptionContext();
+
   const {
     isOpen: isNodeModifierOpen,
     refs: nodeModifierRefs,
     floatingStyles: nodeModifierFloatingStyles,
     getReferenceProps: nodeModifierGetReferenceProps,
     getFloatingProps: nodeModifierGetFloatingProps,
-    setIsInteracting: setIsNodeModifierInteracting,
+    setIsMenuOpen,
   } = useNodeModifier();
 
   const {
@@ -99,8 +100,6 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
     floatingStyles: aiFloatingStyles,
     getFloatingProps: aiGetFloatingProps,
   } = useAI();
-
-  const { locked } = useOptionContext();
 
   if (aiRefs.reference.current !== nodeModifierRefs.reference.current) {
     aiRefs.setReference(nodeModifierRefs.reference.current);
@@ -117,43 +116,41 @@ export const GeneralNode = memo((props: GeneralNodeProps) => {
         nodeModifierGetReferenceProps,
       )}
       {showNodeModifier && (
-        <FloatingPortal
-          root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
+        <div
+          ref={nodeModifierRefs.setFloating}
+          style={{
+            ...nodeModifierFloatingStyles,
+            userSelect: "none",
+          }}
+          {...nodeModifierGetFloatingProps()}
+          contentEditable={false}
+          className="z-[1000]"
         >
-          <div
-            ref={nodeModifierRefs.setFloating}
-            style={nodeModifierFloatingStyles}
-            {...nodeModifierGetFloatingProps()}
-          >
-            <EditorNodeModifier
-              nodeId={getNodeId(props)}
-              activeBlock={getActiveBlock(props)}
-              actions={props.actions}
-              onFloatingInteraction={setIsNodeModifierInteracting}
-              openAiPrompt={() => setIsAIOpen(true)}
-            />
-          </div>
-        </FloatingPortal>
+          <EditorNodeModifier
+            nodeId={getNodeId(props)}
+            activeBlock={getActiveBlock(props)}
+            actions={props.actions}
+            setIsMenuOpen={setIsMenuOpen}
+            openAiPrompt={() => setIsAIOpen(true)}
+          />
+        </div>
       )}
       {showAIPrompt && (
-        <FloatingPortal
-        // TODO: can't seem to to be able to write in the ai prompt when the root is the node modifier refs
-        // root={nodeModifierRefs.domReference as RefObject<HTMLElement | null>}
+        <div
+          ref={aiRefs.setFloating}
+          style={aiFloatingStyles}
+          {...aiGetFloatingProps()}
+          contentEditable={false}
+          className="z-[1000]"
         >
-          <div
-            ref={aiRefs.setFloating}
-            style={aiFloatingStyles}
-            {...aiGetFloatingProps()}
-          >
-            <EditorAIPrompt
-              nodeId={getNodeId(props)}
-              nodeText={getNodeText(props)}
-              nodeMarks={getNodeMarks(props)}
-              actions={props.actions}
-              closeAiPrompt={() => setIsAIOpen(false)}
-            />
-          </div>
-        </FloatingPortal>
+          <EditorAIPrompt
+            nodeId={getNodeId(props)}
+            nodeText={getNodeText(props)}
+            nodeMarks={getNodeMarks(props)}
+            actions={props.actions}
+            closeAiPrompt={() => setIsAIOpen(false)}
+          />
+        </div>
       )}
     </>
   );

@@ -5,32 +5,25 @@ export function getSelectionRange(): SelectionRange | null {
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) return null;
 
-  const anchor = selection.anchorNode
-    ? domToCaretPosition(selection.anchorNode, selection.anchorOffset)
-    : null;
-  const focus = selection.focusNode
-    ? domToCaretPosition(selection.focusNode, selection.focusOffset)
-    : null;
+  const range = selection.getRangeAt(0);
 
-  if (!anchor || !focus) return null;
-  const isCollapsed = isRangeCollapsed(anchor, focus);
+  const start = domToCaretPosition(
+    range.startContainer,
+    range.startOffset,
+    true,
+  );
+  const end = domToCaretPosition(range.endContainer, range.endOffset, false);
 
-  if (selection.direction === "backward") {
-    return {
-      start: focus,
-      end: anchor,
-      isCollapsed,
-    };
-  }
+  if (!start || !end) return null;
 
   return {
-    start: anchor,
-    end: focus,
-    isCollapsed,
+    start,
+    end,
+    isCollapsed: isRangeCollapsed(start, end),
   };
 }
 
-function domToCaretPosition(node: Node, offset: number) {
+function domToCaretPosition(node: Node, offset: number, isStart: boolean) {
   let element =
     node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element);
 
@@ -38,46 +31,42 @@ function domToCaretPosition(node: Node, offset: number) {
     element = element.parentElement;
   }
 
-  let editorNode = element?.closest("[data-node-id]");
+  if (element && (element as HTMLElement).dataset?.textEditorRoot) {
+    const root = element as HTMLElement;
+    const nodes = root.querySelectorAll("[data-node-id]");
+    if (nodes.length === 0) return null;
 
-  if (!editorNode) {
-    if (
-      element &&
-      element.tagName === "DIV" &&
-      (element as HTMLElement).dataset.textEditorRoot
-    ) {
-      editorNode = element.querySelector("[data-node-id]");
-    }
-    if (!editorNode) {
-      return null;
-    }
+    const node = isStart ? nodes[0]! : nodes[nodes.length - 1]!;
+    const nodeId = node.getAttribute("data-node-id")!;
+    const offset = isStart ? 0 : elementTextLength(node);
+
+    return {
+      nodeId,
+      offset,
+    };
   }
 
+  const editorNode = element?.closest("[data-node-id]");
+  if (!editorNode) return null;
+
   const nodeId = editorNode.getAttribute("data-node-id")!;
-  const walker = document.createTreeWalker(
-    editorNode,
-    NodeFilter.SHOW_TEXT,
-    null,
-  );
 
-  let currentOffset = 0;
-  let textNode = walker.nextNode() as Text | null;
+  if (editorNode.contains(node)) {
+    const range = document.createRange();
+    range.setStart(editorNode, 0);
+    range.setEnd(node, offset);
 
-  while (textNode) {
-    if (textNode === node) {
-      return {
-        nodeId,
-        offset: currentOffset + offset,
-      };
-    }
+    const text = range.toString();
 
-    currentOffset += textNode.data.length;
-    textNode = walker.nextNode() as Text | null;
+    return {
+      nodeId,
+      offset: text.length,
+    };
   }
 
   return {
     nodeId,
-    offset: 0,
+    offset: isStart ? 0 : elementTextLength(editorNode),
   };
 }
 
@@ -121,10 +110,40 @@ function caretPositionToDom(position: CaretPosition) {
     text = walker.nextNode() as Text | null;
   }
 
+  const lastTextNode = getLastTextNode(nodeElement);
+  if (lastTextNode) {
+    return {
+      node: lastTextNode,
+      offset: lastTextNode.data.length,
+    };
+  }
+
   return {
     node: nodeElement,
     offset: 0,
   };
+}
+
+function getLastTextNode(el: Element) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+  let last: Text | null = null;
+  let text = walker.nextNode() as Text | null;
+  while (text) {
+    last = text;
+    text = walker.nextNode() as Text | null;
+  }
+  return last;
+}
+
+function elementTextLength(el: Element) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+  let text = walker.nextNode() as Text | null;
+  let currentOffset = 0;
+  while (text) {
+    currentOffset += text.data.length;
+    text = walker.nextNode() as Text | null;
+  }
+  return currentOffset;
 }
 
 function isRangeCollapsed(start: CaretPosition, end: CaretPosition) {

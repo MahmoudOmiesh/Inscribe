@@ -31,6 +31,15 @@ export function EditorInputHandler({
   const onBeforeInput = useCallback(
     (e: InputEvent) => {
       const { inputType, data, dataTransfer } = e;
+      const target = e.target as HTMLElement | null;
+
+      if (isTargetNoIntercept(target)) {
+        // don't intercept input events from input/textarea/contenteditable=false
+        // to make sure we can type in input/textarea/contenteditable=false
+        // i.e when typing in the ai prompt
+        return;
+      }
+
       e.preventDefault();
 
       switch (inputType) {
@@ -141,6 +150,11 @@ export function EditorInputHandler({
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (isTargetNoIntercept(target)) {
+        return;
+      }
+
       handleKeyDown(e, actions, undo, redo);
     },
     [actions, undo, redo],
@@ -175,5 +189,13 @@ export function EditorInputHandler({
         />
       )}
     </>
+  );
+}
+
+export function isTargetNoIntercept(target: HTMLElement | null) {
+  return (
+    target?.tagName === "TEXTAREA" ||
+    target?.tagName === "INPUT" ||
+    target?.getAttribute("contenteditable") === "false"
   );
 }
