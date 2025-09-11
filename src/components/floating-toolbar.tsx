@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   useFloating,
   useDismiss,
@@ -6,6 +7,7 @@ import {
   inline,
   autoUpdate,
   offset,
+  FloatingPortal,
 } from "@floating-ui/react";
 import { useEffect, useState } from "react";
 
@@ -16,7 +18,10 @@ export function FloatingToolbar({
   containerRef: React.RefObject<HTMLDivElement | null>;
   children: React.ReactNode;
 }) {
+  const [bottomOffset, setBottomOffset] = useState(0);
+
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const { refs, floatingStyles, context } = useFloating({
     placement: "top",
@@ -26,9 +31,44 @@ export function FloatingToolbar({
     whileElementsMounted: autoUpdate,
   });
 
-  const dismiss = useDismiss(context);
+  const dismiss = useDismiss(context, {
+    enabled: !isMobile,
+  });
 
   const { getFloatingProps } = useInteractions([dismiss]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setBottomOffset(0);
+      return;
+    }
+
+    const vv = window.visualViewport;
+    function update() {
+      if (!vv) {
+        setBottomOffset(0);
+        return;
+      }
+
+      const overlap = Math.max(
+        0,
+        window.innerHeight - (vv.offsetTop + vv.height),
+      );
+      setBottomOffset(overlap);
+    }
+
+    update();
+
+    vv?.addEventListener("resize", update);
+    vv?.addEventListener("scroll", update);
+    window?.addEventListener("orientationchange", update);
+
+    return () => {
+      vv?.removeEventListener("resize", update);
+      vv?.removeEventListener("scroll", update);
+      window?.removeEventListener("orientationchange", update);
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     function handleRange() {
@@ -60,15 +100,7 @@ export function FloatingToolbar({
       });
     }
 
-    function handleMouseUp(event: MouseEvent) {
-      if (refs.floating.current?.contains(event.target as Element | null)) {
-        return;
-      }
-
-      handleRange();
-    }
-
-    function handleMouseDown(event: MouseEvent) {
+    function handleStart(event: MouseEvent | TouchEvent) {
       if (refs.floating.current?.contains(event.target as Element | null)) {
         return;
       }
@@ -78,7 +110,7 @@ export function FloatingToolbar({
       }
     }
 
-    function handleKeyDown(event: KeyboardEvent) {
+    function handleEnd(event: MouseEvent | TouchEvent | KeyboardEvent | Event) {
       if (refs.floating.current?.contains(event.target as Element | null)) {
         return;
       }
@@ -86,19 +118,47 @@ export function FloatingToolbar({
       handleRange();
     }
 
-    window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("keydown", handleKeyDown);
+    const container = containerRef.current;
+
+    window.addEventListener("mousedown", handleStart);
+    window.addEventListener("touchstart", handleStart);
+    window.addEventListener("keydown", handleEnd);
+    window.addEventListener("mouseup", handleEnd);
+    window.addEventListener("touchend", handleEnd);
+
+    if (isMobile) {
+      container?.addEventListener("selectstart", handleRange);
+    }
 
     return () => {
-      window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("mousedown", handleStart);
+      window.removeEventListener("touchstart", handleStart);
+      window.removeEventListener("keydown", handleEnd);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchend", handleEnd);
+
+      if (isMobile) {
+        container?.removeEventListener("selectstart", handleRange);
+      }
     };
-  }, [refs, containerRef]);
+  }, [refs, containerRef, isMobile]);
 
   return (
-    isOpen && (
+    isOpen &&
+    (isMobile ? (
+      <FloatingPortal>
+        <div
+          ref={refs.setFloating}
+          className="fixed inset-x-0 z-[1000]"
+          style={{
+            bottom: `calc(env(safe-area-inset-bottom) + ${bottomOffset}px)`,
+          }}
+          {...getFloatingProps()}
+        >
+          {children}
+        </div>
+      </FloatingPortal>
+    ) : (
       <div
         ref={refs.setFloating}
         style={floatingStyles}
@@ -107,6 +167,6 @@ export function FloatingToolbar({
       >
         {children}
       </div>
-    )
+    ))
   );
 }

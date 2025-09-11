@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from "react";
+import { Fragment, memo, type ReactNode } from "react";
 import { HIGHLIGHT_COLORS_CSS, type Mark } from "../model/schema";
 
 const MARK_PRIORITY: Record<Mark["type"], number> = {
@@ -18,92 +18,47 @@ export const MarkRenderer = memo(
       return <>{text}</>;
     }
 
-    return <>{buildMarkTree(text, marks, 0, text.length)}</>;
+    const textParts = markText(text, marks);
+
+    return (
+      <>
+        {textParts.map((part, index) => (
+          <Fragment key={`${text}-${index}`}>{part}</Fragment>
+        ))}
+      </>
+    );
   },
 );
 
 MarkRenderer.displayName = "MarkRenderer";
 
-function buildMarkTree(
-  text: string,
-  marks: Mark[],
-  start: number,
-  end: number,
-): ReactNode {
-  if (start >= end) return null;
+function markText(text: string, marks: Mark[]) {
+  let boundaries = marks.flatMap((m) => [m.start, m.end]);
+  boundaries.push(0, text.length);
+  boundaries.sort((a, b) => a - b);
+  boundaries = [...new Set(boundaries)];
 
-  // Find marks that start exactly at this position
-  const activeMarks = marks.filter(
-    (mark) => mark.start <= start && mark.end > start,
-  );
+  const textParts: ReactNode[] = [];
 
-  if (activeMarks.length === 0) {
-    // No marks starting here, find the next boundary
-    const nextBoundary = findNextStartBoundary(marks, start, end);
+  for (let i = 0; i < boundaries.length - 1; i++) {
+    const start = boundaries[i]!;
+    const end = boundaries[i + 1]!;
+    if (start >= end) continue;
 
-    if (nextBoundary === end) {
-      // No more boundaries, return the remaining text
-      return text.slice(start, end);
-    }
-
-    // Return text up to next boundary + continue from there
-    return (
-      <>
-        {text.slice(start, nextBoundary)}
-        {buildMarkTree(text, marks, nextBoundary, end)}
-      </>
+    const marksInRange = marks.filter((m) => m.start <= start && m.end >= end);
+    const sortedMarks = marksInRange.sort(
+      (a, b) => MARK_PRIORITY[b.type] - MARK_PRIORITY[a.type],
     );
-  }
 
-  // Find the mark that starts here and ends furthest
-  const longestMark = activeMarks.reduce((longest, current) => {
-    const currentLength = current.end - current.start;
-    const longestLength = longest.end - longest.start;
-    if (currentLength === longestLength) {
-      return MARK_PRIORITY[current.type] > MARK_PRIORITY[longest.type]
-        ? current
-        : longest;
+    let textPart: ReactNode = <>{text.slice(start, end)}</>;
+    for (const mark of sortedMarks) {
+      textPart = wrapWithMark(textPart, mark);
     }
-    return currentLength > longestLength ? current : longest;
-  });
 
-  // Build content for this mark
-  const markEnd = Math.min(longestMark.end, end);
-  const innerContent = buildMarkTree(
-    text,
-    marks.filter((mark) => mark !== longestMark),
-    start,
-    markEnd,
-  );
-  const wrappedContent = wrapWithMark(innerContent, longestMark);
-
-  // Continue after this mark ends
-  if (markEnd < end) {
-    return (
-      <>
-        {wrappedContent}
-        {buildMarkTree(text, marks, markEnd, end)}
-      </>
-    );
+    textParts.push(textPart);
   }
 
-  return wrappedContent;
-}
-
-function findNextStartBoundary(
-  marks: Mark[],
-  start: number,
-  end: number,
-): number {
-  let nextBoundary = end;
-
-  for (const mark of marks) {
-    if (mark.start > start && mark.start < nextBoundary) {
-      nextBoundary = mark.start;
-    }
-  }
-
-  return nextBoundary;
+  return textParts;
 }
 
 function wrapWithMark(content: ReactNode, mark: Mark): ReactNode {

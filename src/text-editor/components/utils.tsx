@@ -24,8 +24,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function renderBlockLabel(block: BlockType) {
   switch (block) {
@@ -216,8 +217,15 @@ export function EditorTooltip({
   children: ReactNode;
   tooltip: string;
 }) {
+  const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Tooltip disableHoverableContent={true}>
+    <Tooltip
+      disableHoverableContent={true}
+      open={isOpen && !isMobile}
+      onOpenChange={setIsOpen}
+    >
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent
         variant="muted"

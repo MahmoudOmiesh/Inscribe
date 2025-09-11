@@ -22,6 +22,7 @@ import {
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { useThrottleCallback } from "@/hooks/use-throttle-callback";
 import { isTargetNoIntercept } from "../input/editor-input-handler";
+import { scrollCaretIntoView } from "../input/scroll-into-view";
 
 export function useEditor(initialNodes?: EditorNode[]) {
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -152,6 +153,10 @@ export function useEditor(initialNodes?: EditorNode[]) {
     }
 
     setSelectionRange(editorState.selection);
+
+    requestAnimationFrame(() => {
+      scrollCaretIntoView(editorState.selection);
+    });
   }, [editorState.selection, editorState.nodes]);
 
   useEffect(() => {

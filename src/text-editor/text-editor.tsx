@@ -74,12 +74,6 @@ export function TextEditor({
 
 // TODO
 // - fix paste when html
-// - support for mobile phones
-// - deal with firefox bullshit
-// - switch mark rendering algorithm to simple one
-
-// - handle losing focus
-// - move undo/redo to actions
 
 // idk
 // - performance
