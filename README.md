@@ -4,8 +4,6 @@ _A modern, local-first note-taking application with AI-powered writing assistanc
 
 > **Scribble Smarter With Inscribe** - Capture ideas. Organize everything. Think clearly.
 
----
-
 ## 🌟 Overview
 
 **Inscribe** is a sophisticated note-taking application that combines the power of modern web technologies with a custom-built rich text editor. Designed with a local-first approach, it ensures your notes are always available, with seamless background synchronization when online.
@@ -18,8 +16,6 @@ _A modern, local-first note-taking application with AI-powered writing assistanc
 ⚡ **Real-Time Performance** - Optimized for speed and responsiveness  
 🎨 **Beautiful UI/UX** - Modern design with accessibility in mind  
 📱 **Cross-Platform** - Works seamlessly across all devices
-
----
 
 ## 🛠️ Technical Architecture
 
@@ -42,8 +38,6 @@ _A modern, local-first note-taking application with AI-powered writing assistanc
 - **Google AI SDK** - Contextual writing assistance
 - **Streaming Responses** - Real-time AI text generation
 - **Inline Prompts** - AI assistance directly in the editor
-
----
 
 ## 🎯 Core Features
 
@@ -85,8 +79,6 @@ a completely custom-built editor with:
 - **HTML Export**: Styled HTML with embedded CSS
 - **Preserves Formatting**: All rich text features maintained
 
----
-
 ## 🏗️ Advanced Implementation Details
 
 ### **Custom Editor Architecture**
@@ -125,8 +117,6 @@ Features:
 - **Memoization**: Strategic memoization for complex editor components
 - **Virtual Rendering**: Efficient rendering of large documents
 - **Debounced Operations**: Smart batching of user actions
-
----
 
 ## 🚀 Getting Started
 
